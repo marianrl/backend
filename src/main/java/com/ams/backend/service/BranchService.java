@@ -4,7 +4,6 @@ import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.model.Branch;
 import com.ams.backend.repository.BranchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,12 +36,10 @@ public class BranchService {
         return branchRepository.save(branch);
     }
 
-    public ResponseEntity<Void> deleteBranch(Long id) throws ResourceNotFoundException{
+    public void deleteBranch(Long id) throws ResourceNotFoundException{
         Branch branch = branchRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Branch not found for this id :: " + id));
 
         branchRepository.delete(branch);
-
-        return ResponseEntity.noContent().build();
     }
 }

@@ -55,7 +55,8 @@ public class BranchController {
     @DeleteMapping("/branch/{id}")
     public ResponseEntity<Void> deleteBranch(@PathVariable(value = "id") Long branchId)
             throws ResourceNotFoundException {
+        branchService.deleteBranch(branchId);
 
-        return branchService.deleteBranch(branchId);
+        return ResponseEntity.noContent().build();
     }
 }
