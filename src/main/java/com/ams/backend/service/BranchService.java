@@ -3,11 +3,15 @@ package com.ams.backend.service;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.model.Branch;
 import com.ams.backend.repository.BranchRepository;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Service
 public class BranchService {
 
@@ -32,14 +36,15 @@ public class BranchService {
                 .orElseThrow(() -> new ResourceNotFoundException("Branch not found for this id :: " + id));
 
         branch.setBranch(providedBranch.getBranch());
+        branchRepository.save(branch);
 
-        return branchRepository.save(branch);
+        return branch;
     }
 
     public void deleteBranch(Long id) throws ResourceNotFoundException{
-        Branch branch = branchRepository.findById(id)
+        branchRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Branch not found for this id :: " + id));
 
-        branchRepository.delete(branch);
+        branchRepository.deleteById(id);
     }
 }
