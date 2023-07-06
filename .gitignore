@@ -30,3 +30,5 @@ hs_err_pid*
 /target/classes/application.properties
 /target/classes/classpath.index
 /target/test-classes/classpath.index
+/.idea/
+/backend.iml
