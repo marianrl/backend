@@ -1,7 +1,7 @@
 package com.ams.backend.service;
 
 import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.model.Branch;
+import com.ams.backend.entity.Branch;
 import com.ams.backend.repository.BranchRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

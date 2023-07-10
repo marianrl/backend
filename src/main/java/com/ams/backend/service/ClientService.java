@@ -1,12 +1,17 @@
 package com.ams.backend.service;
 
 import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.model.Client;
+import com.ams.backend.entity.Client;
 import com.ams.backend.repository.ClientRepository;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+
+@AllArgsConstructor
+@NoArgsConstructor
 @Service
 public class ClientService {
 
@@ -31,14 +36,13 @@ public class ClientService {
                 .orElseThrow(() -> new ResourceNotFoundException("Client not found for this id :: " + id));
 
         client.setClient(providedClient.getClient());
-
-        return clientRepository.save(client);
+        clientRepository.save(client);
+        return client;
     }
 
     public void deleteClient(Long id) throws ResourceNotFoundException{
-        Client client = clientRepository.findById(id)
+        clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client not found for this id :: " + id));
-
-        clientRepository.delete(client);
+        clientRepository.deleteById(id);
     }
 }

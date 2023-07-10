@@ -3,7 +3,7 @@ package com.ams.backend.controller;
 import java.util.List;
 
 import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.model.Branch;
+import com.ams.backend.entity.Branch;
 import com.ams.backend.service.BranchService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

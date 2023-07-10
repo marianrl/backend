@@ -1,6 +1,6 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.model.Branch;
+import com.ams.backend.entity.Branch;
 import com.ams.backend.service.BranchService;
 import org.junit.Test;
 import org.junit.runner.RunWith;

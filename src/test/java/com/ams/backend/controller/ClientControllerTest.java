@@ -1,6 +1,6 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.model.Client;
+import com.ams.backend.entity.Client;
 import com.ams.backend.service.ClientService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
