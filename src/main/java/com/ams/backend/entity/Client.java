@@ -1,4 +1,4 @@
-package com.ams.backend.model;
+package com.ams.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

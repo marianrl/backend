@@ -1,11 +1,12 @@
-package com.ams.backend.model;
+package com.ams.backend.entity;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,12 +17,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Sucursal")
-public class Branch {
+@Table(name = "Administrada")
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "Sucursal", nullable = false)
-    private String branch;
+    @Column(name = "Unidad", nullable = false)
+    private String group;
 }
