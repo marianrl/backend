@@ -40,8 +40,8 @@ public class AuditedControllerTest {
 
     @Test
     public void getAuditedByIdTest() throws Exception {
-        Audited audited = new Audited(1L, "CABA");
-        Mockito.when(auditedService.getAuditedById(1L)).thenReturn(audited);
+        Audited audited = new Audited(1, "CABA");
+        Mockito.when(auditedService.getAuditedById(1)).thenReturn(audited);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/audited/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -51,9 +51,8 @@ public class AuditedControllerTest {
 
     @Test
     public void createAuditedTest() throws Exception {
-        Audited audited = new Audited(null, "CABA");
-        Audited savedAudited = new Audited(1L, "CABA");
-        Mockito.when(auditedService.createAudited(audited)).thenReturn(savedAudited);
+        Audited savedAudited = new Audited(1, "CABA");
+        Mockito.when(auditedService.createAudited(savedAudited)).thenReturn(savedAudited);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/audited")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -63,9 +62,9 @@ public class AuditedControllerTest {
 
     @Test
     public void updateAuditedTest() throws Exception {
-        Audited updatedAudited = new Audited(1L, "GBA");
+        Audited updatedAudited = new Audited(1, "GBA");
 
-        Mockito.when(auditedService.updateAudited(1L, updatedAudited)).thenReturn(updatedAudited);
+        Mockito.when(auditedService.updateAudited(1, updatedAudited)).thenReturn(updatedAudited);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/audited/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,12 +72,12 @@ public class AuditedControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         Mockito.verify(auditedService, Mockito.times(1))
-                .updateAudited(ArgumentMatchers.any(), ArgumentMatchers.any(Audited.class));
+                .updateAudited(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Audited.class));
     }
 
     @Test
     public void deleteAuditedTest() throws Exception {
-        Long id = 1L;
+        int id = 1;
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/audited/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());

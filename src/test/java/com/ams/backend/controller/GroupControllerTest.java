@@ -40,8 +40,8 @@ public class GroupControllerTest {
 
     @Test
     public void getGroupByIdTest() throws Exception {
-        Group group = new Group(1L, "Gestion Laboral S.A.");
-        Mockito.when(groupService.getGroupById(1L)).thenReturn(group);
+        Group group = new Group(1, "Gestion Laboral S.A.");
+        Mockito.when(groupService.getGroupById(1)).thenReturn(group);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/group/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -51,9 +51,8 @@ public class GroupControllerTest {
 
     @Test
     public void createGroupTest() throws Exception {
-        Group group = new Group(null, "Gestion Laboral S.A.");
-        Group savedGroup = new Group(1L, "Gestion Laboral S.A.");
-        Mockito.when(groupService.createGroup(group)).thenReturn(savedGroup);
+        Group savedGroup = new Group(1, "Gestion Laboral S.A.");
+        Mockito.when(groupService.createGroup(savedGroup)).thenReturn(savedGroup);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/group")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -63,21 +62,22 @@ public class GroupControllerTest {
 
     @Test
     public void updateGroupTest() throws Exception {
-        Group updatedGroup = new Group(1L, "Gestion Logistica S.A.");
+        Group updatedGroup = new Group(1, "Gestion Logistica S.A.");
 
-        Mockito.when(groupService.updateGroup(1L, updatedGroup)).thenReturn(updatedGroup);
+        Mockito.when(groupService.updateGroup(1, updatedGroup)).thenReturn(updatedGroup);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/group/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":\"1\",\"group\":\"Gestion Logistica S.A.\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(groupService, Mockito.times(1)).updateGroup(ArgumentMatchers.any(), ArgumentMatchers.any(Group.class));
+        Mockito.verify(groupService, Mockito.times(1))
+                .updateGroup(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Group.class));
     }
 
     @Test
     public void deleteGroupTest() throws Exception {
-        Long id = 1L;
+        int id = 1;
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/group/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());

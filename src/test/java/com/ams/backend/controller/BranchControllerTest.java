@@ -40,8 +40,8 @@ public class BranchControllerTest {
 
     @Test
     public void getBranchByIdTest() throws Exception {
-        Branch branch = new Branch(1L, "CABA");
-        Mockito.when(branchService.getBranchById(1L)).thenReturn(branch);
+        Branch branch = new Branch(1, "CABA");
+        Mockito.when(branchService.getBranchById(1)).thenReturn(branch);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/branch/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -51,9 +51,8 @@ public class BranchControllerTest {
 
     @Test
     public void createBranchTest() throws Exception {
-        Branch branch = new Branch(null, "CABA");
-        Branch savedBranch = new Branch(1L, "CABA");
-        Mockito.when(branchService.createBranch(branch)).thenReturn(savedBranch);
+        Branch savedBranch = new Branch(1, "CABA");
+        Mockito.when(branchService.createBranch(savedBranch)).thenReturn(savedBranch);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/branch")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -63,21 +62,22 @@ public class BranchControllerTest {
 
     @Test
     public void updateBranchTest() throws Exception {
-        Branch updatedBranch = new Branch(1L, "GBA");
+        Branch updatedBranch = new Branch(1, "GBA");
 
-        Mockito.when(branchService.updateBranch(1L, updatedBranch)).thenReturn(updatedBranch);
+        Mockito.when(branchService.updateBranch(1, updatedBranch)).thenReturn(updatedBranch);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/branch/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":\"1\",\"branch\":\"GBA\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(branchService, Mockito.times(1)).updateBranch(ArgumentMatchers.any(), ArgumentMatchers.any(Branch.class));
+        Mockito.verify(branchService, Mockito.times(1))
+                .updateBranch(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Branch.class));
     }
 
     @Test
     public void deleteBranchTest() throws Exception {
-        Long id = 1L;
+        int id = 1;
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/branch/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());

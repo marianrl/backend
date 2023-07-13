@@ -20,8 +20,8 @@ import lombok.Setter;
 public class AuditType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(name = "Tipo_Auditoria", nullable = false)
+    @Column(name = "tipo_Auditoria", nullable = false)
     private String auditType;
 }

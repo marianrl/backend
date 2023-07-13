@@ -22,7 +22,7 @@ public class AuditTypeService {
         return auditTypeRepository.findAll();
     }
 
-    public AuditType getAuditTypeById(Long id) throws ResourceNotFoundException {
+    public AuditType getAuditTypeById(int id) throws ResourceNotFoundException {
         return auditTypeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audit type not found for this id :: " + id));
     }
@@ -31,7 +31,7 @@ public class AuditTypeService {
         return auditTypeRepository.save(auditType);
     }
 
-    public AuditType updateAuditType(Long id, AuditType providedAuditType) throws ResourceNotFoundException {
+    public AuditType updateAuditType(int id, AuditType providedAuditType) throws ResourceNotFoundException {
         AuditType auditType = auditTypeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audit type not found for this id :: " + id));
 
@@ -41,7 +41,7 @@ public class AuditTypeService {
         return auditType;
     }
 
-    public void deleteAuditType(Long id) throws ResourceNotFoundException{
+    public void deleteAuditType(int id) throws ResourceNotFoundException{
         auditTypeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audit type not found for this id :: " + id));
 

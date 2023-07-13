@@ -22,7 +22,7 @@ public class AnswerService {
         return answerRepository.findAll();
     }
 
-    public Answer getAnswerById(Long id) throws ResourceNotFoundException {
+    public Answer getAnswerById(int id) throws ResourceNotFoundException {
         return answerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Answer not found for this id :: " + id));
     }
@@ -31,7 +31,7 @@ public class AnswerService {
         return answerRepository.save(answer);
     }
 
-    public Answer updateAnswer(Long id, Answer providedAnswer) throws ResourceNotFoundException {
+    public Answer updateAnswer(int id, Answer providedAnswer) throws ResourceNotFoundException {
         Answer answer = answerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Answer not found for this id :: " + id));
 
@@ -41,7 +41,7 @@ public class AnswerService {
         return answer;
     }
 
-    public void deleteAnswer(Long id) throws ResourceNotFoundException{
+    public void deleteAnswer(int id) throws ResourceNotFoundException{
         answerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Answer not found for this id :: " + id));
 

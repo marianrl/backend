@@ -41,7 +41,7 @@ public class AuditedServiceTest {
 
     @Test
     public void testGetAuditedById() throws ResourceNotFoundException {
-        Long auditedId = 1L;
+        int auditedId = 1;
         Audited expectedAudited = new Audited(auditedId, "CABA");
 
         Mockito.when(auditedRepository.findById(auditedId)).thenReturn(Optional.of(expectedAudited));
@@ -52,7 +52,7 @@ public class AuditedServiceTest {
 
     @Test
     public void testCreateAudited() {
-        Long auditedId = 1L;
+        int auditedId = 1;
         Audited audited = new Audited(auditedId, "CABA");
 
         Mockito.when(auditedRepository.save(audited)).thenReturn(audited);
@@ -63,11 +63,11 @@ public class AuditedServiceTest {
 
     @Test
     public void testUpdateAudited() throws ResourceNotFoundException {
-        Long auditedId = 1L;
+        int auditedId = 1;
         Audited audited = new Audited(auditedId, "CABA");
         Audited updatedAudited = new Audited(auditedId, "GBA");
 
-        Mockito.when(auditedRepository.findById(1L)).thenReturn(Optional.of(audited));
+        Mockito.when(auditedRepository.findById(1)).thenReturn(Optional.of(audited));
         Audited actualAudited = auditedService.updateAudited(auditedId, updatedAudited);
 
         assertEquals(updatedAudited.getId(), actualAudited.getId());
@@ -76,13 +76,13 @@ public class AuditedServiceTest {
 
     @Test
     public void testDeleteAudited() throws ResourceNotFoundException {
-        Long auditedId = 1L;
+        int auditedId = 1;
         Audited audited = new Audited(auditedId, "CABA");
 
-        Mockito.when(auditedRepository.findById(1L)).thenReturn(Optional.of(audited));
+        Mockito.when(auditedRepository.findById(1)).thenReturn(Optional.of(audited));
         auditedService.deleteAudited(auditedId);
 
-        verify(auditedRepository).deleteById(1L);
+        verify(auditedRepository).deleteById(1);
     }
 }
 

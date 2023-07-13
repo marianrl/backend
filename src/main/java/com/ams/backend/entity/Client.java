@@ -15,8 +15,8 @@ import lombok.Setter;
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(name = "Cliente", nullable = false)
+    @Column(name = "cliente", nullable = false)
     private String client;
 }

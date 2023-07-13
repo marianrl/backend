@@ -20,8 +20,8 @@ import lombok.Setter;
 public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(name = "Respuestas", nullable = false)
+    @Column(name = "respuestas", nullable = false)
     private String answer;
 }

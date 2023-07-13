@@ -40,8 +40,8 @@ public class ClientControllerTest {
 
     @Test
     public void getClientByIdTest() throws Exception {
-        Client client = new Client(1L, "Mariano");
-        Mockito.when(clientService.getClientById(1L)).thenReturn(client);
+        Client client = new Client(1, "Mariano");
+        Mockito.when(clientService.getClientById(1)).thenReturn(client);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/client/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -51,9 +51,8 @@ public class ClientControllerTest {
 
     @Test
     public void createClientTest() throws Exception {
-        Client client = new Client(null, "Mariano");
-        Client savedClient = new Client(1L, "Mariano");
-        Mockito.when(clientService.createClient(client)).thenReturn(savedClient);
+        Client savedClient = new Client(1, "Mariano");
+        Mockito.when(clientService.createClient(savedClient)).thenReturn(savedClient);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/client")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -63,21 +62,22 @@ public class ClientControllerTest {
 
     @Test
     public void updateClientTest() throws Exception {
-        Client updatedClient = new Client(1L, "Ariel");
+        Client updatedClient = new Client(1, "Ariel");
 
-        Mockito.when(clientService.updateClient(1L, updatedClient)).thenReturn(updatedClient);
+        Mockito.when(clientService.updateClient(1, updatedClient)).thenReturn(updatedClient);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/client/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":\"1\",\"client\":\"Ariel\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(clientService, Mockito.times(1)).updateClient(ArgumentMatchers.any(), ArgumentMatchers.any(Client.class));
+        Mockito.verify(clientService, Mockito.times(1))
+                .updateClient(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Client.class));
     }
 
     @Test
     public void deleteClientTest() throws Exception {
-        Long id = 1L;
+        int id = 1;
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/client/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());

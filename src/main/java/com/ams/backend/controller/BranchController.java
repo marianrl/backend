@@ -31,7 +31,7 @@ public class BranchController {
     }
 
     @GetMapping("/branch/{id}")
-    public ResponseEntity<Branch> getBranchById(@PathVariable(value = "id") Long branchId)
+    public ResponseEntity<Branch> getBranchById(@PathVariable(value = "id") int branchId)
             throws ResourceNotFoundException{
         Branch branch = branchService.getBranchById(branchId);
 
@@ -45,7 +45,7 @@ public class BranchController {
 
     @PutMapping("/branch/{id}")
     public ResponseEntity<Branch> updateBranch(
-            @PathVariable(value = "id") Long branchId,
+            @PathVariable(value = "id") int branchId,
             @Valid @RequestBody Branch branchDetails) throws ResourceNotFoundException {
         final Branch updatedBranch = branchService.updateBranch(branchId, branchDetails);
 
@@ -53,7 +53,7 @@ public class BranchController {
     }
 
     @DeleteMapping("/branch/{id}")
-    public ResponseEntity<Void> deleteBranch(@PathVariable(value = "id") Long branchId)
+    public ResponseEntity<Void> deleteBranch(@PathVariable(value = "id") int branchId)
             throws ResourceNotFoundException {
         branchService.deleteBranch(branchId);
 

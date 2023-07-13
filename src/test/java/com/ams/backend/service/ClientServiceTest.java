@@ -41,7 +41,7 @@ public class ClientServiceTest {
 
     @Test
     public void testGetClientById() throws ResourceNotFoundException {
-        Long clientId = 1L;
+        int clientId = 1;
         Client expectedClient = new Client(clientId, "CABA");
 
         Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(expectedClient));
@@ -52,7 +52,7 @@ public class ClientServiceTest {
 
     @Test
     public void testCreateClient() {
-        Long clientId = 1L;
+        int clientId = 1;
         Client client = new Client(clientId, "CABA");
 
         Mockito.when(clientRepository.save(client)).thenReturn(client);
@@ -63,11 +63,11 @@ public class ClientServiceTest {
 
     @Test
     public void testUpdateClient() throws ResourceNotFoundException {
-        Long clientId = 1L;
+        int clientId = 1;
         Client client = new Client(clientId, "CABA");
         Client updatedClient = new Client(clientId, "GBA");
 
-        Mockito.when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        Mockito.when(clientRepository.findById(1)).thenReturn(Optional.of(client));
         Client actualClient = clientService.updateClient(clientId, updatedClient);
 
         assertEquals(updatedClient.getId(), actualClient.getId());
@@ -76,13 +76,13 @@ public class ClientServiceTest {
 
     @Test
     public void testDeleteClient() throws ResourceNotFoundException {
-        Long clientId = 1L;
+        int clientId = 1;
         Client client = new Client(clientId, "CABA");
 
-        Mockito.when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        Mockito.when(clientRepository.findById(1)).thenReturn(Optional.of(client));
         clientService.deleteClient(clientId);
 
-        verify(clientRepository).deleteById(1L);
+        verify(clientRepository).deleteById(1);
     }
 }
 

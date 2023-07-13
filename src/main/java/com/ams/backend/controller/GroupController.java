@@ -24,7 +24,7 @@ public class GroupController {
     }
 
     @GetMapping("/group/{id}")
-    public ResponseEntity<Group> getGroupById(@PathVariable(value = "id") Long groupId)
+    public ResponseEntity<Group> getGroupById(@PathVariable(value = "id") int groupId)
             throws ResourceNotFoundException{
         Group group = groupService.getGroupById(groupId);
 
@@ -39,7 +39,7 @@ public class GroupController {
 
     @PutMapping("/group/{id}")
     public ResponseEntity<Group> updateGroup(
-            @PathVariable(value = "id") Long groupId,
+            @PathVariable(value = "id") int groupId,
             @Valid @RequestBody Group groupDetails) throws ResourceNotFoundException {
         final Group updatedGroup = groupService.updateGroup(groupId, groupDetails);
 
@@ -47,7 +47,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/group/{id}")
-    public ResponseEntity<Void> deleteGroup(@PathVariable(value = "id") Long groupId)
+    public ResponseEntity<Void> deleteGroup(@PathVariable(value = "id") int groupId)
             throws ResourceNotFoundException {
         groupService.deleteGroup(groupId);
 

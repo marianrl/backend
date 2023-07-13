@@ -31,7 +31,7 @@ public class AnswerController {
     }
 
     @GetMapping("/answer/{id}")
-    public ResponseEntity<Answer> getAnswerById(@PathVariable(value = "id") Long answerId)
+    public ResponseEntity<Answer> getAnswerById(@PathVariable(value = "id") int answerId)
             throws ResourceNotFoundException{
         Answer answer = answerService.getAnswerById(answerId);
 
@@ -45,7 +45,7 @@ public class AnswerController {
 
     @PutMapping("/answer/{id}")
     public ResponseEntity<Answer> updateAnswer(
-            @PathVariable(value = "id") Long answerId,
+            @PathVariable(value = "id") int answerId,
             @Valid @RequestBody Answer answerDetails) throws ResourceNotFoundException {
         final Answer updatedAnswer = answerService.updateAnswer(answerId, answerDetails);
 
@@ -53,7 +53,7 @@ public class AnswerController {
     }
 
     @DeleteMapping("/answer/{id}")
-    public ResponseEntity<Void> deleteAnswer(@PathVariable(value = "id") Long answerId)
+    public ResponseEntity<Void> deleteAnswer(@PathVariable(value = "id") int answerId)
             throws ResourceNotFoundException {
         answerService.deleteAnswer(answerId);
 

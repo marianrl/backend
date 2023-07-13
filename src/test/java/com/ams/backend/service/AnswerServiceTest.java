@@ -41,7 +41,7 @@ public class AnswerServiceTest {
 
     @Test
     public void testGetAnswersById() throws ResourceNotFoundException {
-        Long answersId = 1L;
+        int answersId = 1;
         Answer expectedAnswer = new Answer(answersId, "CABA");
 
         Mockito.when(answerRepository.findById(answersId)).thenReturn(Optional.of(expectedAnswer));
@@ -52,7 +52,7 @@ public class AnswerServiceTest {
 
     @Test
     public void testCreateAnswer() {
-        Long answerId = 1L;
+        int answerId = 1;
         Answer answer = new Answer(answerId, "CABA");
 
         Mockito.when(answerRepository.save(answer)).thenReturn(answer);
@@ -63,11 +63,11 @@ public class AnswerServiceTest {
 
     @Test
     public void testUpdateAnswer() throws ResourceNotFoundException {
-        Long answerId = 1L;
+        int answerId = 1;
         Answer answer = new Answer(answerId, "CABA");
         Answer updatedAnswer = new Answer(answerId, "GBA");
 
-        Mockito.when(answerRepository.findById(1L)).thenReturn(Optional.of(answer));
+        Mockito.when(answerRepository.findById(1)).thenReturn(Optional.of(answer));
         Answer actualAnswer = answerService.updateAnswer(answerId, updatedAnswer);
 
         assertEquals(updatedAnswer.getId(), actualAnswer.getId());
@@ -76,13 +76,13 @@ public class AnswerServiceTest {
 
     @Test
     public void testDeleteAnswer() throws ResourceNotFoundException {
-        Long answerId = 1L;
+        int answerId = 1;
         Answer answer = new Answer(answerId, "CABA");
 
-        Mockito.when(answerRepository.findById(1L)).thenReturn(Optional.of(answer));
+        Mockito.when(answerRepository.findById(1)).thenReturn(Optional.of(answer));
         answerService.deleteAnswer(answerId);
 
-        verify(answerRepository).deleteById(1L);
+        verify(answerRepository).deleteById(1);
     }
 }
 

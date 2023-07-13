@@ -22,7 +22,7 @@ public class GroupService {
         return groupRepository.findAll();
     }
 
-    public Group getGroupById(Long id) throws ResourceNotFoundException {
+    public Group getGroupById(int id) throws ResourceNotFoundException {
         return groupRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Group not found for this id :: " + id));
     }
@@ -31,7 +31,7 @@ public class GroupService {
         return groupRepository.save(group);
     }
 
-    public Group updateGroup(Long id, Group providedGroup) throws ResourceNotFoundException {
+    public Group updateGroup(int id, Group providedGroup) throws ResourceNotFoundException {
         Group group = groupRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Group not found for this id :: " + id));
 
@@ -41,7 +41,7 @@ public class GroupService {
         return group;
     }
 
-    public void deleteGroup(Long id) throws ResourceNotFoundException{
+    public void deleteGroup(int id) throws ResourceNotFoundException{
         groupRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Group not found for this id :: " + id));
 

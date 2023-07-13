@@ -22,7 +22,7 @@ public class AuditedService {
         return auditedRepository.findAll();
     }
 
-    public Audited getAuditedById(Long id) throws ResourceNotFoundException {
+    public Audited getAuditedById(int id) throws ResourceNotFoundException {
         return auditedRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audited not found for this id :: " + id));
     }
@@ -31,7 +31,7 @@ public class AuditedService {
         return auditedRepository.save(audited);
     }
 
-    public Audited updateAudited(Long id, Audited providedAudited) throws ResourceNotFoundException {
+    public Audited updateAudited(int id, Audited providedAudited) throws ResourceNotFoundException {
         Audited audited = auditedRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audited not found for this id :: " + id));
 
@@ -41,7 +41,7 @@ public class AuditedService {
         return audited;
     }
 
-    public void deleteAudited(Long id) throws ResourceNotFoundException{
+    public void deleteAudited(int id) throws ResourceNotFoundException{
         auditedRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audited not found for this id :: " + id));
 

@@ -41,7 +41,7 @@ public class AuditTypeServiceTest {
 
     @Test
     public void testGetAuditTypeById() throws ResourceNotFoundException {
-        Long auditTypeId = 1L;
+        int auditTypeId = 1;
         AuditType expectedAuditType = new AuditType(auditTypeId, "CABA");
 
         Mockito.when(auditTypeRepository.findById(auditTypeId)).thenReturn(Optional.of(expectedAuditType));
@@ -52,7 +52,7 @@ public class AuditTypeServiceTest {
 
     @Test
     public void testCreateAuditType() {
-        Long auditTypeId = 1L;
+        int auditTypeId = 1;
         AuditType auditType = new AuditType(auditTypeId, "CABA");
 
         Mockito.when(auditTypeRepository.save(auditType)).thenReturn(auditType);
@@ -63,11 +63,11 @@ public class AuditTypeServiceTest {
 
     @Test
     public void testUpdateAuditType() throws ResourceNotFoundException {
-        Long auditTypeId = 1L;
+        int auditTypeId = 1;
         AuditType auditType = new AuditType(auditTypeId, "CABA");
         AuditType updatedAuditType = new AuditType(auditTypeId, "GBA");
 
-        Mockito.when(auditTypeRepository.findById(1L)).thenReturn(Optional.of(auditType));
+        Mockito.when(auditTypeRepository.findById(1)).thenReturn(Optional.of(auditType));
         AuditType actualAuditType = auditTypeService.updateAuditType(auditTypeId, updatedAuditType);
 
         assertEquals(updatedAuditType.getId(), actualAuditType.getId());
@@ -76,13 +76,13 @@ public class AuditTypeServiceTest {
 
     @Test
     public void testDeleteAnswer() throws ResourceNotFoundException {
-        Long auditTypeId = 1L;
+        int auditTypeId = 1;
         AuditType auditType = new AuditType(auditTypeId, "CABA");
 
-        Mockito.when(auditTypeRepository.findById(1L)).thenReturn(Optional.of(auditType));
+        Mockito.when(auditTypeRepository.findById(1)).thenReturn(Optional.of(auditType));
         auditTypeService.deleteAuditType(auditTypeId);
 
-        verify(auditTypeRepository).deleteById(1L);
+        verify(auditTypeRepository).deleteById(1);
     }
 }
 

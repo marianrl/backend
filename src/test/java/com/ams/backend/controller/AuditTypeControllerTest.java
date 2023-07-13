@@ -34,16 +34,16 @@ public class AuditTypeControllerTest {
         List<AuditType> auditTypes = new ArrayList<>();
         Mockito.when(auditTypeService.getAllAuditType()).thenReturn(auditTypes);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/audit_type"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/auditType"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
     public void getAuditTypeByIdTest() throws Exception {
-        AuditType auditType = new AuditType(1L, "CABA");
-        Mockito.when(auditTypeService.getAuditTypeById(1L)).thenReturn(auditType);
+        AuditType auditType = new AuditType(1, "CABA");
+        Mockito.when(auditTypeService.getAuditTypeById(1)).thenReturn(auditType);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/audit_type/1"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/auditType/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.auditType").value("CABA"));
@@ -51,11 +51,10 @@ public class AuditTypeControllerTest {
 
     @Test
     public void createAuditTypeTest() throws Exception {
-        AuditType auditType = new AuditType(null, "CABA");
-        AuditType savedAuditType = new AuditType(1L, "CABA");
-        Mockito.when(auditTypeService.createAuditType(auditType)).thenReturn(savedAuditType);
+        AuditType savedAuditType = new AuditType(1, "CABA");
+        Mockito.when(auditTypeService.createAuditType(savedAuditType)).thenReturn(savedAuditType);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/audit_type")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auditType")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"audit_type\":\"CABA\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -63,25 +62,25 @@ public class AuditTypeControllerTest {
 
     @Test
     public void updateAuditTypeTest() throws Exception {
-        AuditType updatedAuditType = new AuditType(1L, "GBA");
+        AuditType updatedAuditType = new AuditType(1, "GBA");
 
-        Mockito.when(auditTypeService.updateAuditType(1L, updatedAuditType))
+        Mockito.when(auditTypeService.updateAuditType(1, updatedAuditType))
                 .thenReturn(updatedAuditType);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/audit_type/1")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/auditType/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":\"1\",\"audit_type\":\"GBA\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         Mockito.verify(auditTypeService, Mockito.times(1))
-                .updateAuditType(ArgumentMatchers.any(), ArgumentMatchers.any(AuditType.class));
+                .updateAuditType(ArgumentMatchers.anyInt(), ArgumentMatchers.any(AuditType.class));
     }
 
     @Test
     public void deleteAuditTypeTest() throws Exception {
-        Long id = 1L;
+        int id = 1;
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/audit_type/{id}", id))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/auditType/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         Mockito.verify(auditTypeService, Mockito.times(1)).deleteAuditType(id);

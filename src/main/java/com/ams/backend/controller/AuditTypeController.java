@@ -24,36 +24,36 @@ public class AuditTypeController {
     @Autowired
     private AuditTypeService auditTypeService;
 
-    @GetMapping("/audit_type")
+    @GetMapping("/auditType")
     public List<AuditType> getAllAuditType() {
 
         return auditTypeService.getAllAuditType();
     }
 
-    @GetMapping("/audit_type/{id}")
-    public ResponseEntity<AuditType> getAuditTypeById(@PathVariable(value = "id") Long auditTypeId)
+    @GetMapping("/auditType/{id}")
+    public ResponseEntity<AuditType> getAuditTypeById(@PathVariable(value = "id") int auditTypeId)
             throws ResourceNotFoundException{
         AuditType auditType = auditTypeService.getAuditTypeById(auditTypeId);
 
         return ResponseEntity.ok().body(auditType);
     }
 
-    @PostMapping("/audit_type")
+    @PostMapping("/auditType")
     public AuditType createAudit(@Valid @RequestBody AuditType auditType) {
         return auditTypeService.createAuditType(auditType);
     }
 
-    @PutMapping("/audit_type/{id}")
+    @PutMapping("/auditType/{id}")
     public ResponseEntity<AuditType> updateAuditType(
-            @PathVariable(value = "id") Long auditTypeId,
+            @PathVariable(value = "id") int auditTypeId,
             @Valid @RequestBody AuditType auditTypeDetails) throws ResourceNotFoundException {
         final AuditType updatedAuditType = auditTypeService.updateAuditType(auditTypeId, auditTypeDetails);
 
         return ResponseEntity.ok(updatedAuditType);
     }
 
-    @DeleteMapping("/audit_type/{id}")
-    public ResponseEntity<Void> deleteAuditType(@PathVariable(value = "id") Long auditTypeId)
+    @DeleteMapping("/auditType/{id}")
+    public ResponseEntity<Void> deleteAuditType(@PathVariable(value = "id") int auditTypeId)
             throws ResourceNotFoundException {
         auditTypeService.deleteAuditType(auditTypeId);
 

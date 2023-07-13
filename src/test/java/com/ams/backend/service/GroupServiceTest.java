@@ -41,7 +41,7 @@ public class GroupServiceTest {
 
     @Test
     public void testGetGroupById() throws ResourceNotFoundException {
-        Long groupId = 1L;
+        int groupId = 1;
         Group expectedGroup = new Group(groupId, "CABA");
 
         Mockito.when(groupRepository.findById(groupId)).thenReturn(Optional.of(expectedGroup));
@@ -52,7 +52,7 @@ public class GroupServiceTest {
 
     @Test
     public void testCreateGroup() {
-        Long groupId = 1L;
+        int groupId = 1;
         Group group = new Group(groupId, "CABA");
 
         Mockito.when(groupRepository.save(group)).thenReturn(group);
@@ -63,11 +63,11 @@ public class GroupServiceTest {
 
     @Test
     public void testUpdateGroup() throws ResourceNotFoundException {
-        Long groupId = 1L;
+        int groupId = 1;
         Group group = new Group(groupId, "CABA");
         Group updatedGroup = new Group(groupId, "GBA");
 
-        Mockito.when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
+        Mockito.when(groupRepository.findById(1)).thenReturn(Optional.of(group));
         Group actualGroup = groupService.updateGroup(groupId, updatedGroup);
 
         assertEquals(updatedGroup.getId(), actualGroup.getId());
@@ -76,12 +76,12 @@ public class GroupServiceTest {
 
     @Test
     public void testDeleteGroup() throws ResourceNotFoundException {
-        Long groupId = 1L;
+        int groupId = 1;
         Group group = new Group(groupId, "CABA");
 
-        Mockito.when(groupRepository.findById(1L)).thenReturn(Optional.of(group));
+        Mockito.when(groupRepository.findById(1)).thenReturn(Optional.of(group));
         groupService.deleteGroup(groupId);
 
-        verify(groupRepository).deleteById(1L);
+        verify(groupRepository).deleteById(1);
     }
 }

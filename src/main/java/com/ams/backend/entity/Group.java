@@ -21,8 +21,8 @@ import lombok.Setter;
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(name = "Unidad", nullable = false)
+    @Column(name = "unidad", nullable = false)
     private String group;
 }

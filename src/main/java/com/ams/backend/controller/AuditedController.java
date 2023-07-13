@@ -31,7 +31,7 @@ public class AuditedController {
     }
 
     @GetMapping("/audited/{id}")
-    public ResponseEntity<Audited> getAuditedById(@PathVariable(value = "id") Long auditedId)
+    public ResponseEntity<Audited> getAuditedById(@PathVariable(value = "id") int auditedId)
             throws ResourceNotFoundException{
         Audited audited = auditedService.getAuditedById(auditedId);
 
@@ -45,7 +45,7 @@ public class AuditedController {
 
     @PutMapping("/audited/{id}")
     public ResponseEntity<Audited> updateAudited(
-            @PathVariable(value = "id") Long auditedId,
+            @PathVariable(value = "id") int auditedId,
             @Valid @RequestBody Audited auditedDetails) throws ResourceNotFoundException {
         final Audited updatedAudited = auditedService.updateAudited(auditedId, auditedDetails);
 
@@ -53,7 +53,7 @@ public class AuditedController {
     }
 
     @DeleteMapping("/audited/{id}")
-    public ResponseEntity<Void> deleteAudited(@PathVariable(value = "id") Long auditedId)
+    public ResponseEntity<Void> deleteAudited(@PathVariable(value = "id") int auditedId)
             throws ResourceNotFoundException {
         auditedService.deleteAudited(auditedId);
 

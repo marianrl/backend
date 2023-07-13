@@ -41,7 +41,7 @@ public class BranchServiceTest {
 
     @Test
     public void testGetBranchById() throws ResourceNotFoundException {
-        Long branchId = 1L;
+        int branchId = 1;
         Branch expectedBranch = new Branch(branchId, "CABA");
 
         Mockito.when(branchRepository.findById(branchId)).thenReturn(Optional.of(expectedBranch));
@@ -52,7 +52,7 @@ public class BranchServiceTest {
 
     @Test
     public void testCreateBranch() {
-        Long branchId = 1L;
+        int branchId = 1;
         Branch branch = new Branch(branchId, "CABA");
 
         Mockito.when(branchRepository.save(branch)).thenReturn(branch);
@@ -63,11 +63,11 @@ public class BranchServiceTest {
 
     @Test
     public void testUpdateBranch() throws ResourceNotFoundException {
-        Long branchId = 1L;
+        int branchId = 1;
         Branch branch = new Branch(branchId, "CABA");
         Branch updatedBranch = new Branch(branchId, "GBA");
 
-        Mockito.when(branchRepository.findById(1L)).thenReturn(Optional.of(branch));
+        Mockito.when(branchRepository.findById(1)).thenReturn(Optional.of(branch));
         Branch actualBranch = branchService.updateBranch(branchId, updatedBranch);
 
         assertEquals(updatedBranch.getId(), actualBranch.getId());
@@ -76,13 +76,13 @@ public class BranchServiceTest {
 
     @Test
     public void testDeleteBranch() throws ResourceNotFoundException {
-        Long branchId = 1L;
+        int branchId = 1;
         Branch branch = new Branch(branchId, "CABA");
 
-        Mockito.when(branchRepository.findById(1L)).thenReturn(Optional.of(branch));
+        Mockito.when(branchRepository.findById(1)).thenReturn(Optional.of(branch));
         branchService.deleteBranch(branchId);
 
-        verify(branchRepository).deleteById(1L);
+        verify(branchRepository).deleteById(1);
     }
 }
 

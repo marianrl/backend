@@ -40,8 +40,8 @@ public class AnswerControllerTest {
 
     @Test
     public void getAnswerByIdTest() throws Exception {
-        Answer answer = new Answer(1L, "CABA");
-        Mockito.when(answerService.getAnswerById(1L)).thenReturn(answer);
+        Answer answer = new Answer(1, "CABA");
+        Mockito.when(answerService.getAnswerById(1)).thenReturn(answer);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/answer/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -51,9 +51,8 @@ public class AnswerControllerTest {
 
     @Test
     public void createAnswerTest() throws Exception {
-        Answer answer = new Answer(null, "CABA");
-        Answer savedAnswer = new Answer(1L, "CABA");
-        Mockito.when(answerService.createAnswer(answer)).thenReturn(savedAnswer);
+        Answer savedAnswer = new Answer(1, "CABA");
+        Mockito.when(answerService.createAnswer(savedAnswer)).thenReturn(savedAnswer);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/answer")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -63,9 +62,9 @@ public class AnswerControllerTest {
 
     @Test
     public void updateAnswerTest() throws Exception {
-        Answer updatedAnswer = new Answer(1L, "GBA");
+        Answer updatedAnswer = new Answer(1, "GBA");
 
-        Mockito.when(answerService.updateAnswer(1L, updatedAnswer)).thenReturn(updatedAnswer);
+        Mockito.when(answerService.updateAnswer(1, updatedAnswer)).thenReturn(updatedAnswer);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/answer/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,12 +72,12 @@ public class AnswerControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         Mockito.verify(answerService, Mockito.times(1))
-                .updateAnswer(ArgumentMatchers.any(), ArgumentMatchers.any(Answer.class));
+                .updateAnswer(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Answer.class));
     }
 
     @Test
     public void deleteAnswerTest() throws Exception {
-        Long id = 1L;
+        int id = 1;
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/answer/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());

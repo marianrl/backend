@@ -22,7 +22,7 @@ public class BranchService {
         return branchRepository.findAll();
     }
 
-    public Branch getBranchById(Long id) throws ResourceNotFoundException {
+    public Branch getBranchById(int id) throws ResourceNotFoundException {
         return branchRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Branch not found for this id :: " + id));
     }
@@ -31,7 +31,7 @@ public class BranchService {
         return branchRepository.save(branch);
     }
 
-    public Branch updateBranch(Long id, Branch providedBranch) throws ResourceNotFoundException {
+    public Branch updateBranch(int id, Branch providedBranch) throws ResourceNotFoundException {
         Branch branch = branchRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Branch not found for this id :: " + id));
 
@@ -41,7 +41,7 @@ public class BranchService {
         return branch;
     }
 
-    public void deleteBranch(Long id) throws ResourceNotFoundException{
+    public void deleteBranch(int id) throws ResourceNotFoundException{
         branchRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Branch not found for this id :: " + id));
 

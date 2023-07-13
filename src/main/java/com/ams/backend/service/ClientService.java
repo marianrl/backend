@@ -22,7 +22,7 @@ public class ClientService {
         return clientRepository.findAll();
     }
 
-    public Client getClientById(Long id) throws ResourceNotFoundException {
+    public Client getClientById(int id) throws ResourceNotFoundException {
         return clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client not found for this id :: " + id));
     }
@@ -31,7 +31,7 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    public Client updateClient(Long id, Client providedClient) throws ResourceNotFoundException {
+    public Client updateClient(int id, Client providedClient) throws ResourceNotFoundException {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client not found for this id :: " + id));
 
@@ -40,7 +40,7 @@ public class ClientService {
         return client;
     }
 
-    public void deleteClient(Long id) throws ResourceNotFoundException{
+    public void deleteClient(int id) throws ResourceNotFoundException{
         clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client not found for this id :: " + id));
         clientRepository.deleteById(id);
