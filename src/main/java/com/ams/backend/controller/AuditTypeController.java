@@ -47,7 +47,8 @@ public class AuditTypeController {
     public ResponseEntity<AuditType> updateAuditType(
             @PathVariable(value = "id") int auditTypeId,
             @Valid @RequestBody AuditType auditTypeDetails) throws ResourceNotFoundException {
-        final AuditType updatedAuditType = auditTypeService.updateAuditType(auditTypeId, auditTypeDetails);
+        final AuditType updatedAuditType = auditTypeService
+                .updateAuditType(auditTypeId, auditTypeDetails);
 
         return ResponseEntity.ok(updatedAuditType);
     }
