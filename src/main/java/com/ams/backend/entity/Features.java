@@ -34,4 +34,6 @@ public class Features {
     @ManyToOne
     @JoinColumn(name = "id_auditado")
     private Audited audited;
+
+
 }
