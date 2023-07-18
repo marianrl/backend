@@ -24,49 +24,49 @@ import static org.mockito.Mockito.verify;
 public class FeatureServiceTest {
 
     @Mock
-    private FeaturesRepository featurRepository;
+    private FeaturesRepository featuresRepository;
 
-    private FeaturesService featurService;
+    private FeaturesService featuresService;
 
     @Before
     public void setup() {
-        featurService = new FeaturesService(featurRepository);
+        featuresService = new FeaturesService(featuresRepository);
     }
 
     @Test
-    public void testGetAllFeaturess() {
-        List<Features> featurs = new ArrayList<>();
-        Mockito.when(featurRepository.findAll()).thenReturn(featurs);
-        List<Features> actualFeaturess = featurService.getAllFeatures();
+    public void testGetAllFeatures() {
+        List<Features> features = new ArrayList<>();
+        Mockito.when(featuresRepository.findAll()).thenReturn(features);
+        List<Features> actualFeatures = featuresService.getAllFeatures();
 
-        assertEquals(featurs, actualFeaturess);
+        assertEquals(features, actualFeatures);
     }
 
     @Test
-    public void testGetFeaturessById() throws ResourceNotFoundException {
-        int featursId = 1;
+    public void testGetFeaturesById() throws ResourceNotFoundException {
+        int featuresId = 1;
         AuditType auditType = new AuditType(1, "AFIP");
         Answer answer = new Answer(1, "SE AJUSTA");
         Audited audited = new Audited(1,"NO");
-        Features expectedFeatures = new Features(featursId,auditType, answer,audited );
+        Features expectedFeatures = new Features(featuresId,auditType, answer,audited );
 
-        Mockito.when(featurRepository.findById(featursId)).thenReturn(Optional.of(expectedFeatures));
-        Features actualFeatures = featurService.getFeaturesById(featursId);
+        Mockito.when(featuresRepository.findById(featuresId)).thenReturn(Optional.of(expectedFeatures));
+        Features actualFeatures = featuresService.getFeaturesById(featuresId);
 
         assertEquals(expectedFeatures, actualFeatures);
     }
 
     @Test
     public void testCreateFeatures() {
-        int featursId = 1;
+        int featuresId = 1;
         AuditType auditType = new AuditType(1, "AFIP");
         Answer answer = new Answer(1, "SE AJUSTA");
         Audited audited = new Audited(1,"NO");
-        Features featur = new Features(featursId,auditType,answer,audited);
+        Features featur = new Features(featuresId,auditType,answer,audited);
 
 
-        Mockito.when(featurRepository.save(featur)).thenReturn(featur);
-        Features actualFeatures = featurService.createFeatures(featur);
+        Mockito.when(featuresRepository.save(featur)).thenReturn(featur);
+        Features actualFeatures = featuresService.createFeatures(featur);
 
         assertEquals(actualFeatures, featur);
     }
@@ -80,8 +80,8 @@ public class FeatureServiceTest {
         Features featur = new Features(featurId,auditType,answer,audited);
         Features updatedFeatures = new Features(featurId,auditType,answer,audited);
 
-        Mockito.when(featurRepository.findById(1)).thenReturn(Optional.of(featur));
-        Features actualFeatures = featurService.updateFeatures(featurId, updatedFeatures);
+        Mockito.when(featuresRepository.findById(1)).thenReturn(Optional.of(featur));
+        Features actualFeatures = featuresService.updateFeatures(featurId, updatedFeatures);
 
         assertEquals(updatedFeatures.getId(), actualFeatures.getId());
         assertEquals(updatedFeatures.getAuditType(), actualFeatures.getAuditType());
@@ -97,10 +97,10 @@ public class FeatureServiceTest {
         Audited audited = new Audited(1,"NO");
         Features featur = new Features(featurId,auditType,answer,audited);
 
-        Mockito.when(featurRepository.findById(1)).thenReturn(Optional.of(featur));
-        featurService.deleteFeatures(featurId);
+        Mockito.when(featuresRepository.findById(1)).thenReturn(Optional.of(featur));
+        featuresService.deleteFeatures(featurId);
 
-        verify(featurRepository).deleteById(1);
+        verify(featuresRepository).deleteById(1);
     }
 }
 
