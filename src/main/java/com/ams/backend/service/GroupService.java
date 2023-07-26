@@ -4,14 +4,12 @@ import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.entity.Group;
 import com.ams.backend.repository.GroupRepository;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Service
 public class GroupService {
 

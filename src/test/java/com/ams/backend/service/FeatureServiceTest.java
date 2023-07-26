@@ -62,13 +62,13 @@ public class FeatureServiceTest {
         AuditType auditType = new AuditType(1, "AFIP");
         Answer answer = new Answer(1, "SE AJUSTA");
         Audited audited = new Audited(1,"NO");
-        Features featur = new Features(featuresId,auditType,answer,audited);
+        Features feature = new Features(featuresId,auditType,answer,audited);
 
 
-        Mockito.when(featuresRepository.save(featur)).thenReturn(featur);
-        Features actualFeatures = featuresService.createFeatures(featur);
+        Mockito.when(featuresRepository.save(feature)).thenReturn(feature);
+        Features actualFeatures = featuresService.createFeatures(feature);
 
-        assertEquals(actualFeatures, featur);
+        assertEquals(actualFeatures, feature);
     }
 
     @Test
@@ -77,10 +77,10 @@ public class FeatureServiceTest {
         AuditType auditType = new AuditType(1, "AFIP");
         Answer answer = new Answer(1, "SE AJUSTA");
         Audited audited = new Audited(1,"NO");
-        Features featur = new Features(featurId,auditType,answer,audited);
+        Features feature = new Features(featurId,auditType,answer,audited);
         Features updatedFeatures = new Features(featurId,auditType,answer,audited);
 
-        Mockito.when(featuresRepository.findById(1)).thenReturn(Optional.of(featur));
+        Mockito.when(featuresRepository.findById(1)).thenReturn(Optional.of(feature));
         Features actualFeatures = featuresService.updateFeatures(featurId, updatedFeatures);
 
         assertEquals(updatedFeatures.getId(), actualFeatures.getId());
@@ -95,9 +95,9 @@ public class FeatureServiceTest {
         AuditType auditType = new AuditType(1, "AFIP");
         Answer answer = new Answer(1, "SE AJUSTA");
         Audited audited = new Audited(1,"NO");
-        Features featur = new Features(featurId,auditType,answer,audited);
+        Features feature = new Features(featurId,auditType,answer,audited);
 
-        Mockito.when(featuresRepository.findById(1)).thenReturn(Optional.of(featur));
+        Mockito.when(featuresRepository.findById(1)).thenReturn(Optional.of(feature));
         featuresService.deleteFeatures(featurId);
 
         verify(featuresRepository).deleteById(1);
