@@ -27,3 +27,8 @@ hs_err_pid*
 /.idea/jarRepositories.xml
 /.idea/misc.xml
 /.idea/vcs.xml
+/target/classes/application.properties
+/target/classes/classpath.index
+/target/test-classes/classpath.index
+/.idea/
+/backend.iml
