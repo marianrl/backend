@@ -1,5 +1,6 @@
 package com.ams.backend.controller;
 
+import com.ams.backend.entity.AuthenticateRequest;
 import com.ams.backend.entity.User;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.service.UserService;
@@ -34,6 +35,13 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable(value = "id") int userId)
             throws ResourceNotFoundException{
         User user = userService.getUserById(userId);
+
+        return ResponseEntity.ok().body(user);
+    }
+
+    @PostMapping("/user/authenticate")
+    public ResponseEntity<User> authenticate(@RequestBody AuthenticateRequest request) {
+        User user = userService.getUserByMailAndPassword(request.getMail(), request.getPassword());
 
         return ResponseEntity.ok().body(user);
     }

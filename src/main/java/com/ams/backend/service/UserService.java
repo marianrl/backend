@@ -25,6 +25,10 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found for this id :: " + id));
     }
 
+    public User getUserByMailAndPassword(String mail, String password) {
+        return userRepository.findByMailAndPassword(mail, password);
+    }
+
     public User createUser(User user) {
         return userRepository.save(user);
     }
