@@ -43,7 +43,12 @@ public class UserController {
     public ResponseEntity<User> authenticate(@RequestBody AuthenticateRequest request) {
         User user = userService.getUserByMailAndPassword(request.getMail(), request.getPassword());
 
-        return ResponseEntity.ok().body(user);
+        if(user != null) {
+            return ResponseEntity.ok().body(user);
+        }
+        else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/user")
