@@ -44,7 +44,7 @@ public class UserController {
         User user = userService.getUserByMailAndPassword(request.getMail(), request.getPassword());
 
         if(user != null) {
-            return ResponseEntity.ok().body(user);
+            return ResponseEntity.ok().build();
         }
         else {
             return ResponseEntity.notFound().build();
