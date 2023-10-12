@@ -31,9 +31,4 @@ public class Features {
     @JoinColumn(name = "id_respuestas")
     private Answer answer;
 
-    @ManyToOne
-    @JoinColumn(name = "id_auditado")
-    private Audited audited;
-
-
 }

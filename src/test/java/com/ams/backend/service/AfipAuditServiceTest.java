@@ -1,14 +1,8 @@
 package com.ams.backend.service;
 
-import com.ams.backend.entity.Answer;
-import com.ams.backend.entity.AuditType;
-import com.ams.backend.entity.Audited;
-import com.ams.backend.entity.Branch;
-import com.ams.backend.entity.Client;
-import com.ams.backend.entity.AfipAudit;
-import com.ams.backend.entity.Features;
+import com.ams.backend.entity.*;
 import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.repository.AfipAuditRepository;
+import com.ams.backend.repository.AfipInputRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,19 +21,20 @@ import static org.mockito.Mockito.verify;
 public class AfipAuditServiceTest {
 
     @Mock
-    private AfipAuditRepository afipAuditRepository;
+    private AfipInputRepository afipInputRepository;
 
-    private AfipAuditService afipAuditService;
+    private AfipInputService afipAuditService;
 
     final private Client client = new Client(1, "hola");
     final private Branch branch = new Branch(1, "hola");
     final private Answer answer = new Answer(1, "SE AJUSTA");
     final private AuditType auditType = new AuditType(1, "AFIP");
     final private Audited audited = new Audited(1,"NO");
-    final private Features features = new Features(1,auditType ,answer ,audited);
-    final private AfipAudit afipAudit = new AfipAudit(
+    final private Features features = new Features(1,auditType ,answer);
+    final private Audit audit = new Audit(1,1,"11/10/2023",auditType,audited);
+
+    final private AfipInput afipInput = new AfipInput(
             1,
-            "17/07/2023",
             "Perez",
             "Juan",
             "20-45125484-7",
@@ -49,70 +44,71 @@ public class AfipAuditServiceTest {
             "Capital Federal",
             branch,
             "17/06/2023",
-            features
+            features,
+            audit
     );
 
     @Before
     public void setup() {
-        afipAuditService = new AfipAuditService(afipAuditRepository);
+        afipAuditService = new AfipInputService(afipInputRepository);
     }
 
     @Test
-    public void testGetAllAfipAuditService() {
-        List<AfipAudit> afipAudits = new ArrayList<>();
-        Mockito.when(afipAuditRepository.findAll()).thenReturn(afipAudits);
-        List<AfipAudit> actualAfipAudit = afipAuditService.getAllAfipAudits();
+    public void testGetAllAfipInputService() {
+        List<AfipInput> afipInputs = new ArrayList<>();
+        Mockito.when(afipInputRepository.findAll()).thenReturn(afipInputs);
+        List<AfipInput> actualAfipInput = afipAuditService.getAllAfipInputs();
 
-        assertEquals(afipAudits, actualAfipAudit);
+        assertEquals(afipInputs, actualAfipInput);
     }
 
     @Test
-    public void testGetAfipAuditById() throws ResourceNotFoundException {
+    public void testGetAfipInputById() throws ResourceNotFoundException {
 
-        Mockito.when(afipAuditRepository.findById(afipAudit.getId())).thenReturn(Optional.of(afipAudit));
-        AfipAudit actualAfipAudit = afipAuditService.getAfipAuditById(afipAudit.getId());
+        Mockito.when(afipInputRepository.findById(afipInput.getId())).thenReturn(Optional.of(afipInput));
+        List<AfipInput> actualAfipInput = afipAuditService.getAfipInputByAuditNumber(afipInput.getId());
 
-        assertEquals(afipAudit, actualAfipAudit);
+        assertEquals(afipInput, actualAfipInput);
     }
 
     @Test
     public void testCreateAfipAudit() {
-        Mockito.when(afipAuditRepository.save(afipAudit)).thenReturn(afipAudit);
-        AfipAudit actualAfipAudit = afipAuditService.createAfipAudit(afipAudit);
+        Mockito.when(afipInputRepository.save(afipInput)).thenReturn(afipInput);
+        AfipInput actualAfipInput = afipAuditService.createAfipInput(afipInput);
 
-        assertEquals(afipAudit, actualAfipAudit);
+        assertEquals(afipInput, actualAfipInput);
     }
 
     @Test
     public void testUpdateAfipAudit() throws ResourceNotFoundException {
-        Mockito.when(afipAuditRepository.findById(1)).thenReturn(Optional.of(afipAudit));
+        Mockito.when(afipInputRepository.findById(1)).thenReturn(Optional.of(afipInput));
 
-        AfipAudit actualAfipAudit = afipAuditService
-                .updateAfipAudit(afipAudit.getId(), afipAudit);
+        AfipInput actualAfipInput = afipAuditService
+                .updateAfipInput(afipInput.getId(), afipInput);
 
-        assertEquals(afipAudit.getAuditDate(), actualAfipAudit.getAuditDate());
-        assertEquals(afipAudit.getLastName(), actualAfipAudit.getLastName());
-        assertEquals(afipAudit.getName(), actualAfipAudit.getName());
-        assertEquals(afipAudit.getCuil(), actualAfipAudit.getCuil());
-        assertEquals(afipAudit.getFile(), actualAfipAudit.getFile());
-        assertEquals(afipAudit.getAllocation(), actualAfipAudit.getAllocation());
-        assertEquals(afipAudit.getClient().getClient(), actualAfipAudit.getClient().getClient());
-        assertEquals(afipAudit.getUoc(), actualAfipAudit.getUoc());
-        assertEquals(afipAudit.getBranch().getBranch(), actualAfipAudit.getBranch().getBranch());
-        assertEquals(afipAudit.getAdmissionDate(), actualAfipAudit.getAdmissionDate());
-        assertEquals(afipAudit.getFeatures().getAuditType().getAuditType(),
-                actualAfipAudit.getFeatures().getAuditType().getAuditType());
-        assertEquals(afipAudit.getFeatures().getAnswer().getAnswer(), actualAfipAudit.getFeatures().getAnswer().getAnswer());
-        assertEquals(afipAudit.getFeatures().getAudited().getAudited(), actualAfipAudit.getFeatures().getAudited().getAudited());
+        assertEquals(afipInput.getLastName(), actualAfipInput.getLastName());
+        assertEquals(afipInput.getName(), actualAfipInput.getName());
+        assertEquals(afipInput.getCuil(), actualAfipInput.getCuil());
+        assertEquals(afipInput.getFile(), actualAfipInput.getFile());
+        assertEquals(afipInput.getAllocation(), actualAfipInput.getAllocation());
+        assertEquals(afipInput.getClient().getClient(), actualAfipInput.getClient().getClient());
+        assertEquals(afipInput.getUoc(), actualAfipInput.getUoc());
+        assertEquals(afipInput.getBranch().getBranch(), actualAfipInput.getBranch().getBranch());
+        assertEquals(afipInput.getAdmissionDate(), actualAfipInput.getAdmissionDate());
+        assertEquals(afipInput.getFeatures().getAuditType().getAuditType(),
+                actualAfipInput.getFeatures().getAuditType().getAuditType());
+        assertEquals(afipInput.getFeatures().getAnswer().getAnswer(), actualAfipInput.getFeatures().getAnswer().getAnswer());
+        assertEquals(afipInput.getAudit().getAuditNumber(), actualAfipInput.getAudit().getAuditNumber());
+
     }
 
     @Test
     public void testDeleteAfipAudit() throws ResourceNotFoundException {
 
-        Mockito.when(afipAuditRepository.findById(1)).thenReturn(Optional.of(afipAudit));
-        afipAuditService.deleteAfipAudit(afipAudit.getId());
+        Mockito.when(afipInputRepository.findById(1)).thenReturn(Optional.of(afipInput));
+        afipAuditService.deleteAfipInput(afipInput.getId());
 
-        verify(afipAuditRepository).deleteById(1);
+        verify(afipInputRepository).deleteById(1);
     }
 }
 

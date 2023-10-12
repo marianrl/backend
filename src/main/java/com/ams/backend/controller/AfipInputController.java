@@ -1,8 +1,8 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.AfipAudit;
+import com.ams.backend.entity.AfipInput;
 import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.service.AfipAuditService;
+import com.ams.backend.service.AfipInputService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,43 +19,43 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
-public class AfipAuditController {
+public class AfipInputController {
 
     @Autowired
-    private AfipAuditService afipAuditService;
+    private AfipInputService afipInputService;
 
     @GetMapping("/afipAudit")
-    public List<AfipAudit> getAllAfipAudits() {
+    public List<AfipInput> getAllAfipAudits() {
 
-        return afipAuditService.getAllAfipAudits();
+        return afipInputService.getAllAfipInputs();
     }
 
     @GetMapping("/afipAudit/{id}")
-    public ResponseEntity<AfipAudit> getAfipAuditById(@PathVariable(value = "id") int afipAuditId)
+    public ResponseEntity<List<AfipInput>> getAfipAuditByAuditNumber(@PathVariable(value = "id") int auditNumber)
             throws ResourceNotFoundException{
-        AfipAudit afipAudit = afipAuditService.getAfipAuditById(afipAuditId);
+        List<AfipInput> afipInput = afipInputService.getAfipInputByAuditNumber(auditNumber);
 
-        return ResponseEntity.ok().body(afipAudit);
+        return ResponseEntity.ok().body(afipInput);
     }
 
     @PostMapping("/afipAudit")
-    public AfipAudit createAfipAudit(@Valid @RequestBody AfipAudit afipAudit) {
-        return afipAuditService.createAfipAudit(afipAudit);
+    public AfipInput createAfipAudit(@Valid @RequestBody AfipInput afipInput) {
+        return afipInputService.createAfipInput(afipInput);
     }
 
     @PutMapping("/afipAudit/{id}")
-    public ResponseEntity<AfipAudit> updateAfipAudit(
+    public ResponseEntity<AfipInput> updateAfipAudit(
             @PathVariable(value = "id") int afipAuditId,
-            @Valid @RequestBody AfipAudit afipAuditDetails) throws ResourceNotFoundException {
-        final AfipAudit updatedAfipAudit = afipAuditService.updateAfipAudit(afipAuditId, afipAuditDetails);
+            @Valid @RequestBody AfipInput afipInputDetails) throws ResourceNotFoundException {
+        final AfipInput updatedAfipInput = afipInputService.updateAfipInput(afipAuditId, afipInputDetails);
 
-        return ResponseEntity.ok(updatedAfipAudit);
+        return ResponseEntity.ok(updatedAfipInput);
     }
 
     @DeleteMapping("/afipAudit/{id}")
     public ResponseEntity<Void> deleteAfipAudit(@PathVariable(value = "id") int afipAuditId)
             throws ResourceNotFoundException {
-        afipAuditService.deleteAfipAudit(afipAuditId);
+        afipInputService.deleteAfipInput(afipAuditId);
 
         return ResponseEntity.noContent().build();
     }

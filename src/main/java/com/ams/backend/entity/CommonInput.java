@@ -19,13 +19,10 @@ import lombok.Setter;
 @Setter
 @Getter
 @Table(name = "Auditoria_Comun")
-public class CommonAudit {
+public class CommonInput {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
-    @Column(name = "fecha_auditoria", nullable = false)
-    private String auditDate;
 
     @Column(name = "apellido", nullable = false)
     private String lastName;
@@ -59,4 +56,8 @@ public class CommonAudit {
     @ManyToOne
     @JoinColumn(name = "id_caracteristicas")
     private Features features;
+
+    @ManyToOne
+    @JoinColumn(name = "id_auditoria")
+    private Audit audit;
 }

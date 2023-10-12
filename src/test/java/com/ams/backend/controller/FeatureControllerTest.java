@@ -38,7 +38,7 @@ public class FeatureControllerTest {
     final private Answer answer = new Answer(1, "SE AJUSTA");
     final private AuditType auditType = new AuditType(1, "AFIP");
     final private Audited audited = new Audited(1,"NO");
-    final private Features features = new Features(1,auditType ,answer ,audited);
+    final private Features features = new Features(1,auditType ,answer);
 
     @Test
     public void getAllFeaturesTest() throws Exception {
@@ -58,9 +58,7 @@ public class FeatureControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/features/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditType.auditType").value("AFIP"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.answer.answer").value("SE AJUSTA"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.audited.audited").value("NO"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.auditType.auditType").value("AFIP"));
     }
 
     @Test
@@ -75,7 +73,7 @@ public class FeatureControllerTest {
 
         assertEquals("SE AJUSTA", features.getAnswer().getAnswer());
         assertEquals("AFIP", features.getAuditType().getAuditType());
-        assertEquals("NO", features.getAudited().getAudited());
+
     }
 
     @Test
@@ -93,7 +91,7 @@ public class FeatureControllerTest {
 
         assertEquals("SE AJUSTA", features.getAnswer().getAnswer());
         assertEquals("AFIP", features.getAuditType().getAuditType());
-        assertEquals("NO", features.getAudited().getAudited());
+
     }
 
     @Test

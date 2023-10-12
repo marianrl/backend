@@ -35,7 +35,6 @@ public class FeaturesService {
 
         features.setAnswer(providedFeatures.getAnswer());
         features.setAuditType(providedFeatures.getAuditType());
-        features.setAudited(providedFeatures.getAudited());
 
         featuresRepository.save(features);
 

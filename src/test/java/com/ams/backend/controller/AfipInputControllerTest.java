@@ -1,13 +1,7 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.Answer;
-import com.ams.backend.entity.AuditType;
-import com.ams.backend.entity.Audited;
-import com.ams.backend.entity.Branch;
-import com.ams.backend.entity.Client;
-import com.ams.backend.entity.AfipAudit;
-import com.ams.backend.entity.Features;
-import com.ams.backend.service.AfipAuditService;
+import com.ams.backend.entity.*;
+import com.ams.backend.service.AfipInputService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -29,24 +23,24 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(AfipAuditController.class)
-public class AfipAuditControllerTest {
+@WebMvcTest(AfipInputController.class)
+public class AfipInputControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private AfipAuditService afipAuditService;
+    private AfipInputService afipInputService;
 
     final private Client client = new Client(1, "hola");
     final private Branch branch = new Branch(1, "hola");
     final private Answer answer = new Answer(1, "SE AJUSTA");
     final private AuditType auditType = new AuditType(1, "AFIP");
     final private Audited audited = new Audited(1,"NO");
-    final private Features features = new Features(1,auditType ,answer ,audited);
-    final private AfipAudit afipAudit = new AfipAudit(
+    final private Features features = new Features(1,auditType ,answer);
+    final private Audit audit = new Audit(1,1,"11/10/2023",auditType,audited);
+    final private AfipInput afipInput = new AfipInput(
             1,
-            "17/07/2023",
             "Perez",
             "Juan",
             "20-45125484-7",
@@ -56,22 +50,25 @@ public class AfipAuditControllerTest {
             "Capital Federal",
             branch,
             "17/06/2023",
-            features
+            features,
+            audit
     );
-
     @Test
-    public void getAllAfipAuditTest() throws Exception {
+    public void getAllAfipInputTest() throws Exception {
 
-        List<AfipAudit> afipAudits = new ArrayList<>();
-        Mockito.when(afipAuditService.getAllAfipAudits()).thenReturn(afipAudits);
+        List<AfipInput> afipInputs = new ArrayList<>();
+        
+        Mockito.when(afipInputService.getAllAfipInputs()).thenReturn(afipInputs);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/afipAudit"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    public void getAfipAuditByIdTest() throws Exception {
-        Mockito.when(afipAuditService.getAfipAuditById(1)).thenReturn(afipAudit);
+    public void getAfipInputByIdTest() throws Exception {
+        List<AfipInput> afipInputsList = new ArrayList<>();
+        afipInputsList.add(afipInput);
+        Mockito.when(afipInputService.getAfipInputByAuditNumber(1)).thenReturn(afipInputsList);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/afipAudit/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -88,60 +85,61 @@ public class AfipAuditControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.admissionDate").value("17/06/2023"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.features.auditType.auditType").value("AFIP"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.features.answer.answer").value("SE AJUSTA"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.features.audited.audited").value("NO"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.audit").value(1));
     }
 
     @Test
-    public void createAfipAuditTest() throws Exception {
-        Mockito.when(afipAuditService.createAfipAudit(afipAudit)).thenReturn(afipAudit);
+    public void createAfipInputTest() throws Exception {
+        Mockito.when(afipInputService.createAfipInput(afipInput)).thenReturn(afipInput);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/afipAudit")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(afipAudit)))
+                        .content(asJsonString(afipInput)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        assertEquals("17/07/2023", afipAudit.getAuditDate());
-        assertEquals("Perez", afipAudit.getLastName());
-        assertEquals("Juan", afipAudit.getName());
-        assertEquals("20-45125484-7", afipAudit.getCuil());
-        assertEquals("4568", afipAudit.getFile());
-        assertEquals("1248", afipAudit.getAllocation());
-        assertEquals("hola", afipAudit.getClient().getClient());
-        assertEquals("Capital Federal", afipAudit.getUoc());
-        assertEquals("hola", afipAudit.getBranch().getBranch());
-        assertEquals("17/06/2023", afipAudit.getAdmissionDate());
-        assertEquals("AFIP", afipAudit.getFeatures().getAuditType().getAuditType());
-        assertEquals("SE AJUSTA", afipAudit.getFeatures().getAnswer().getAnswer());
-        assertEquals("NO", afipAudit.getFeatures().getAudited().getAudited());
+        assertEquals("Perez", afipInput.getLastName());
+        assertEquals("Juan", afipInput.getName());
+        assertEquals("20-45125484-7", afipInput.getCuil());
+        assertEquals("4568", afipInput.getFile());
+        assertEquals("1248", afipInput.getAllocation());
+        assertEquals("hola", afipInput.getClient().getClient());
+        assertEquals("Capital Federal", afipInput.getUoc());
+        assertEquals("hola", afipInput.getBranch().getBranch());
+        assertEquals("17/06/2023", afipInput.getAdmissionDate());
+        assertEquals("AFIP", afipInput.getFeatures().getAuditType().getAuditType());
+        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
+        assertEquals(1, afipInput.getAudit().getAuditNumber());
 
     }
 
     @Test
-    public void updateAfipAuditTest() throws Exception {
+    public void updateAfipInputTest() throws Exception {
 
-        Mockito.when(afipAuditService.updateAfipAudit(1, afipAudit)).thenReturn(afipAudit);
+        Mockito.when(afipInputService.updateAfipInput(1, afipInput)).thenReturn(afipInput);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/afipAudit/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(afipAudit)))
+                        .content(asJsonString(afipInput)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(afipAuditService, Mockito.times(1))
-                .updateAfipAudit(ArgumentMatchers.anyInt(), ArgumentMatchers.any(AfipAudit.class));
+        Mockito.verify(afipInputService, Mockito.times(1))
+                .updateAfipInput(ArgumentMatchers.anyInt(), ArgumentMatchers.any(AfipInput.class));
 
-        assertEquals("17/07/2023", afipAudit.getAuditDate());
-        assertEquals("Perez", afipAudit.getLastName());
-        assertEquals("Juan", afipAudit.getName());
-        assertEquals("20-45125484-7", afipAudit.getCuil());
-        assertEquals("4568", afipAudit.getFile());
-        assertEquals("1248", afipAudit.getAllocation());
-        assertEquals("hola", afipAudit.getClient().getClient());
-        assertEquals("Capital Federal", afipAudit.getUoc());
-        assertEquals("hola", afipAudit.getBranch().getBranch());
-        assertEquals("17/06/2023", afipAudit.getAdmissionDate());
-        assertEquals("AFIP", afipAudit.getFeatures().getAuditType().getAuditType());
-        assertEquals("SE AJUSTA", afipAudit.getFeatures().getAnswer().getAnswer());
-        assertEquals("NO", afipAudit.getFeatures().getAudited().getAudited());
+        assertEquals("Perez", afipInput.getLastName());
+        assertEquals("Juan", afipInput.getName());
+        assertEquals("20-45125484-7", afipInput.getCuil());
+        assertEquals("4568", afipInput.getFile());
+        assertEquals("1248", afipInput.getAllocation());
+        assertEquals("hola", afipInput.getClient().getClient());
+        assertEquals("Capital Federal", afipInput.getUoc());
+        assertEquals("hola", afipInput.getBranch().getBranch());
+        assertEquals("17/06/2023", afipInput.getAdmissionDate());
+        assertEquals("AFIP", afipInput.getFeatures().getAuditType().getAuditType());
+        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
+        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
+        assertEquals(1, afipInput.getAudit().getAuditNumber());
+
+
     }
 
     @Test
@@ -151,7 +149,7 @@ public class AfipAuditControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/afipAudit/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        Mockito.verify(afipAuditService, Mockito.times(1)).deleteAfipAudit(id);
+        Mockito.verify(afipInputService, Mockito.times(1)).deleteAfipInput(id);
     }
 
     private static String asJsonString(Object obj) throws JsonProcessingException {
