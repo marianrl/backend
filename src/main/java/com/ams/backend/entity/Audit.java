@@ -24,7 +24,7 @@ public class Audit {
     private String auditDate;
 
     @ManyToOne
-    @JoinColumn(name = "id_tipo_auditoriaa")
+    @JoinColumn(name = "id_tipo_auditoria")
     private AuditType idTipoAuditoria;
 
     @ManyToOne

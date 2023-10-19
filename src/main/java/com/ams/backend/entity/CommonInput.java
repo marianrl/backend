@@ -18,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Auditoria_Comun")
+@Table(name = "Ingreso_Comun")
 public class CommonInput {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
