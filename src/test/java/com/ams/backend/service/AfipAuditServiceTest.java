@@ -23,7 +23,7 @@ public class AfipAuditServiceTest {
     @Mock
     private AfipInputRepository afipInputRepository;
 
-    private AfipInputService afipAuditService;
+    private AfipInputService afipInputService;
 
     final private Client client = new Client(1, "hola");
     final private Branch branch = new Branch(1, "hola");
@@ -50,31 +50,34 @@ public class AfipAuditServiceTest {
 
     @Before
     public void setup() {
-        afipAuditService = new AfipInputService(afipInputRepository);
+        afipInputService = new AfipInputService(afipInputRepository);
     }
 
     @Test
     public void testGetAllAfipInputService() {
         List<AfipInput> afipInputs = new ArrayList<>();
         Mockito.when(afipInputRepository.findAll()).thenReturn(afipInputs);
-        List<AfipInput> actualAfipInput = afipAuditService.getAllAfipInputs();
+        List<AfipInput> actualAfipInput = afipInputService.getAllAfipInputs();
 
         assertEquals(afipInputs, actualAfipInput);
     }
 
     @Test
-    public void testGetAfipInputById() throws ResourceNotFoundException {
+    public void testGetAfipInputByAuditNumber() {
 
-        Mockito.when(afipInputRepository.findById(afipInput.getId())).thenReturn(Optional.of(afipInput));
-        List<AfipInput> actualAfipInput = afipAuditService.getAfipInputByAuditNumber(afipInput.getId());
+        List<AfipInput> afipInputList = new ArrayList<>();
+        afipInputList.add(afipInput);
 
-        assertEquals(afipInput, actualAfipInput);
+        Mockito.when(afipInputRepository.findByAuditNumber(afipInput.getId())).thenReturn(afipInputList);
+        List<AfipInput> actualAfipInput = afipInputService.getAfipInputByAuditNumber(afipInput.getId());
+
+        assertEquals(afipInputList, actualAfipInput);
     }
 
     @Test
     public void testCreateAfipAudit() {
         Mockito.when(afipInputRepository.save(afipInput)).thenReturn(afipInput);
-        AfipInput actualAfipInput = afipAuditService.createAfipInput(afipInput);
+        AfipInput actualAfipInput = afipInputService.createAfipInput(afipInput);
 
         assertEquals(afipInput, actualAfipInput);
     }
@@ -83,7 +86,7 @@ public class AfipAuditServiceTest {
     public void testUpdateAfipAudit() throws ResourceNotFoundException {
         Mockito.when(afipInputRepository.findById(1)).thenReturn(Optional.of(afipInput));
 
-        AfipInput actualAfipInput = afipAuditService
+        AfipInput actualAfipInput = afipInputService
                 .updateAfipInput(afipInput.getId(), afipInput);
 
         assertEquals(afipInput.getLastName(), actualAfipInput.getLastName());
@@ -106,7 +109,7 @@ public class AfipAuditServiceTest {
     public void testDeleteAfipAudit() throws ResourceNotFoundException {
 
         Mockito.when(afipInputRepository.findById(1)).thenReturn(Optional.of(afipInput));
-        afipAuditService.deleteAfipInput(afipInput.getId());
+        afipInputService.deleteAfipInput(afipInput.getId());
 
         verify(afipInputRepository).deleteById(1);
     }

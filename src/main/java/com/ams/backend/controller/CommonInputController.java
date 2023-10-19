@@ -32,8 +32,8 @@ public class CommonInputController {
 
     @GetMapping("/commonInput/{id}")
     public ResponseEntity<List<CommonInput>> getCommonInputById(@PathVariable(value = "id") int commonInputId)
-            throws ResourceNotFoundException{
-        List<CommonInput> commonInput = commonInputService.getCommonInputById(commonInputId);
+    {
+        List<CommonInput> commonInput = commonInputService.getCommonInputByAuditNumber(commonInputId);
 
         return ResponseEntity.ok().body(commonInput);
     }

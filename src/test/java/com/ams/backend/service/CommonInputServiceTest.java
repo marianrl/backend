@@ -63,12 +63,14 @@ public class CommonInputServiceTest {
     }
 
     @Test
-    public void testGetCommonInputById() throws ResourceNotFoundException {
+    public void testGetCommonInputByAuditNumber(){
+        List<CommonInput> commonInputs = new ArrayList<>();
+        commonInputs.add(commonInput);
 
-        Mockito.when(commonInputRepository.findById(commonInput.getId())).thenReturn(Optional.of(commonInput));
-        List <CommonInput> actualCommonInput = commonInputService.getCommonInputById(commonInput.getId());
+        Mockito.when(commonInputRepository.findByAuditNumber(commonInput.getId())).thenReturn(commonInputs);
+        List <CommonInput> actualCommonInput = commonInputService.getCommonInputByAuditNumber(commonInput.getId());
 
-        assertEquals(commonInput, actualCommonInput);
+        assertEquals(commonInputs, actualCommonInput);
     }
 
     @Test

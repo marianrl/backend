@@ -20,7 +20,7 @@ public class AfipInputService {
         return afipInputRepository.findAll();
     }
 
-    public List<AfipInput> getAfipInputByAuditNumber(int id) throws ResourceNotFoundException {
+    public List<AfipInput> getAfipInputByAuditNumber(int id) {
         return afipInputRepository.findByAuditNumber(id);
     }
 

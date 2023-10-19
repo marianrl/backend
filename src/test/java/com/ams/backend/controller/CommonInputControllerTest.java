@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(SpringRunner.class)
@@ -61,41 +62,27 @@ public class CommonInputControllerTest {
         List<CommonInput> commonInputs = new ArrayList<>();
         Mockito.when(commonInputService.getAllCommonInputs()).thenReturn(commonInputs);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/commonAudit"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/commonInput"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    public void getCommonAuditByIdTest() throws Exception {
+    public void getCommonAuditByAuditNumberTest() throws Exception {
 
         List<CommonInput> commonInputsList = new ArrayList<>();
         commonInputsList.add(commonInput);
-        Mockito.when(commonInputService.getCommonInputById(1)).thenReturn(commonInputsList);
+        Mockito.when(commonInputService.getCommonInputByAuditNumber(1)).thenReturn(commonInputsList);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/commonAudit/1"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/commonInput/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditDate").value("17/07/2023"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value("Perez"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Juan"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.cuil").value("20-45125484-7"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.file").value("4568"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.allocation").value("1248"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.client.client").value("hola"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.uoc").value("Capital Federal"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.branch.branch").value("hola"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.admissionDate").value("17/06/2023"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.features.auditType.auditType").value("AFIP"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.features.answer.answer").value("SE AJUSTA"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.audit").value(1));
-
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)));
     }
 
     @Test
-    public void createCommonAuditTest() throws Exception {
+    public void createCommonInputTest() throws Exception {
         Mockito.when(commonInputService.createCommonInput(commonInput)).thenReturn(commonInput);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/commonAudit")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/commonInput")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(commonInput)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -112,7 +99,6 @@ public class CommonInputControllerTest {
         assertEquals("AFIP", commonInput.getFeatures().getAuditType().getAuditType());
         assertEquals("SE AJUSTA", commonInput.getFeatures().getAnswer().getAnswer());
         assertEquals(1, commonInput.getAudit().getAuditNumber());
-
     }
 
     @Test
@@ -120,7 +106,7 @@ public class CommonInputControllerTest {
 
         Mockito.when(commonInputService.updateCommonInput(1, commonInput)).thenReturn(commonInput);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/commonAudit/1")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/commonInput/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(commonInput)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -147,7 +133,7 @@ public class CommonInputControllerTest {
     public void deleteCommonAuditTest() throws Exception {
         int id = 1;
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/commonAudit/{id}", id))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/commonInput/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         Mockito.verify(commonInputService, Mockito.times(1)).deleteCommonInput(id);

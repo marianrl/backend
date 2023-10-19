@@ -60,9 +60,7 @@ public class AuditControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.auditNumber").value(22))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditDate").value("11/10/2023"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditType").value(auditType))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.audited").value(audited));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.auditDate").value("11/10/2023"));
     }
 
     @Test

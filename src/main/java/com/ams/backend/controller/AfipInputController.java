@@ -24,26 +24,26 @@ public class AfipInputController {
     @Autowired
     private AfipInputService afipInputService;
 
-    @GetMapping("/afipAudit")
+    @GetMapping("/afipInput")
     public List<AfipInput> getAllAfipAudits() {
 
         return afipInputService.getAllAfipInputs();
     }
 
-    @GetMapping("/afipAudit/{id}")
+    @GetMapping("/afipInput/{id}")
     public ResponseEntity<List<AfipInput>> getAfipAuditByAuditNumber(@PathVariable(value = "id") int auditNumber)
-            throws ResourceNotFoundException{
+    {
         List<AfipInput> afipInput = afipInputService.getAfipInputByAuditNumber(auditNumber);
 
         return ResponseEntity.ok().body(afipInput);
     }
 
-    @PostMapping("/afipAudit")
+    @PostMapping("/afipInput")
     public AfipInput createAfipAudit(@Valid @RequestBody AfipInput afipInput) {
         return afipInputService.createAfipInput(afipInput);
     }
 
-    @PutMapping("/afipAudit/{id}")
+    @PutMapping("/afipInput/{id}")
     public ResponseEntity<AfipInput> updateAfipAudit(
             @PathVariable(value = "id") int afipAuditId,
             @Valid @RequestBody AfipInput afipInputDetails) throws ResourceNotFoundException {
@@ -52,7 +52,7 @@ public class AfipInputController {
         return ResponseEntity.ok(updatedAfipInput);
     }
 
-    @DeleteMapping("/afipAudit/{id}")
+    @DeleteMapping("/afipInput/{id}")
     public ResponseEntity<Void> deleteAfipAudit(@PathVariable(value = "id") int afipAuditId)
             throws ResourceNotFoundException {
         afipInputService.deleteAfipInput(afipAuditId);

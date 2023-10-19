@@ -20,7 +20,7 @@ public class CommonInputService {
         return commonInputRepository.findAll();
     }
 
-    public List<CommonInput> getCommonInputById(int id) throws ResourceNotFoundException {
+    public List<CommonInput> getCommonInputByAuditNumber(int id){
         return commonInputRepository.findByAuditNumber(id);
     }
 
