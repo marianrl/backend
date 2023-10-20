@@ -68,7 +68,7 @@ public class AfipAuditServiceTest {
         List<AfipInput> afipInputList = new ArrayList<>();
         afipInputList.add(afipInput);
 
-        Mockito.when(afipInputRepository.findByAuditNumber(afipInput.getId())).thenReturn(afipInputList);
+        Mockito.when(afipInputRepository.findByAudit_AuditNumber(afipInput.getId())).thenReturn(afipInputList);
         List<AfipInput> actualAfipInput = afipInputService.getAfipInputByAuditNumber(afipInput.getId());
 
         assertEquals(afipInputList, actualAfipInput);

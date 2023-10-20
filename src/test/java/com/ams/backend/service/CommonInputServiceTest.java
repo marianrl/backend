@@ -67,7 +67,7 @@ public class CommonInputServiceTest {
         List<CommonInput> commonInputs = new ArrayList<>();
         commonInputs.add(commonInput);
 
-        Mockito.when(commonInputRepository.findByAuditNumber(commonInput.getId())).thenReturn(commonInputs);
+        Mockito.when(commonInputRepository.findByAudit_AuditNumber(commonInput.getId())).thenReturn(commonInputs);
         List <CommonInput> actualCommonInput = commonInputService.getCommonInputByAuditNumber(commonInput.getId());
 
         assertEquals(commonInputs, actualCommonInput);

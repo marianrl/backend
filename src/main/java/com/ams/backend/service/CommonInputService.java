@@ -21,7 +21,7 @@ public class CommonInputService {
     }
 
     public List<CommonInput> getCommonInputByAuditNumber(int id){
-        return commonInputRepository.findByAuditNumber(id);
+        return commonInputRepository.findByAudit_AuditNumber(id);
     }
 
     public CommonInput createCommonInput(CommonInput commonInput) {

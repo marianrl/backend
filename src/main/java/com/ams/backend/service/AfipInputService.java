@@ -21,7 +21,7 @@ public class AfipInputService {
     }
 
     public List<AfipInput> getAfipInputByAuditNumber(int id) {
-        return afipInputRepository.findByAuditNumber(id);
+        return afipInputRepository.findByAudit_AuditNumber(id);
     }
 
     public AfipInput createAfipInput(AfipInput afipInput) {

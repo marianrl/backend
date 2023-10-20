@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AfipInputRepository extends JpaRepository<AfipInput, Integer> {
-    List<AfipInput> findByAuditNumber(int id);
+
+    List<AfipInput> findByAudit_AuditNumber(int id);
 }
