@@ -17,7 +17,7 @@ public class Audit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "AuditNumber", nullable = false)
+    @Column(name = "audit_number", nullable = false)
     private int auditNumber;
 
     @Column(name = "fecha_auditoria", nullable = false)
