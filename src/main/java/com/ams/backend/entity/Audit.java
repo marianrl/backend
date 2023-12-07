@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 @Entity
 @AllArgsConstructor
@@ -21,7 +24,7 @@ public class Audit {
     private int auditNumber;
 
     @Column(name = "fecha_auditoria", nullable = false)
-    private String auditDate;
+    private @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate auditDate;
 
     @ManyToOne
     @JoinColumn(name = "id_tipo_auditoria")

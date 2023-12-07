@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class CommonInputControllerTest {
     final private AuditType auditType = new AuditType(1, "AFIP");
     final private Audited audited = new Audited(1,"NO");
     final private Features features = new Features(1,auditType ,answer);
-    final private Audit audit = new Audit(1,1,"11/10/2023",auditType,audited);
+    final private Audit audit = new Audit(1,1,LocalDate.now(),auditType,audited);
 
     final private CommonInput commonInput = new CommonInput(
             1,
@@ -51,7 +52,7 @@ public class CommonInputControllerTest {
             client,
             "Capital Federal",
             branch,
-            "17/06/2023",
+            LocalDate.now(),
             features,
             audit
     );
@@ -95,7 +96,7 @@ public class CommonInputControllerTest {
         assertEquals("hola", commonInput.getClient().getClient());
         assertEquals("Capital Federal", commonInput.getUoc());
         assertEquals("hola", commonInput.getBranch().getBranch());
-        assertEquals("17/06/2023", commonInput.getAdmissionDate());
+        assertEquals(LocalDate.now(), commonInput.getAdmissionDate());
         assertEquals("AFIP", commonInput.getFeatures().getAuditType().getAuditType());
         assertEquals("SE AJUSTA", commonInput.getFeatures().getAnswer().getAnswer());
         assertEquals(1, commonInput.getAudit().getAuditNumber());
@@ -122,7 +123,7 @@ public class CommonInputControllerTest {
         assertEquals("hola", commonInput.getClient().getClient());
         assertEquals("Capital Federal", commonInput.getUoc());
         assertEquals("hola", commonInput.getBranch().getBranch());
-        assertEquals("17/06/2023", commonInput.getAdmissionDate());
+        assertEquals(LocalDate.now(), commonInput.getAdmissionDate());
         assertEquals("AFIP", commonInput.getFeatures().getAuditType().getAuditType());
         assertEquals("SE AJUSTA", commonInput.getFeatures().getAnswer().getAnswer());
         assertEquals(1, commonInput.getAudit().getAuditNumber());

@@ -12,6 +12,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 @Entity
 @AllArgsConstructor
@@ -51,7 +54,7 @@ public class CommonInput {
     private Branch branch;
 
     @Column(name = "fecha_ingreso", nullable = false)
-    private String admissionDate;
+    private @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate admissionDate;
 
     @ManyToOne
     @JoinColumn(name = "id_caracteristicas")

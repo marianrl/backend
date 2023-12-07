@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class AuditControllerTest {
     final private Audit audit = new Audit(
             1,
             22,
-            "11/10/2023",
+            LocalDate.now(),
             auditType,
             audited
     );
@@ -60,7 +61,7 @@ public class AuditControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.auditNumber").value(22))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditDate").value("11/10/2023"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.auditDate").value(LocalDate.now()));
     }
 
     @Test
@@ -74,7 +75,7 @@ public class AuditControllerTest {
 
         assertEquals(1, audit.getId());
         assertEquals(22, audit.getAuditNumber());
-        assertEquals("11/10/2023", audit.getAuditDate());
+        assertEquals(LocalDate.now(), audit.getAuditDate());
         assertEquals(auditType, audit.getIdTipoAuditoria());
         assertEquals(audited, audit.getIdAuditado());
     }
@@ -94,7 +95,7 @@ public class AuditControllerTest {
 
         assertEquals(1, audit.getId());
         assertEquals(22, audit.getAuditNumber());
-        assertEquals("11/10/2023", audit.getAuditDate());
+        assertEquals(LocalDate.now(), audit.getAuditDate());
         assertEquals(auditType, audit.getIdTipoAuditoria());
         assertEquals(audited, audit.getIdAuditado());
     }
