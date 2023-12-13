@@ -1,12 +1,15 @@
 package com.ams.backend.service;
 
 import com.ams.backend.entity.AfipInput;
+import com.ams.backend.entity.AfipInputSpecification;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.AfipInputRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -22,6 +25,25 @@ public class AfipInputService {
 
     public List<AfipInput> getAfipInputByAuditNumber(int id) {
         return afipInputRepository.findByAudit_AuditNumber(id);
+    }
+
+    public List<AfipInput> getFilteredAfipInputs(
+            String apellido,
+            String nombre,
+            String cuil,
+            String legajo,
+            String asignacion,
+            Long idCliente,
+            String uoc,
+            Long idSucursal,
+            LocalDate fechaIngreso,
+            Long idCaracteristicas) {
+
+        Specification<AfipInput> specification = AfipInputSpecification.getFilteredAfipInputs(
+                apellido, nombre, cuil, legajo, asignacion, idCliente, uoc, idSucursal, fechaIngreso, idCaracteristicas
+        );
+
+        return afipInputRepository.findAll(specification);
     }
 
     public AfipInput createAfipInput(AfipInput afipInput) {
