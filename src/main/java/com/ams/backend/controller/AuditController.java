@@ -1,6 +1,5 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.AuthenticateRequest;
 import com.ams.backend.entity.Audit;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.service.AuditService;
