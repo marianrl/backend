@@ -26,7 +26,6 @@ public class AnswerController {
 
     @GetMapping("/answer")
     public List<Answer> getAllAnswers() {
-
         return answerService.getAllAnswers();
     }
 
@@ -58,5 +57,10 @@ public class AnswerController {
         answerService.deleteAnswer(answerId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/answersByAuditType/{auditTypeId}")
+    public List<Answer> getAnswersByAuditType(@PathVariable int auditTypeId){
+        return answerService.getAnswersByAuditType(auditTypeId);
     }
 }

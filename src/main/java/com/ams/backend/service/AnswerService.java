@@ -25,6 +25,10 @@ public class AnswerService {
                 .orElseThrow(() -> new ResourceNotFoundException("Answer not found for this id :: " + id));
     }
 
+    public List<Answer> getAnswersByAuditType(int id) {
+        return answerRepository.findByAuditTypeId(id);
+    }
+
     public Answer createAnswer(Answer answer) {
         return answerRepository.save(answer);
     }

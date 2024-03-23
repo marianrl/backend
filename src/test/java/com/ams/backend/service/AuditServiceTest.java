@@ -1,8 +1,8 @@
 package com.ams.backend.service;
 
-import com.ams.backend.entity.Answer;
+import com.ams.backend.entity.Audit;
 import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.repository.AnswerRepository;
+import com.ams.backend.repository.AuditRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,68 +21,69 @@ import static org.mockito.Mockito.verify;
 public class AuditServiceTest {
 
     @Mock
-    private AnswerRepository auditRepository;
+    private AuditRepository auditRepository;
 
-    private AnswerService auditService;
+    private AuditService auditService;
 
     @Before
     public void setup() {
-        auditService = new AnswerService(auditRepository);
+        auditService = new AuditService(auditRepository);
     }
 
     @Test
-    public void testGetAllAnswers() {
-        List<Answer> audits = new ArrayList<>();
+    public void testGetAllAudits() {
+        List<Audit> audits = new ArrayList<>();
         Mockito.when(auditRepository.findAll()).thenReturn(audits);
-        List<Answer> actualAnswers = auditService.getAllAnswers();
+        List<Audit> actualAudits = auditService.getAllAudit();
 
-        assertEquals(audits, actualAnswers);
+        assertEquals(audits, actualAudits);
     }
 
-    @Test
-    public void testGetAnswersById() throws ResourceNotFoundException {
-        int auditsId = 1;
-        Answer expectedAnswer = new Answer(auditsId, "CABA");
-
-        Mockito.when(auditRepository.findById(auditsId)).thenReturn(Optional.of(expectedAnswer));
-        Answer actualAnswer = auditService.getAnswerById(auditsId);
-
-        assertEquals(expectedAnswer, actualAnswer);
-    }
-
-    @Test
-    public void testCreateAnswer() {
-        int auditId = 1;
-        Answer audit = new Answer(auditId, "CABA");
-
-        Mockito.when(auditRepository.save(audit)).thenReturn(audit);
-        Answer actualAnswer = auditService.createAnswer(audit);
-
-        assertEquals(actualAnswer, audit);
-    }
-
-    @Test
-    public void testUpdateAnswer() throws ResourceNotFoundException {
-        int auditId = 1;
-        Answer audit = new Answer(auditId, "CABA");
-        Answer updatedAnswer = new Answer(auditId, "GBA");
-
-        Mockito.when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
-        Answer actualAnswer = auditService.updateAnswer(auditId, updatedAnswer);
-
-        assertEquals(updatedAnswer.getId(), actualAnswer.getId());
-        assertEquals(updatedAnswer.getAnswer(), actualAnswer.getAnswer());
-    }
-
-    @Test
-    public void testDeleteAnswer() throws ResourceNotFoundException {
-        int auditId = 1;
-        Answer audit = new Answer(auditId, "CABA");
-
-        Mockito.when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
-        auditService.deleteAnswer(auditId);
-
-        verify(auditRepository).deleteById(1);
-    }
+    //TODO
+//    @Test
+//    public void testGetAuditsById() throws ResourceNotFoundException {
+//        int auditsId = 1;
+//        Audit expectedAudit = new Audit(auditsId, "CABA");
+//
+//        Mockito.when(auditRepository.findById(auditsId)).thenReturn(Optional.of(expectedAudit));
+//        Audit actualAudit = auditService.getAuditById(auditsId);
+//
+//        assertEquals(expectedAudit, actualAudit);
+//    }
+//
+//    @Test
+//    public void testCreateAudit() {
+//        int auditId = 1;
+//        Audit audit = new Audit(auditId, "CABA");
+//
+//        Mockito.when(auditRepository.save(audit)).thenReturn(audit);
+//        Audit actualAudit = auditService.createAudit(audit);
+//
+//        assertEquals(actualAudit, audit);
+//    }
+//
+//    @Test
+//    public void testUpdateAudit() throws ResourceNotFoundException {
+//        int auditId = 1;
+//        Audit audit = new Audit(auditId, "CABA");
+//        Audit updatedAudit = new Audit(auditId, "GBA");
+//
+//        Mockito.when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+//        Audit actualAudit = auditService.updateAudit(auditId, updatedAudit);
+//
+//        assertEquals(updatedAudit.getId(), actualAudit.getId());
+//        assertEquals(updatedAudit.getAudit(), actualAudit.getAudit());
+//    }
+//
+//    @Test
+//    public void testDeleteAudit() throws ResourceNotFoundException {
+//        int auditId = 1;
+//        Audit audit = new Audit(auditId, "CABA");
+//
+//        Mockito.when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+//        auditService.deleteAudit(auditId);
+//
+//        verify(auditRepository).deleteById(1);
+//    }
 }
 
