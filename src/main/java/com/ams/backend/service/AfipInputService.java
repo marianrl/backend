@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -22,6 +23,11 @@ public class AfipInputService {
     public List<AfipInput> getAllAfipInputs() {
         return afipInputRepository.findAll();
     }
+
+    public Optional<AfipInput> getAfipInputById(int id) {
+        return afipInputRepository.findById(id);
+    }
+
 
     public List<AfipInput> getAfipInputByAuditNumber(int id) {
         return afipInputRepository.findByAudit_AuditNumber(id);

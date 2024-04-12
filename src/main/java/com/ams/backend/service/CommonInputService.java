@@ -2,8 +2,11 @@ package com.ams.backend.service;
 
 import com.ams.backend.entity.CommonInput;
 import com.ams.backend.entity.CommonInputSpecification;
+import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.CommonInputRepository;
+import com.ams.backend.repository.FeaturesRepository;
+import com.ams.backend.request.CommonInputUpdateRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -19,12 +23,19 @@ public class CommonInputService {
     @Autowired
     private CommonInputRepository commonInputRepository;
 
+    @Autowired
+    private FeaturesRepository featuresRepository;
+
     public List<CommonInput> getAllCommonInputs() {
         return commonInputRepository.findAll();
     }
 
     public List<CommonInput> getCommonInputByAuditNumber(int id){
         return commonInputRepository.findByAudit_AuditNumber(id);
+    }
+
+    public Optional<CommonInput> getCommonInputById(int id) {
+        return commonInputRepository.findById(id);
     }
 
     public List<CommonInput> getFilteredCommonInputs(
@@ -50,25 +61,30 @@ public class CommonInputService {
         return commonInputRepository.save(commonInput);
     }
 
-    public CommonInput updateCommonInput(int id, CommonInput commonInput) throws ResourceNotFoundException {
-        CommonInput commonInput1 = commonInputRepository.findById(id)
+    public CommonInput updateCommonInput(int id, CommonInputUpdateRequest commonInputUpdateRequest) throws ResourceNotFoundException {
+
+        CommonInput commonInputToUpdate = commonInputRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("CommonInput not found for this id :: " + id));
 
-        commonInput1.setLastName(commonInput.getLastName());
-        commonInput1.setName(commonInput.getName());
-        commonInput1.setCuil(commonInput.getCuil());
-        commonInput1.setFile(commonInput.getFile());
-        commonInput1.setAllocation(commonInput.getAllocation());
-        commonInput1.setClient(commonInput.getClient());
-        commonInput1.setUoc(commonInput.getUoc());
-        commonInput1.setBranch(commonInput.getBranch());
-        commonInput1.setAdmissionDate(commonInput.getAdmissionDate());
-        commonInput1.setFeatures(commonInput.getFeatures());
-        commonInput1.setAudit(commonInput.getAudit());
+        // Asignar los valores simples que no son FK
+        commonInputToUpdate.setLastName(commonInputUpdateRequest.getLastName());
+        commonInputToUpdate.setName(commonInputUpdateRequest.getName());
+        commonInputToUpdate.setCuil(commonInputUpdateRequest.getCuil());
+        commonInputToUpdate.setFile(commonInputUpdateRequest.getFile());
+        commonInputToUpdate.setAllocation(commonInputUpdateRequest.getAllocation());
+        commonInputToUpdate.setUoc(commonInputUpdateRequest.getUoc());
+        commonInputToUpdate.setAdmissionDate(commonInputUpdateRequest.getAdmissionDate());
+        // Otros campos que deseas actualizar
 
-        commonInputRepository.save(commonInput1);
+        // Cargar el objeto Features existente desde la base de datos utilizando su ID
+        Features existingFeatures = featuresRepository.findById(commonInputUpdateRequest.getFeaturesId())
+                .orElseThrow(() -> new ResourceNotFoundException("Features not found with id :: " + commonInputUpdateRequest.getFeaturesId()));
 
-        return commonInput1;
+        // Asignar el objeto Features existente al CommonInput actualizado
+        commonInputToUpdate.setFeatures(existingFeatures);
+
+        // Guardar el CommonInput actualizado en la base de datos
+        return commonInputRepository.save(commonInputToUpdate);
     }
 
     public void deleteCommonInput(int id) throws ResourceNotFoundException{

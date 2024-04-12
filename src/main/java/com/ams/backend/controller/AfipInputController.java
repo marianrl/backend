@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -31,6 +32,12 @@ public class AfipInputController {
     public List<AfipInput> getAllAfipAudits() {
 
         return afipInputService.getAllAfipInputs();
+    }
+
+    @GetMapping("/afipInputById/{id}")
+    public Optional<AfipInput> getAfipInputById(@PathVariable(value = "id") int afipInputId) {
+
+        return afipInputService.getAfipInputById(afipInputId);
     }
 
     @GetMapping("/afipInput/{id}")
@@ -76,9 +83,9 @@ public class AfipInputController {
 
     @PutMapping("/afipInput/{id}")
     public ResponseEntity<AfipInput> updateAfipAudit(
-            @PathVariable(value = "id") int afipAuditId,
+            @PathVariable(value = "id") int afipInputId,
             @Valid @RequestBody AfipInput afipInputDetails) throws ResourceNotFoundException {
-        final AfipInput updatedAfipInput = afipInputService.updateAfipInput(afipAuditId, afipInputDetails);
+        final AfipInput updatedAfipInput = afipInputService.updateAfipInput(afipInputId, afipInputDetails);
 
         return ResponseEntity.ok(updatedAfipInput);
     }

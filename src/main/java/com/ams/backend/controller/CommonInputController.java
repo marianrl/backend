@@ -2,6 +2,7 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.CommonInput;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.request.CommonInputUpdateRequest;
 import com.ams.backend.service.CommonInputService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -31,6 +33,12 @@ public class CommonInputController {
     public List<CommonInput> getAllCommonInputs() {
 
         return commonInputService.getAllCommonInputs();
+    }
+
+    @GetMapping("/commonInputById/{id}")
+    public Optional<CommonInput> getCommonInputById(@PathVariable(value = "id") int commonInputId) {
+
+        return commonInputService.getCommonInputById(commonInputId);
     }
 
     @GetMapping("/commonInput/{id}")
@@ -77,8 +85,8 @@ public class CommonInputController {
     @PutMapping("/commonInput/{id}")
     public ResponseEntity<CommonInput> updateCommonInput(
             @PathVariable(value = "id") int commonInputId,
-            @Valid @RequestBody CommonInput commonInputDetails) throws ResourceNotFoundException {
-        final CommonInput updatedCommonInput = commonInputService.updateCommonInput(commonInputId, commonInputDetails);
+            @Valid @RequestBody CommonInputUpdateRequest commonInputUpdateRequest) throws ResourceNotFoundException {
+        final CommonInput updatedCommonInput = commonInputService.updateCommonInput(commonInputId, commonInputUpdateRequest);
 
         return ResponseEntity.ok(updatedCommonInput);
     }
