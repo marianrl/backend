@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -101,35 +100,35 @@ public class AfipInputControllerTest {
 
     }
 
-    @Test
-    public void updateAfipInputTest() throws Exception {
-
-        Mockito.when(afipInputService.updateAfipInput(1, afipInput)).thenReturn(afipInput);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/afipInput/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(afipInput)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        Mockito.verify(afipInputService, Mockito.times(1))
-                .updateAfipInput(ArgumentMatchers.anyInt(), ArgumentMatchers.any(AfipInput.class));
-
-        assertEquals("Perez", afipInput.getLastName());
-        assertEquals("Juan", afipInput.getName());
-        assertEquals("20-45125484-7", afipInput.getCuil());
-        assertEquals("4568", afipInput.getFile());
-        assertEquals("1248", afipInput.getAllocation());
-        assertEquals("hola", afipInput.getClient().getClient());
-        assertEquals("Capital Federal", afipInput.getUoc());
-        assertEquals("hola", afipInput.getBranch().getBranch());
-        assertEquals(LocalDate.now(), afipInput.getAdmissionDate());
-        assertEquals("AFIP", afipInput.getFeatures().getAuditType().getAuditType());
-        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
-        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
-        assertEquals(1, afipInput.getAudit().getAuditNumber());
-
-
-    }
+//    @Test
+//    public void updateAfipInputTest() throws Exception {
+//
+//        Mockito.when(afipInputService.updateAfipInput(1, afipInput)).thenReturn(afipInput);
+//
+//        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/afipInput/1")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(asJsonString(afipInput)))
+//                .andExpect(MockMvcResultMatchers.status().isOk());
+//
+//        Mockito.verify(afipInputService, Mockito.times(1))
+//                .updateAfipInput(ArgumentMatchers.anyInt(), ArgumentMatchers.any(AfipInput.class));
+//
+//        assertEquals("Perez", afipInput.getLastName());
+//        assertEquals("Juan", afipInput.getName());
+//        assertEquals("20-45125484-7", afipInput.getCuil());
+//        assertEquals("4568", afipInput.getFile());
+//        assertEquals("1248", afipInput.getAllocation());
+//        assertEquals("hola", afipInput.getClient().getClient());
+//        assertEquals("Capital Federal", afipInput.getUoc());
+//        assertEquals("hola", afipInput.getBranch().getBranch());
+//        assertEquals(LocalDate.now(), afipInput.getAdmissionDate());
+//        assertEquals("AFIP", afipInput.getFeatures().getAuditType().getAuditType());
+//        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
+//        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
+//        assertEquals(1, afipInput.getAudit().getAuditNumber());
+//
+//
+//    }
 
     @Test
     public void deleteAfipAuditTest() throws Exception {

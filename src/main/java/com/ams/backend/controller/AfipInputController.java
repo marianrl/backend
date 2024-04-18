@@ -2,6 +2,7 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.AfipInput;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.request.AfipInputUpdateRequest;
 import com.ams.backend.service.AfipInputService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,8 +85,8 @@ public class AfipInputController {
     @PutMapping("/afipInput/{id}")
     public ResponseEntity<AfipInput> updateAfipAudit(
             @PathVariable(value = "id") int afipInputId,
-            @Valid @RequestBody AfipInput afipInputDetails) throws ResourceNotFoundException {
-        final AfipInput updatedAfipInput = afipInputService.updateAfipInput(afipInputId, afipInputDetails);
+            @Valid @RequestBody AfipInputUpdateRequest afipInputUpdateRequest) throws ResourceNotFoundException {
+        final AfipInput updatedAfipInput = afipInputService.updateAfipInput(afipInputId, afipInputUpdateRequest);
 
         return ResponseEntity.ok(updatedAfipInput);
     }

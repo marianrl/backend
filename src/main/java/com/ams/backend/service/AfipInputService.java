@@ -2,8 +2,11 @@ package com.ams.backend.service;
 
 import com.ams.backend.entity.AfipInput;
 import com.ams.backend.entity.AfipInputSpecification;
+import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.AfipInputRepository;
+import com.ams.backend.repository.FeaturesRepository;
+import com.ams.backend.request.AfipInputUpdateRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +22,9 @@ public class AfipInputService {
 
     @Autowired
     private AfipInputRepository afipInputRepository;
+
+    @Autowired
+    private FeaturesRepository featuresRepository;
 
     public List<AfipInput> getAllAfipInputs() {
         return afipInputRepository.findAll();
@@ -56,25 +62,29 @@ public class AfipInputService {
         return afipInputRepository.save(afipInput);
     }
 
-    public AfipInput updateAfipInput(int id, AfipInput afipInput) throws ResourceNotFoundException {
-        AfipInput afipInput1 = afipInputRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("AfipAudit not found for this id :: " + id));
+    public AfipInput updateAfipInput(int id, AfipInputUpdateRequest afipInputUpdateRequest) throws ResourceNotFoundException {
+        AfipInput afipInputToUpdate = afipInputRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("AfipInput not found for this id :: " + id));
 
-        afipInput1.setLastName(afipInput.getLastName());
-        afipInput1.setName(afipInput.getName());
-        afipInput1.setCuil(afipInput.getCuil());
-        afipInput1.setFile(afipInput.getFile());
-        afipInput1.setAllocation(afipInput.getAllocation());
-        afipInput1.setClient(afipInput.getClient());
-        afipInput1.setUoc(afipInput.getUoc());
-        afipInput1.setBranch(afipInput.getBranch());
-        afipInput1.setAdmissionDate(afipInput.getAdmissionDate());
-        afipInput1.setFeatures(afipInput.getFeatures());
-        afipInput1.setAudit(afipInput.getAudit());
+        // Asignar los valores simples que no son FK
+        afipInputToUpdate.setLastName(afipInputUpdateRequest.getLastName());
+        afipInputToUpdate.setName(afipInputUpdateRequest.getName());
+        afipInputToUpdate.setCuil(afipInputUpdateRequest.getCuil());
+        afipInputToUpdate.setFile(afipInputUpdateRequest.getFile());
+        afipInputToUpdate.setAllocation(afipInputUpdateRequest.getAllocation());
+        afipInputToUpdate.setUoc(afipInputUpdateRequest.getUoc());
+        afipInputToUpdate.setAdmissionDate(afipInputUpdateRequest.getAdmissionDate());
+        // Otros campos que deseas actualizar
 
-        afipInputRepository.save(afipInput1);
+        // Cargar el objeto Features existente desde la base de datos utilizando su ID
+        Features existingFeatures = featuresRepository.findById(afipInputUpdateRequest.getFeaturesId())
+                .orElseThrow(() -> new ResourceNotFoundException("Features not found with id :: " + afipInputUpdateRequest.getFeaturesId()));
 
-        return afipInput1;
+        // Asignar el objeto Features existente al AfipInput actualizado
+        afipInputToUpdate.setFeatures(existingFeatures);
+
+        // Guardar el AfipInput actualizado en la base de datos
+        return afipInputRepository.save(afipInputToUpdate);
     }
 
     public void deleteAfipInput(int id) throws ResourceNotFoundException{
