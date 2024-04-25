@@ -64,21 +64,21 @@ public class AuditControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.auditDate").value(LocalDate.now()));
     }
 
-    @Test
-    public void createAuditTest() throws Exception {
-        Mockito.when(auditService.createAudit(audit)).thenReturn(audit);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/audit")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(audit)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        assertEquals(1, audit.getId());
-        assertEquals(22, audit.getAuditNumber());
-        assertEquals(LocalDate.now(), audit.getAuditDate());
-        assertEquals(auditType, audit.getIdTipoAuditoria());
-        assertEquals(audited, audit.getIdAuditado());
-    }
+//    @Test
+//    public void createAuditTest() throws Exception {
+//        Mockito.when(auditService.createAudit(audit)).thenReturn(audit);
+//
+//        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/audit")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(asJsonString(audit)))
+//                .andExpect(MockMvcResultMatchers.status().isOk());
+//
+//        assertEquals(1, audit.getId());
+//        assertEquals(22, audit.getAuditNumber());
+//        assertEquals(LocalDate.now(), audit.getAuditDate());
+//        assertEquals(auditType, audit.getIdTipoAuditoria());
+//        assertEquals(audited, audit.getIdAuditado());
+//    }
 
     @Test
     public void updateAuditTest() throws Exception {

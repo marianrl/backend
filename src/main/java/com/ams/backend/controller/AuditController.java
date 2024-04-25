@@ -31,8 +31,8 @@ public class AuditController {
         return ResponseEntity.ok().body(audit);
     }
     @PostMapping("/audit")
-    public Audit createAudit(@Valid @RequestBody Audit audit) {
-        return auditService.createAudit(audit);
+    public Audit createAudit(@Valid @RequestBody int auditTypeId) throws ResourceNotFoundException {
+        return auditService.createAudit(auditTypeId);
     }
 
     @PutMapping("/audit/{id}")
