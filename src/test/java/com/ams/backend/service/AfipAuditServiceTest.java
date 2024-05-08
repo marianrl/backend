@@ -3,6 +3,7 @@ package com.ams.backend.service;
 import com.ams.backend.entity.*;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.AfipInputRepository;
+import com.ams.backend.repository.AnswerRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,9 @@ public class AfipAuditServiceTest {
 
     @Mock
     private FeaturesRepository featuresRepository;
+
+    @Mock
+    private AnswerRepository answerRepository;
 
     private AfipInputService afipInputService;
 
@@ -55,7 +59,7 @@ public class AfipAuditServiceTest {
 
     @Before
     public void setup() {
-        afipInputService = new AfipInputService(afipInputRepository, featuresRepository);
+        afipInputService = new AfipInputService(afipInputRepository, featuresRepository, answerRepository);
     }
 
     @Test
