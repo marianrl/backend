@@ -1,9 +1,11 @@
 package com.ams.backend.service;
 
+import com.ams.backend.entity.Answer;
 import com.ams.backend.entity.CommonInput;
 import com.ams.backend.entity.CommonInputSpecification;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.repository.AnswerRepository;
 import com.ams.backend.repository.CommonInputRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.CommonInputUpdateRequest;
@@ -22,6 +24,9 @@ public class CommonInputService {
 
     @Autowired
     private CommonInputRepository commonInputRepository;
+
+    @Autowired
+    private AnswerRepository answerRepository;
 
     @Autowired
     private FeaturesRepository featuresRepository;
@@ -76,14 +81,15 @@ public class CommonInputService {
         commonInputToUpdate.setAdmissionDate(commonInputUpdateRequest.getAdmissionDate());
         // Otros campos que deseas actualizar
 
-        // Cargar el objeto Features existente desde la base de datos utilizando su ID
-        Features existingFeatures = featuresRepository.findById(commonInputUpdateRequest.getFeaturesId())
-                .orElseThrow(() -> new ResourceNotFoundException("Features not found with id :: " + commonInputUpdateRequest.getFeaturesId()));
+        // Actualizar la relación de Answer en Features según el request
+        Answer existingAnswer = answerRepository.findById(commonInputUpdateRequest.getAnswerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Answer not found with id :: " + commonInputUpdateRequest.getAnswerId()));
 
-        // Asignar el objeto Features existente al CommonInput actualizado
-        commonInputToUpdate.setFeatures(existingFeatures);
+        Features updatedFeature = featuresRepository.findByAuditTypeAndAnswer(commonInputToUpdate.getFeatures().getAuditType(), existingAnswer);
 
-        // Guardar el CommonInput actualizado en la base de datos
+        commonInputToUpdate.setFeatures(updatedFeature);
+
+        // Guardar CommonInput actualizado en la base de datos
         return commonInputRepository.save(commonInputToUpdate);
     }
 

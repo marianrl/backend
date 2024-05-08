@@ -21,7 +21,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Ingreso_Comun")
+@Table(name = "Ingreso_Afip")
 public class AfipInput {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

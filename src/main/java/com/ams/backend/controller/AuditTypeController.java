@@ -39,7 +39,7 @@ public class AuditTypeController {
     }
 
     @PostMapping("/auditType")
-    public AuditType createAudit(@Valid @RequestBody AuditType auditType) {
+    public AuditType createAuditType(@Valid @RequestBody AuditType auditType) {
         return auditTypeService.createAuditType(auditType);
     }
 

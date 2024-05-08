@@ -23,5 +23,5 @@ public class AfipInputUpdateRequest {
     private String allocation;
     private String uoc;
     private @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate admissionDate;
-    private int featuresId;
+    private int answerId;
 }

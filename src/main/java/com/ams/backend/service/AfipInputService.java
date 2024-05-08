@@ -2,9 +2,11 @@ package com.ams.backend.service;
 
 import com.ams.backend.entity.AfipInput;
 import com.ams.backend.entity.AfipInputSpecification;
+import com.ams.backend.entity.Answer;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.AfipInputRepository;
+import com.ams.backend.repository.AnswerRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.AfipInputUpdateRequest;
 import lombok.AllArgsConstructor;
@@ -25,6 +27,9 @@ public class AfipInputService {
 
     @Autowired
     private FeaturesRepository featuresRepository;
+
+    @Autowired
+    private AnswerRepository answerRepository;
 
     public List<AfipInput> getAllAfipInputs() {
         return afipInputRepository.findAll();
@@ -76,14 +81,15 @@ public class AfipInputService {
         afipInputToUpdate.setAdmissionDate(afipInputUpdateRequest.getAdmissionDate());
         // Otros campos que deseas actualizar
 
-        // Cargar el objeto Features existente desde la base de datos utilizando su ID
-        Features existingFeatures = featuresRepository.findById(afipInputUpdateRequest.getFeaturesId())
-                .orElseThrow(() -> new ResourceNotFoundException("Features not found with id :: " + afipInputUpdateRequest.getFeaturesId()));
+        // Actualizar la relación de Answer en Features según el request
+        Answer existingAnswer = answerRepository.findById(afipInputUpdateRequest.getAnswerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Answer not found with id :: " + afipInputUpdateRequest.getAnswerId()));
 
-        // Asignar el objeto Features existente al AfipInput actualizado
-        afipInputToUpdate.setFeatures(existingFeatures);
+        Features updatedFeature = featuresRepository.findByAuditTypeAndAnswer(afipInputToUpdate.getFeatures().getAuditType(), existingAnswer);
 
-        // Guardar el AfipInput actualizado en la base de datos
+        afipInputToUpdate.setFeatures(updatedFeature);
+
+        // Guardar CommonInput actualizado en la base de datos
         return afipInputRepository.save(afipInputToUpdate);
     }
 
