@@ -1,8 +1,8 @@
 package com.ams.backend.service;
 
 import com.ams.backend.entity.Audit;
-import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.AuditRepository;
+import com.ams.backend.repository.AuditTypeRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,10 +12,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AuditServiceTest {
@@ -23,11 +21,14 @@ public class AuditServiceTest {
     @Mock
     private AuditRepository auditRepository;
 
+    @Mock
+    private AuditTypeRepository auditTypeRepository;
+
     private AuditService auditService;
 
     @Before
     public void setup() {
-        auditService = new AuditService(auditRepository);
+        auditService = new AuditService(auditRepository, auditTypeRepository);
     }
 
     @Test
