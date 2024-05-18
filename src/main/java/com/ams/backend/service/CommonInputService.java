@@ -1,11 +1,13 @@
 package com.ams.backend.service;
 
 import com.ams.backend.entity.Answer;
+import com.ams.backend.entity.AuditType;
 import com.ams.backend.entity.CommonInput;
 import com.ams.backend.entity.CommonInputSpecification;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.AnswerRepository;
+import com.ams.backend.repository.AuditTypeRepository;
 import com.ams.backend.repository.CommonInputRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.CommonInputUpdateRequest;
@@ -30,6 +32,9 @@ public class CommonInputService {
 
     @Autowired
     private FeaturesRepository featuresRepository;
+
+    @Autowired
+    private AuditTypeRepository auditTypeRepository;
 
     public List<CommonInput> getAllCommonInputs() {
         return commonInputRepository.findAll();
@@ -85,7 +90,10 @@ public class CommonInputService {
         Answer existingAnswer = answerRepository.findById(commonInputUpdateRequest.getAnswerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Answer not found with id :: " + commonInputUpdateRequest.getAnswerId()));
 
-        Features updatedFeature = featuresRepository.findByAuditTypeAndAnswer(commonInputToUpdate.getFeatures().getAuditType(), existingAnswer);
+        AuditType existingNewAuditType = auditTypeRepository.findById(commonInputUpdateRequest.getAuditTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException("AuditType not found with id :: " + commonInputUpdateRequest.getAuditTypeId()));
+
+        Features updatedFeature = featuresRepository.findByAuditTypeAndAnswer(existingNewAuditType, existingAnswer);
 
         commonInputToUpdate.setFeatures(updatedFeature);
 

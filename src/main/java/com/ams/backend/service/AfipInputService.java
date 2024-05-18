@@ -3,10 +3,12 @@ package com.ams.backend.service;
 import com.ams.backend.entity.AfipInput;
 import com.ams.backend.entity.AfipInputSpecification;
 import com.ams.backend.entity.Answer;
+import com.ams.backend.entity.AuditType;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.AfipInputRepository;
 import com.ams.backend.repository.AnswerRepository;
+import com.ams.backend.repository.AuditTypeRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.AfipInputUpdateRequest;
 import lombok.AllArgsConstructor;
@@ -30,6 +32,9 @@ public class AfipInputService {
 
     @Autowired
     private AnswerRepository answerRepository;
+
+    @Autowired
+    private AuditTypeRepository auditTypeRepository;
 
     public List<AfipInput> getAllAfipInputs() {
         return afipInputRepository.findAll();
@@ -68,6 +73,7 @@ public class AfipInputService {
     }
 
     public AfipInput updateAfipInput(int id, AfipInputUpdateRequest afipInputUpdateRequest) throws ResourceNotFoundException {
+
         AfipInput afipInputToUpdate = afipInputRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AfipInput not found for this id :: " + id));
 
@@ -82,10 +88,13 @@ public class AfipInputService {
         // Otros campos que deseas actualizar
 
         // Actualizar la relación de Answer en Features según el request
-        Answer existingAnswer = answerRepository.findById(afipInputUpdateRequest.getAnswerId())
+        Answer existingNewAnswer = answerRepository.findById(afipInputUpdateRequest.getAnswerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Answer not found with id :: " + afipInputUpdateRequest.getAnswerId()));
 
-        Features updatedFeature = featuresRepository.findByAuditTypeAndAnswer(afipInputToUpdate.getFeatures().getAuditType(), existingAnswer);
+        AuditType existingNewAuditType = auditTypeRepository.findById(afipInputUpdateRequest.getAuditTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException("AuditType not found with id :: " + afipInputUpdateRequest.getAuditTypeId()));
+
+        Features updatedFeature = featuresRepository.findByAuditTypeAndAnswer(existingNewAuditType, existingNewAnswer);
 
         afipInputToUpdate.setFeatures(updatedFeature);
 
