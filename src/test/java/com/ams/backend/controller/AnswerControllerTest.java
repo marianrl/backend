@@ -5,7 +5,6 @@ import com.ams.backend.service.AnswerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,6 +17,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import static org.mockito.Mockito.*;
+
 @RunWith(SpringRunner.class)
 @WebMvcTest(AnswerController.class)
 public class AnswerControllerTest {
@@ -29,60 +31,91 @@ public class AnswerControllerTest {
     private AnswerService answerService;
 
     @Test
-    public void getAllAnswersTest() throws Exception {
-
+    public void testGetAllAnswers() throws Exception {
         List<Answer> answers = new ArrayList<>();
-        Mockito.when(answerService.getAllAnswers()).thenReturn(answers);
+        // Agregar respuestas de prueba
+        when(answerService.getAllAnswers()).thenReturn(answers);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/answer"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
-
-    @Test
-    public void getAnswerByIdTest() throws Exception {
-        Answer answer = new Answer(1, "CABA");
-        Mockito.when(answerService.getAnswerById(1)).thenReturn(answer);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/answer/1"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/answer")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.answer").value("CABA"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(answers.size()));
+
+        verify(answerService, times(1)).getAllAnswers();
+        verifyNoMoreInteractions(answerService);
     }
 
     @Test
-    public void createAnswerTest() throws Exception {
-        Answer savedAnswer = new Answer(1, "CABA");
-        Mockito.when(answerService.createAnswer(savedAnswer)).thenReturn(savedAnswer);
+    public void testGetAnswerById() throws Exception {
+        int answerId = 1;
+        Answer answer = new Answer(answerId, "CABA");
+        when(answerService.getAnswerById(answerId)).thenReturn(answer);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/answer/{id}", answerId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(answer.getId()));
+
+        verify(answerService, times(1)).getAnswerById(answerId);
+        verifyNoMoreInteractions(answerService);
+    }
+
+    @Test
+    public void testCreateAnswer() throws Exception {
+        Answer answer = new Answer(1, "CABA");
+        when(answerService.createAnswer(ArgumentMatchers.any(Answer.class))).thenReturn(answer);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/answer")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"answer\":\"CABA\"}"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                        .content("{\"id\": 1, \"answer\": \"CABA\"}"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(answer.getId()));
+
+        verify(answerService, times(1)).createAnswer(ArgumentMatchers.any(Answer.class));
+        verifyNoMoreInteractions(answerService);
     }
 
     @Test
-    public void updateAnswerTest() throws Exception {
-        Answer updatedAnswer = new Answer(1, "GBA");
+    public void testUpdateAnswer() throws Exception {
+        int answerId = 1;
+        Answer updatedAnswer = new Answer(answerId, "GBA");
 
-        Mockito.when(answerService.updateAnswer(1, updatedAnswer)).thenReturn(updatedAnswer);
+        when(answerService.updateAnswer(eq(answerId), ArgumentMatchers.any(Answer.class))).thenReturn(updatedAnswer);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/answer/1")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/answer/{id}", answerId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":\"1\",\"answer\":\"GBA\"}"))
+                        .content("{\"id\": 1, \"answer\": \"GBA\"}"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(answerService, Mockito.times(1))
-                .updateAnswer(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Answer.class));
+        verify(answerService, times(1)).updateAnswer(eq(answerId), ArgumentMatchers.any(Answer.class));
+        verifyNoMoreInteractions(answerService);
     }
 
     @Test
-    public void deleteAnswerTest() throws Exception {
-        int id = 1;
+    public void testDeleteAnswer() throws Exception {
+        int answerId = 1;
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/answer/{id}", id))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/answer/{id}", answerId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        Mockito.verify(answerService, Mockito.times(1)).deleteAnswer(id);
+        verify(answerService, times(1)).deleteAnswer(answerId);
+        verifyNoMoreInteractions(answerService);
     }
 
+    @Test
+    public void testGetAnswersByAuditType() throws Exception {
+        int auditTypeId = 1;
+        List<Answer> answers = new ArrayList<>();
+        // Agregar respuestas de prueba
+        when(answerService.getAnswersByAuditType(auditTypeId)).thenReturn(answers);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/answersByAuditType/{auditTypeId}", auditTypeId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()").value(answers.size()));
+
+        verify(answerService, times(1)).getAnswersByAuditType(auditTypeId);
+        verifyNoMoreInteractions(answerService);
+    }
 }

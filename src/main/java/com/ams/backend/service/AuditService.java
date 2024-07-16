@@ -38,7 +38,7 @@ public class AuditService {
                 .orElseThrow(() -> new ResourceNotFoundException("AuditType not found for this id :: " + auditTypeId));
 
         Audit audit = new Audit();
-        audit.setAuditNumber(99); //TODO Este valor hay que borrarlo de la base
+        audit.setAuditNumber(99);
         audit.setAuditDate(LocalDate.now());
         audit.setIdTipoAuditoria(auditType);
         audit.setIdAuditado(new Audited(2, "No"));

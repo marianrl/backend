@@ -1,147 +1,130 @@
 package com.ams.backend.controller;
 
 import com.ams.backend.entity.*;
+import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.request.CommonInputUpdateRequest;
 import com.ams.backend.service.CommonInputService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(CommonInputController.class)
 public class CommonInputControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private CommonInputService commonInputService;
 
-    final private Client client = new Client(1, "hola");
-    final private Branch branch = new Branch(1, "hola");
-    final private Answer answer = new Answer(1, "SE AJUSTA");
-    final private AuditType auditType = new AuditType(1, "AFIP");
-    final private Audited audited = new Audited(1,"NO");
-    final private Features features = new Features(1,auditType ,answer);
-    final private Audit audit = new Audit(1,1,LocalDate.now(),auditType,audited);
+    @InjectMocks
+    private CommonInputController commonInputController;
 
-    final private CommonInput commonInput = new CommonInput(
-            1,
-            "Perez",
-            "Juan",
-            "20-45125484-7",
-            "4568",
-            "1248",
-            client,
-            "Capital Federal",
-            branch,
-            LocalDate.now(),
-            features,
-            audit
-    );
+    private CommonInput commonInput;
 
-    @Test
-    public void getAllCommonInputTest() throws Exception {
-
-        List<CommonInput> commonInputs = new ArrayList<>();
-        Mockito.when(commonInputService.getAllCommonInputs()).thenReturn(commonInputs);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/commonInput"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(commonInputController).build();
+        commonInput = new CommonInput();
+        commonInput.setId(1);
     }
 
     @Test
-    public void getCommonAuditByAuditNumberTest() throws Exception {
+    public void testGetAllCommonAudits() {
+        List<CommonInput> commonInputs = Collections.singletonList(commonInput);
+        when(commonInputService.getAllCommonInputs()).thenReturn(commonInputs);
 
-        List<CommonInput> commonInputsList = new ArrayList<>();
-        commonInputsList.add(commonInput);
-        Mockito.when(commonInputService.getCommonInputByAuditNumber(1)).thenReturn(commonInputsList);
+        List<CommonInput> result = commonInputController.getAllCommonInputs();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/commonInput/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)));
+        assertEquals(commonInputs, result);
+        verify(commonInputService, times(1)).getAllCommonInputs();
     }
 
     @Test
-    public void createCommonInputTest() throws Exception {
-        Mockito.when(commonInputService.createCommonInput(commonInput)).thenReturn(commonInput);
+    public void testGetCommonInputById() {
+        when(commonInputService.getCommonInputById(1)).thenReturn(Optional.of(commonInput));
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/commonInput")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(commonInput)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        Optional<CommonInput> result = commonInputController.getCommonInputById(1);
 
-        assertEquals("Perez", commonInput.getLastName());
-        assertEquals("Juan", commonInput.getName());
-        assertEquals("20-45125484-7", commonInput.getCuil());
-        assertEquals("4568", commonInput.getFile());
-        assertEquals("1248", commonInput.getAllocation());
-        assertEquals("hola", commonInput.getClient().getClient());
-        assertEquals("Capital Federal", commonInput.getUoc());
-        assertEquals("hola", commonInput.getBranch().getBranch());
-        assertEquals(LocalDate.now(), commonInput.getAdmissionDate());
-        assertEquals("AFIP", commonInput.getFeatures().getAuditType().getAuditType());
-        assertEquals("SE AJUSTA", commonInput.getFeatures().getAnswer().getAnswer());
-        assertEquals(1, commonInput.getAudit().getAuditNumber());
+        assertEquals(Optional.of(commonInput), result);
+        verify(commonInputService, times(1)).getCommonInputById(1);
     }
 
     @Test
-    public void updateCommonAuditTest() {
-//TODO
-//        Mockito.when(commonInputService.updateCommonInput(1, commonInput)).thenReturn(commonInput);
-//
-//        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/commonInput/1")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(asJsonString(commonInput)))
-//                .andExpect(MockMvcResultMatchers.status().isOk());
-//
-//        Mockito.verify(commonInputService, Mockito.times(1))
-//                .updateCommonInput(ArgumentMatchers.anyInt(), ArgumentMatchers.any(CommonInput.class));
-//
-//        assertEquals("Perez", commonInput.getLastName());
-//        assertEquals("Juan", commonInput.getName());
-//        assertEquals("20-45125484-7", commonInput.getCuil());
-//        assertEquals("4568", commonInput.getFile());
-//        assertEquals("1248", commonInput.getAllocation());
-//        assertEquals("hola", commonInput.getClient().getClient());
-//        assertEquals("Capital Federal", commonInput.getUoc());
-//        assertEquals("hola", commonInput.getBranch().getBranch());
-//        assertEquals(LocalDate.now(), commonInput.getAdmissionDate());
-//        assertEquals("AFIP", commonInput.getFeatures().getAuditType().getAuditType());
-//        assertEquals("SE AJUSTA", commonInput.getFeatures().getAnswer().getAnswer());
-//        assertEquals(1, commonInput.getAudit().getAuditNumber());
+    public void testGetCommonAuditByAuditNumber() {
+        List<CommonInput> commonInputs = Collections.singletonList(commonInput);
+        when(commonInputService.getCommonInputByAuditNumber(1)).thenReturn(commonInputs);
 
+        ResponseEntity<List<CommonInput>> result = commonInputController.getCommonAuditByAuditNumber(1);
+
+        assertEquals(commonInputs, result.getBody());
+        verify(commonInputService, times(1)).getCommonInputByAuditNumber(1);
     }
 
     @Test
-    public void deleteCommonAuditTest() throws Exception {
-        int id = 1;
+    public void testGetFilteredCommonInputs() {
+        List<CommonInput> commonInputs = Collections.singletonList(commonInput);
+        when(commonInputService.getFilteredCommonInputs(
+                anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong()))
+                .thenReturn(commonInputs);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/commonInput/{id}", id))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        List<CommonInput> result = commonInputController.getFilteredCommonInputs(
+                "Apellido", "Nombre", "20-12345678-9", "1234", "Asignacion",
+                1L, "UOC", 1L, LocalDate.now(), 1L);
 
-        Mockito.verify(commonInputService, Mockito.times(1)).deleteCommonInput(id);
+        assertEquals(commonInputs, result);
+        verify(commonInputService, times(1)).getFilteredCommonInputs(
+                anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong());
     }
 
-    private static String asJsonString(Object obj) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(obj);
+    @Test
+    public void testCreateCommonAudit() {
+        when(commonInputService.createCommonInput(any(CommonInput.class))).thenReturn(commonInput);
+
+        CommonInput result = commonInputController.createCommonInput(commonInput);
+
+        assertEquals(commonInput, result);
+        verify(commonInputService, times(1)).createCommonInput(any(CommonInput.class));
+    }
+
+    @Test
+    public void testUpdateCommonAudit() throws ResourceNotFoundException {
+        CommonInputUpdateRequest commonInputUpdateRequest = new CommonInputUpdateRequest();
+        when(commonInputService.updateCommonInput(eq(1), any(CommonInputUpdateRequest.class))).thenReturn(commonInput);
+
+        ResponseEntity<CommonInput> result = commonInputController.updateCommonInput(1, commonInputUpdateRequest);
+
+        assertEquals(commonInput, result.getBody());
+        verify(commonInputService, times(1)).updateCommonInput(eq(1), any(CommonInputUpdateRequest.class));
+    }
+
+    @Test
+    public void testDeleteCommonAudit() throws ResourceNotFoundException {
+        doNothing().when(commonInputService).deleteCommonInput(1);
+
+        ResponseEntity<Void> result = commonInputController.deleteCommonInput(1);
+
+        assertEquals(204, result.getStatusCodeValue());
+        verify(commonInputService, times(1)).deleteCommonInput(1);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.ams.backend.controller;
 
+import com.ams.backend.entity.AuthenticateRequest;
 import com.ams.backend.entity.Role;
 import com.ams.backend.entity.User;
 import com.ams.backend.service.UserService;
@@ -22,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserController.class)
@@ -68,6 +72,49 @@ public class UserControllerTest {
     }
 
     @Test
+    public void authenticateUserTest() throws Exception {
+        String mail = "juan.perez@mail.com";
+        String password = "1234";
+        AuthenticateRequest request = new AuthenticateRequest(mail, password);
+
+        // Simular el usuario encontrado
+        Mockito.when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
+
+        // Realizar la solicitud cuando se encuentra el usuario
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user/authenticate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(request)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Juan"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value("Perez"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.mail").value("juan.perez@mail.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value("1234"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.role.role").value("admin"));
+
+        // Verificar que se llamó al método del servicio con los parámetros correctos
+        verify(userService, times(1)).getUserByMailAndPassword(mail, password);
+        verifyNoMoreInteractions(userService);
+
+        // Reiniciar las interacciones del servicio para simular un usuario no encontrado
+        Mockito.reset(userService);
+
+        // Simular el usuario no encontrado
+        Mockito.when(userService.getUserByMailAndPassword(mail, password)).thenReturn(null);
+
+        // Realizar la solicitud cuando no se encuentra el usuario
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user/authenticate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(request)))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+        // Verificar que se llamó al método del servicio con los parámetros correctos
+        verify(userService, times(1)).getUserByMailAndPassword(mail, password);
+        verifyNoMoreInteractions(userService);
+    }
+
+
+    @Test
     public void createUserTest() throws Exception {
         Mockito.when(userService.createUser(user)).thenReturn(user);
 
@@ -93,7 +140,7 @@ public class UserControllerTest {
                         .content(asJsonString(user)))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(userService, Mockito.times(1))
+        verify(userService, times(1))
                 .updateUser(ArgumentMatchers.anyInt(), ArgumentMatchers.any(User.class));
 
         assertEquals("Juan", user.getName());
@@ -110,7 +157,7 @@ public class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/user/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        Mockito.verify(userService, Mockito.times(1)).deleteUser(id);
+        verify(userService, times(1)).deleteUser(id);
     }
 
     private static String asJsonString(Object obj) throws JsonProcessingException {

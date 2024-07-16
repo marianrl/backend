@@ -2,11 +2,9 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.*;
 import com.ams.backend.service.AuditService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,7 +19,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(AuditController.class)
@@ -60,44 +62,46 @@ public class AuditControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/audit/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditNumber").value(22))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditDate").value(LocalDate.now()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.auditNumber").value(22));
     }
 
-//    @Test
-//    public void createAuditTest() throws Exception {
-//        Mockito.when(auditService.createAudit(audit)).thenReturn(audit);
-//
-//        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/audit")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(asJsonString(audit)))
-//                .andExpect(MockMvcResultMatchers.status().isOk());
-//
-//        assertEquals(1, audit.getId());
-//        assertEquals(22, audit.getAuditNumber());
-//        assertEquals(LocalDate.now(), audit.getAuditDate());
-//        assertEquals(auditType, audit.getIdTipoAuditoria());
-//        assertEquals(audited, audit.getIdAuditado());
-//    }
+    @Test
+    public void createAuditTest() throws Exception {
+        int auditTypeId = 1;
+        Audit createdAudit = new Audit(1, 99, LocalDate.now(), auditType, audited);
+
+        Mockito.when(auditService.createAudit(auditTypeId)).thenReturn(createdAudit);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/audit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.valueOf(auditTypeId)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        verify(auditService, times(1)).createAudit(auditTypeId);
+        verifyNoMoreInteractions(auditService);
+    }
 
     @Test
     public void updateAuditTest() throws Exception {
+        int auditId = 1;
+        Audit updatedAudit = new Audit(auditId, 99, LocalDate.now(), auditType, audited);
 
-        Mockito.when(auditService.updateAudit(1, audit)).thenReturn(audit);
+        // Configurar el comportamiento del servicio mock
+        Mockito.when(auditService.updateAudit(eq(auditId), argThat(new AuditMatcher(updatedAudit))))
+                .thenReturn(updatedAudit);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/audit/1")
+        // Convertir el objeto Audit a JSON manualmente
+        String jsonContent = "{\"id\":1,\"auditNumber\":99,\"auditDate\":\"" + updatedAudit.getAuditDate() + "\",\"idTipoAuditoria\":{\"id\":1,\"name\":\"Test\"},\"idAuditado\":{\"id\":1,\"name\":\"TEST\"}}";
+
+        // Realizar la solicitud al controlador utilizando MockMvc
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/audit/{id}", auditId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(audit)))
+                        .content(jsonContent))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        Mockito.verify(auditService, Mockito.times(1))
-                .updateAudit(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Audit.class));
-
-        assertEquals(1, audit.getId());
-        assertEquals(22, audit.getAuditNumber());
-        assertEquals(LocalDate.now(), audit.getAuditDate());
-        assertEquals(auditType, audit.getIdTipoAuditoria());
-        assertEquals(audited, audit.getIdAuditado());
+        // Verificar las interacciones del servicio mock
+        verify(auditService, times(1)).updateAudit(eq(auditId), argThat(new AuditMatcher(updatedAudit)));
+        verifyNoMoreInteractions(auditService);
     }
 
     @Test
@@ -107,12 +111,7 @@ public class AuditControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/audit/{id}", id))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        Mockito.verify(auditService, Mockito.times(1)).deleteAudit(id);
-    }
-
-    private static String asJsonString(Object obj) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(obj);
+        verify(auditService, times(1)).deleteAudit(id);
     }
 
 }

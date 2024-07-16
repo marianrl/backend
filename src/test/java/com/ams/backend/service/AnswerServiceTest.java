@@ -51,6 +51,22 @@ public class AnswerServiceTest {
     }
 
     @Test
+    public void testGetAnswersByAuditType_Success() {
+        int auditTypeId = 1;
+        List<Answer> expectedAnswers = new ArrayList<>();
+        expectedAnswers.add(new Answer(1, "Answer 1"));
+        expectedAnswers.add(new Answer(2, "Answer 2"));
+
+        Mockito.when(answerRepository.findByAuditTypeId(auditTypeId)).thenReturn(expectedAnswers);
+
+        List<Answer> actualAnswers = answerService.getAnswersByAuditType(auditTypeId);
+
+        assertEquals(expectedAnswers, actualAnswers);
+
+        verify(answerRepository).findByAuditTypeId(auditTypeId);
+    }
+
+    @Test
     public void testCreateAnswer() {
         int answerId = 1;
         Answer answer = new Answer(answerId, "CABA");

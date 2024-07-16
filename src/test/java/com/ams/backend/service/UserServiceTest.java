@@ -60,6 +60,19 @@ public class UserServiceTest {
     }
 
     @Test
+    public void testGetUserByMailAndPassword() {
+        String mail = "juan.perez@mail.com";
+        String password = "1234";
+
+        Mockito.when(userRepository.findByMailAndPassword(mail, password)).thenReturn(user);
+
+        User actualUser = userService.getUserByMailAndPassword(mail, password);
+
+        assertEquals(user, actualUser);
+        verify(userRepository).findByMailAndPassword(mail, password);
+    }
+
+    @Test
     public void testCreateUser() {
         Mockito.when(userRepository.save(user)).thenReturn(user);
         User actualUser = userService.createUser(user);

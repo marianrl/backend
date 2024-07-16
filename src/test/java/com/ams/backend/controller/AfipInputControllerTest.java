@@ -1,148 +1,122 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.*;
+import com.ams.backend.entity.AfipInput;
+import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.request.AfipInputUpdateRequest;
 import com.ams.backend.service.AfipInputService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(AfipInputController.class)
 public class AfipInputControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private AfipInputService afipInputService;
 
-    final private Client client = new Client(1, "hola");
-    final private Branch branch = new Branch(1, "hola");
-    final private Answer answer = new Answer(1, "SE AJUSTA");
-    final private AuditType auditType = new AuditType(1, "AFIP");
-    final private Audited audited = new Audited(1,"NO");
-    final private Features features = new Features(1,auditType ,answer);
-    final private Audit audit = new Audit(1,1, LocalDate.now(),auditType,audited);
-    final private AfipInput afipInput = new AfipInput(
-            1,
-            "Perez",
-            "Juan",
-            "20-45125484-7",
-            "4568",
-            "1248",
-            client,
-            "Capital Federal",
-            branch,
-            LocalDate.now(),
-            features,
-            audit
-    );
-    @Test
-    public void getAllAfipInputTest() throws Exception {
+    @InjectMocks
+    private AfipInputController afipInputController;
 
-        List<AfipInput> afipInputs = new ArrayList<>();
-        
-        Mockito.when(afipInputService.getAllAfipInputs()).thenReturn(afipInputs);
+    private AfipInput afipInput;
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/afipInput"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(afipInputController).build();
+        afipInput = new AfipInput();
+        afipInput.setId(1);
     }
 
     @Test
-    public void getAfipInputByAuditNumberTest() throws Exception {
-        List<AfipInput> afipInputsList = new ArrayList<>();
-        afipInputsList.add(afipInput);
-        Mockito.when(afipInputService.getAfipInputByAuditNumber(1)).thenReturn(afipInputsList);
+    public void testGetAllAfipAudits() {
+        List<AfipInput> afipInputs = Collections.singletonList(afipInput);
+        when(afipInputService.getAllAfipInputs()).thenReturn(afipInputs);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/afipInput/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)));
+        List<AfipInput> result = afipInputController.getAllAfipAudits();
+
+        assertEquals(afipInputs, result);
+        verify(afipInputService, times(1)).getAllAfipInputs();
     }
 
     @Test
-    public void createAfipInputTest() throws Exception {
-        Mockito.when(afipInputService.createAfipInput(afipInput)).thenReturn(afipInput);
+    public void testGetAfipInputById() {
+        when(afipInputService.getAfipInputById(1)).thenReturn(Optional.of(afipInput));
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/afipInput")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(afipInput)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        Optional<AfipInput> result = afipInputController.getAfipInputById(1);
 
-        assertEquals("Perez", afipInput.getLastName());
-        assertEquals("Juan", afipInput.getName());
-        assertEquals("20-45125484-7", afipInput.getCuil());
-        assertEquals("4568", afipInput.getFile());
-        assertEquals("1248", afipInput.getAllocation());
-        assertEquals("hola", afipInput.getClient().getClient());
-        assertEquals("Capital Federal", afipInput.getUoc());
-        assertEquals("hola", afipInput.getBranch().getBranch());
-        assertEquals(LocalDate.now(), afipInput.getAdmissionDate());
-        assertEquals("AFIP", afipInput.getFeatures().getAuditType().getAuditType());
-        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
-        assertEquals(1, afipInput.getAudit().getAuditNumber());
-
+        assertEquals(Optional.of(afipInput), result);
+        verify(afipInputService, times(1)).getAfipInputById(1);
     }
-
-//    @Test
-//    public void updateAfipInputTest() throws Exception {
-//
-//        Mockito.when(afipInputService.updateAfipInput(1, afipInput)).thenReturn(afipInput);
-//
-//        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/afipInput/1")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(asJsonString(afipInput)))
-//                .andExpect(MockMvcResultMatchers.status().isOk());
-//
-//        Mockito.verify(afipInputService, Mockito.times(1))
-//                .updateAfipInput(ArgumentMatchers.anyInt(), ArgumentMatchers.any(AfipInput.class));
-//
-//        assertEquals("Perez", afipInput.getLastName());
-//        assertEquals("Juan", afipInput.getName());
-//        assertEquals("20-45125484-7", afipInput.getCuil());
-//        assertEquals("4568", afipInput.getFile());
-//        assertEquals("1248", afipInput.getAllocation());
-//        assertEquals("hola", afipInput.getClient().getClient());
-//        assertEquals("Capital Federal", afipInput.getUoc());
-//        assertEquals("hola", afipInput.getBranch().getBranch());
-//        assertEquals(LocalDate.now(), afipInput.getAdmissionDate());
-//        assertEquals("AFIP", afipInput.getFeatures().getAuditType().getAuditType());
-//        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
-//        assertEquals("SE AJUSTA", afipInput.getFeatures().getAnswer().getAnswer());
-//        assertEquals(1, afipInput.getAudit().getAuditNumber());
-//
-//
-//    }
 
     @Test
-    public void deleteAfipAuditTest() throws Exception {
-        int id = 1;
+    public void testGetAfipAuditByAuditNumber() {
+        List<AfipInput> afipInputs = Collections.singletonList(afipInput);
+        when(afipInputService.getAfipInputByAuditNumber(1)).thenReturn(afipInputs);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/afipInput/{id}", id))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        ResponseEntity<List<AfipInput>> result = afipInputController.getAfipAuditByAuditNumber(1);
 
-        Mockito.verify(afipInputService, Mockito.times(1)).deleteAfipInput(id);
+        assertEquals(afipInputs, result.getBody());
+        verify(afipInputService, times(1)).getAfipInputByAuditNumber(1);
     }
 
-    private static String asJsonString(Object obj) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(obj);
+    @Test
+    public void testGetFilteredAfipInputs() {
+        List<AfipInput> afipInputs = Collections.singletonList(afipInput);
+        when(afipInputService.getFilteredAfipInputs(
+                anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong()))
+                .thenReturn(afipInputs);
+
+        List<AfipInput> result = afipInputController.getFilteredAfipInputs(
+                "Apellido", "Nombre", "20-12345678-9", "1234", "Asignacion",
+                1L, "UOC", 1L, LocalDate.now(), 1L);
+
+        assertEquals(afipInputs, result);
+        verify(afipInputService, times(1)).getFilteredAfipInputs(
+                anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong());
     }
 
+    @Test
+    public void testCreateAfipAudit() {
+        when(afipInputService.createAfipInput(any(AfipInput.class))).thenReturn(afipInput);
+
+        AfipInput result = afipInputController.createAfipAudit(afipInput);
+
+        assertEquals(afipInput, result);
+        verify(afipInputService, times(1)).createAfipInput(any(AfipInput.class));
+    }
+
+    @Test
+    public void testUpdateAfipAudit() throws ResourceNotFoundException {
+        AfipInputUpdateRequest afipInputUpdateRequest = new AfipInputUpdateRequest();
+        when(afipInputService.updateAfipInput(eq(1), any(AfipInputUpdateRequest.class))).thenReturn(afipInput);
+
+        ResponseEntity<AfipInput> result = afipInputController.updateAfipAudit(1, afipInputUpdateRequest);
+
+        assertEquals(afipInput, result.getBody());
+        verify(afipInputService, times(1)).updateAfipInput(eq(1), any(AfipInputUpdateRequest.class));
+    }
+
+    @Test
+    public void testDeleteAfipAudit() throws ResourceNotFoundException {
+        doNothing().when(afipInputService).deleteAfipInput(1);
+
+        ResponseEntity<Void> result = afipInputController.deleteAfipAudit(1);
+
+        assertEquals(204, result.getStatusCodeValue());
+        verify(afipInputService, times(1)).deleteAfipInput(1);
+    }
 }
