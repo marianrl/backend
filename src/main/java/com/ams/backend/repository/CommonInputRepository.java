@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface CommonInputRepository extends JpaRepository<CommonInput, Integer>, JpaSpecificationExecutor<CommonInput> {
 
-    List<CommonInput> findByAudit_AuditNumber(int id);
+    List<CommonInput> findByAudit_Id(int id);
 
 }

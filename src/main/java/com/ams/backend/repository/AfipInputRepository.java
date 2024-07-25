@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface AfipInputRepository extends JpaRepository<AfipInput, Integer>, JpaSpecificationExecutor<AfipInput> {
 
-    List<AfipInput> findByAudit_AuditNumber(int id);
+    List<AfipInput> findByAudit_Id(int id);
 }

@@ -51,7 +51,7 @@ public class AfipInputServiceTest {
     final private AuditType auditType = new AuditType(1, "AFIP");
     final private Audited audited = new Audited(1,"NO");
     final private Features features = new Features(1,auditType ,answer);
-    final private Audit audit = new Audit(1,1,LocalDate.now(),auditType,audited);
+    final private Audit audit = new Audit(1,LocalDate.now(),auditType,audited);
 
     final private AfipInput afipInput = new AfipInput(
             1,
@@ -120,7 +120,7 @@ public class AfipInputServiceTest {
         List<AfipInput> afipInputList = new ArrayList<>();
         afipInputList.add(afipInput);
 
-        when(afipInputRepository.findByAudit_AuditNumber(afipInput.getId())).thenReturn(afipInputList);
+        when(afipInputRepository.findByAudit_Id(afipInput.getId())).thenReturn(afipInputList);
         List<AfipInput> actualAfipInput = afipInputService.getAfipInputByAuditNumber(afipInput.getId());
 
         assertEquals(afipInputList, actualAfipInput);

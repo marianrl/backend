@@ -20,9 +20,6 @@ public class Audit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "audit_number", nullable = false)
-    private int auditNumber;
-
     @Column(name = "fecha_auditoria", nullable = false)
     private @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate auditDate;
 

@@ -41,7 +41,7 @@ public class CommonInputService {
     }
 
     public List<CommonInput> getCommonInputByAuditNumber(int id){
-        return commonInputRepository.findByAudit_AuditNumber(id);
+        return commonInputRepository.findByAudit_Id(id);
     }
 
     public Optional<CommonInput> getCommonInputById(int id) {

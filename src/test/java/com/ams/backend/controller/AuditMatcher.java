@@ -14,7 +14,6 @@ public class AuditMatcher implements ArgumentMatcher<Audit> {
     public boolean matches(Audit actual) {
         // Comparar los campos relevantes para determinar si son iguales
         return actual.getId() == expected.getId() &&
-                actual.getAuditNumber() == expected.getAuditNumber() &&
                 actual.getAuditDate().isEqual(expected.getAuditDate()) &&
                 actual.getIdTipoAuditoria().getId() == expected.getIdTipoAuditoria().getId() &&
                 actual.getIdAuditado().getId() == expected.getIdAuditado().getId();

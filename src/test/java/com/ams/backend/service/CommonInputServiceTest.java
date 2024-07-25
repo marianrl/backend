@@ -51,7 +51,7 @@ public class CommonInputServiceTest {
     final private AuditType auditType = new AuditType(1, "INTERNA");
     final private Audited audited = new Audited(1,"NO");
     final private Features features = new Features(1,auditType ,answer);
-    final private Audit audit = new Audit(1,1,LocalDate.now(),auditType,audited);
+    final private Audit audit = new Audit(1,LocalDate.now(),auditType,audited);
 
     final private CommonInput commonInput = new CommonInput(
             1,
@@ -120,7 +120,7 @@ public class CommonInputServiceTest {
         List<CommonInput> commonInputList = new ArrayList<>();
         commonInputList.add(commonInput);
 
-        when(commonInputRepository.findByAudit_AuditNumber(commonInput.getId())).thenReturn(commonInputList);
+        when(commonInputRepository.findByAudit_Id(commonInput.getId())).thenReturn(commonInputList);
         List<CommonInput> actualCommonInput = commonInputService.getCommonInputByAuditNumber(commonInput.getId());
 
         assertEquals(commonInputList, actualCommonInput);

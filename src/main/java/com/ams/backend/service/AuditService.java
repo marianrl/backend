@@ -38,7 +38,6 @@ public class AuditService {
                 .orElseThrow(() -> new ResourceNotFoundException("AuditType not found for this id :: " + auditTypeId));
 
         Audit audit = new Audit();
-        audit.setAuditNumber(99);
         audit.setAuditDate(LocalDate.now());
         audit.setIdTipoAuditoria(auditType);
         audit.setIdAuditado(new Audited(2, "No"));
@@ -51,7 +50,6 @@ public class AuditService {
                 .orElseThrow(() -> new ResourceNotFoundException("Audit not found for this id :: " + id));
 
         audit.setAuditDate(providedAudit.getAuditDate());
-        audit.setAuditNumber(providedAudit.getAuditNumber());
         auditRepository.save(audit);
 
         return audit;

@@ -47,14 +47,12 @@ public class AuditServiceTest {
         auditType = new AuditType(auditTypeId, "Audit Type");
         audit = new Audit();
         audit.setId(auditId);
-        audit.setAuditNumber(99);
         audit.setAuditDate(LocalDate.now());
         audit.setIdTipoAuditoria(auditType);
         audit.setIdAuditado(new Audited(2, "No"));
 
         updatedAudit = new Audit();
         updatedAudit.setId(auditId);
-        updatedAudit.setAuditNumber(100);
         updatedAudit.setAuditDate(LocalDate.now().plusDays(1));
         updatedAudit.setIdTipoAuditoria(auditType);
         updatedAudit.setIdAuditado(new Audited(2, "Yes"));
@@ -90,7 +88,6 @@ public class AuditServiceTest {
 
         Audit actualAudit = auditService.createAudit(auditTypeId);
 
-        assertEquals(audit.getAuditNumber(), actualAudit.getAuditNumber());
         assertEquals(audit.getAuditDate(), actualAudit.getAuditDate());
         assertEquals(audit.getIdTipoAuditoria(), actualAudit.getIdTipoAuditoria());
         verify(auditTypeRepository).findById(auditTypeId);
@@ -104,7 +101,6 @@ public class AuditServiceTest {
 
         Audit actualAudit = auditService.updateAudit(auditId, updatedAudit);
 
-        assertEquals(updatedAudit.getAuditNumber(), actualAudit.getAuditNumber());
         assertEquals(updatedAudit.getAuditDate(), actualAudit.getAuditDate());
         verify(auditRepository).findById(auditId);
         verify(auditRepository).save(audit);

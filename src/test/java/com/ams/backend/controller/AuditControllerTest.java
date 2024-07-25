@@ -2,7 +2,6 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.*;
 import com.ams.backend.service.AuditService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -39,7 +38,6 @@ public class AuditControllerTest {
     final private Audited audited = new Audited(1,"TEST");
     final private Audit audit = new Audit(
             1,
-            22,
             LocalDate.now(),
             auditType,
             audited
@@ -61,14 +59,13 @@ public class AuditControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/audit/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditNumber").value(22));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1));
     }
 
     @Test
     public void createAuditTest() throws Exception {
         int auditTypeId = 1;
-        Audit createdAudit = new Audit(1, 99, LocalDate.now(), auditType, audited);
+        Audit createdAudit = new Audit(1, LocalDate.now(), auditType, audited);
 
         Mockito.when(auditService.createAudit(auditTypeId)).thenReturn(createdAudit);
 
@@ -84,7 +81,7 @@ public class AuditControllerTest {
     @Test
     public void updateAuditTest() throws Exception {
         int auditId = 1;
-        Audit updatedAudit = new Audit(auditId, 99, LocalDate.now(), auditType, audited);
+        Audit updatedAudit = new Audit(auditId, LocalDate.now(), auditType, audited);
 
         // Configurar el comportamiento del servicio mock
         Mockito.when(auditService.updateAudit(eq(auditId), argThat(new AuditMatcher(updatedAudit))))
