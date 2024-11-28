@@ -23,7 +23,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,6 +52,10 @@ public class CommonInputServiceTest {
     final private Audited audited = new Audited(1,"NO");
     final private Features features = new Features(1,auditType ,answer);
     final private Audit audit = new Audit(1,LocalDate.now(),auditType,audited);
+
+    private static Specification<CommonInput> anyCommonInputSpecification() {
+        return argThat(argument -> true); // Acepta cualquier Specification<AfipInput>
+    }
 
     final private CommonInput commonInput = new CommonInput(
             1,
@@ -131,7 +135,7 @@ public class CommonInputServiceTest {
 
         List<CommonInput> expectedCommonInputs = Arrays.asList(commonInput, commonInput2);
 
-        when(commonInputRepository.findAll(any(Specification.class))).thenReturn(expectedCommonInputs);
+        when(commonInputRepository.findAll(anyCommonInputSpecification())).thenReturn(expectedCommonInputs);
 
         List<CommonInput> result = commonInputService.getFilteredCommonInputs(
                 "Perez", "Juan", "20-45125484-7", "4568", "1248", 1L, "UOC-123", 1L, LocalDate.now(), 1L
@@ -139,7 +143,7 @@ public class CommonInputServiceTest {
 
         assertEquals(expectedCommonInputs, result);
 
-        verify(commonInputRepository).findAll(any(Specification.class));
+        verify(commonInputRepository).findAll(anyCommonInputSpecification());
     }
 
     @Test

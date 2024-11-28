@@ -2,7 +2,6 @@ package com.ams.backend.service;
 
 import com.ams.backend.entity.Answer;
 import com.ams.backend.entity.AuditType;
-import com.ams.backend.entity.Audited;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.FeaturesRepository;
@@ -47,7 +46,6 @@ public class FeatureServiceTest {
         int featuresId = 1;
         AuditType auditType = new AuditType(1, "AFIP");
         Answer answer = new Answer(1, "SE AJUSTA");
-        Audited audited = new Audited(1,"NO");
         Features expectedFeatures = new Features(featuresId,auditType, answer );
 
         Mockito.when(featuresRepository.findById(featuresId)).thenReturn(Optional.of(expectedFeatures));
@@ -61,7 +59,6 @@ public class FeatureServiceTest {
         int featuresId = 1;
         AuditType auditType = new AuditType(1, "AFIP");
         Answer answer = new Answer(1, "SE AJUSTA");
-        Audited audited = new Audited(1,"NO");
         Features feature = new Features(featuresId,auditType,answer);
 
 
@@ -76,7 +73,6 @@ public class FeatureServiceTest {
         int featurId = 1;
         AuditType auditType = new AuditType(1, "AFIP");
         Answer answer = new Answer(1, "SE AJUSTA");
-        Audited audited = new Audited(1,"NO");
         Features feature = new Features(featurId,auditType,answer);
         Features updatedFeatures = new Features(featurId,auditType,answer);
 
@@ -93,7 +89,6 @@ public class FeatureServiceTest {
         int featurId = 1;
         AuditType auditType = new AuditType(1, "AFIP");
         Answer answer = new Answer(1, "SE AJUSTA");
-        Audited audited = new Audited(1,"NO");
         Features feature = new Features(featurId,auditType,answer);
 
         Mockito.when(featuresRepository.findById(1)).thenReturn(Optional.of(feature));

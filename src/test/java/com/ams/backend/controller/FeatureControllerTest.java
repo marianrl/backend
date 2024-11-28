@@ -2,7 +2,6 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.Answer;
 import com.ams.backend.entity.AuditType;
-import com.ams.backend.entity.Audited;
 import com.ams.backend.entity.Features;
 import com.ams.backend.service.FeaturesService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,7 +36,6 @@ public class FeatureControllerTest {
 
     final private Answer answer = new Answer(1, "SE AJUSTA");
     final private AuditType auditType = new AuditType(1, "AFIP");
-    final private Audited audited = new Audited(1,"NO");
     final private Features features = new Features(1,auditType ,answer);
 
     @Test

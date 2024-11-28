@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AfipInputServiceTest {
@@ -52,6 +52,10 @@ public class AfipInputServiceTest {
     final private Audited audited = new Audited(1,"NO");
     final private Features features = new Features(1,auditType ,answer);
     final private Audit audit = new Audit(1,LocalDate.now(),auditType,audited);
+
+    private static Specification<AfipInput> anyAfipInputSpecification() {
+    return argThat(argument -> true); // Acepta cualquier Specification<AfipInput>
+}
 
     final private AfipInput afipInput = new AfipInput(
             1,
@@ -131,7 +135,8 @@ public class AfipInputServiceTest {
 
         List<AfipInput> expectedAfipInputs = Arrays.asList(afipInput, afipInput2);
 
-        when(afipInputRepository.findAll(any(Specification.class))).thenReturn(expectedAfipInputs);
+        // Usa el matcher personalizado para evitar warnings
+        when(afipInputRepository.findAll(anyAfipInputSpecification())).thenReturn(expectedAfipInputs);
 
         List<AfipInput> result = afipInputService.getFilteredAfipInputs(
                 "Perez", "Juan", "20-45125484-7", "4568", "1248", 1L, "UOC-123", 1L, LocalDate.now(), 1L
@@ -139,8 +144,9 @@ public class AfipInputServiceTest {
 
         assertEquals(expectedAfipInputs, result);
 
-        verify(afipInputRepository).findAll(any(Specification.class));
+        verify(afipInputRepository).findAll(anyAfipInputSpecification());
     }
+
 
     @Test
     public void testCreateAfipAudit() {

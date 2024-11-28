@@ -9,9 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -19,6 +18,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class AfipInputControllerTest {
@@ -33,8 +36,7 @@ public class AfipInputControllerTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(afipInputController).build();
+        MockitoAnnotations.openMocks(this);
         afipInput = new AfipInput();
         afipInput.setId(1);
     }
@@ -112,11 +114,12 @@ public class AfipInputControllerTest {
 
     @Test
     public void testDeleteAfipAudit() throws ResourceNotFoundException {
+        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
         doNothing().when(afipInputService).deleteAfipInput(1);
 
         ResponseEntity<Void> result = afipInputController.deleteAfipAudit(1);
 
-        assertEquals(204, result.getStatusCodeValue());
+        assertEquals(isNoContent, result.getStatusCode());
         verify(afipInputService, times(1)).deleteAfipInput(1);
     }
 }

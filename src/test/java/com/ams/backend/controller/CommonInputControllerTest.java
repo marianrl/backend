@@ -9,9 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -40,8 +39,7 @@ public class CommonInputControllerTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(commonInputController).build();
+        MockitoAnnotations.openMocks(this);
         commonInput = new CommonInput();
         commonInput.setId(1);
     }
@@ -119,11 +117,12 @@ public class CommonInputControllerTest {
 
     @Test
     public void testDeleteCommonAudit() throws ResourceNotFoundException {
+        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
         doNothing().when(commonInputService).deleteCommonInput(1);
 
         ResponseEntity<Void> result = commonInputController.deleteCommonInput(1);
 
-        assertEquals(204, result.getStatusCodeValue());
+        assertEquals(isNoContent, result.getStatusCode());
         verify(commonInputService, times(1)).deleteCommonInput(1);
     }
 
