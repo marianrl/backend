@@ -48,3 +48,7 @@ Asegúrate de tener instalados:
 2. **Maven 3.x**: [Descargar Maven](https://maven.apache.org/download.cgi)
 3. **Base de datos**: [Descargar Microsoft SQL](https://www.microsoft.com/es-ar/sql-server/sql-server-downloads).
 4. **Git**: [Descargue Git](https://git-scm.com/).
+
+## How to run the project
+
+- From the root, run this command in terminal: mvn spring-boot:run
