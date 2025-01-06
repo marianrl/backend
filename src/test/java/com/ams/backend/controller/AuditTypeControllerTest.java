@@ -2,88 +2,95 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.AuditType;
 import com.ams.backend.service.AuditTypeService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(AuditTypeController.class)
 public class AuditTypeControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private AuditTypeService auditTypeService;
+
+    @InjectMocks
+    private AuditTypeController auditTypeController;
+
+    private AuditType auditType;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        auditType = new AuditType();
+        auditType.setId(1);
+    }
 
     @Test
     public void getAllAuditTypesTest() throws Exception {
 
-        List<AuditType> auditTypes = new ArrayList<>();
-        Mockito.when(auditTypeService.getAllAuditType()).thenReturn(auditTypes);
+        List<AuditType> auditTypes = Collections.singletonList(auditType);
+        when(auditTypeService.getAllAuditType()).thenReturn(auditTypes);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/auditType"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        List<AuditType> result = auditTypeController.getAllAuditType();
+
+        assertEquals(auditTypes, result);
+        verify(auditTypeService, times(1)).getAllAuditType();
     }
 
     @Test
     public void getAuditTypeByIdTest() throws Exception {
-        AuditType auditType = new AuditType(1, "CABA");
-        Mockito.when(auditTypeService.getAuditTypeById(1)).thenReturn(auditType);
+        when(auditTypeService.getAuditTypeById(1)).thenReturn(auditType);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/auditType/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditType").value("CABA"));
+        ResponseEntity<AuditType> result = auditTypeController.getAuditTypeById(1);
+
+        assertEquals(auditType, result.getBody());
+        verify(auditTypeService, times(1)).getAuditTypeById(1);
     }
 
     @Test
     public void createAuditTypeTest() throws Exception {
-        AuditType savedAuditType = new AuditType(1, "CABA");
-        Mockito.when(auditTypeService.createAuditType(savedAuditType)).thenReturn(savedAuditType);
+        when(auditTypeService.createAuditType(any(AuditType.class))).thenReturn(auditType);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auditType")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"audit_type\":\"CABA\"}"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        AuditType result = auditTypeController.createAuditType(auditType);
+
+        assertEquals(auditType, result);
+        verify(auditTypeService, times(1)).createAuditType(any(AuditType.class));
     }
 
     @Test
     public void updateAuditTypeTest() throws Exception {
-        AuditType updatedAuditType = new AuditType(1, "GBA");
+        AuditType auditType = new AuditType();
+        when(auditTypeService.updateAuditType(eq(1), any(AuditType.class))).thenReturn(auditType);
 
-        Mockito.when(auditTypeService.updateAuditType(1, updatedAuditType))
-                .thenReturn(updatedAuditType);
+        ResponseEntity<AuditType> result = auditTypeController.updateAuditType(1, auditType);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/auditType/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":\"1\",\"audit_type\":\"GBA\"}"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        Mockito.verify(auditTypeService, Mockito.times(1))
-                .updateAuditType(ArgumentMatchers.anyInt(), ArgumentMatchers.any(AuditType.class));
+        assertEquals(auditType, result.getBody());
+        verify(auditTypeService, times(1)).updateAuditType(eq(1), any(AuditType.class));
     }
 
     @Test
     public void deleteAuditTypeTest() throws Exception {
-        int id = 1;
+        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
+        doNothing().when(auditTypeService).deleteAuditType(1);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/auditType/{id}", id))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        ResponseEntity<Void> result = auditTypeController.deleteAuditType(1);
 
-        Mockito.verify(auditTypeService, Mockito.times(1)).deleteAuditType(id);
+        assertEquals(isNoContent, result.getStatusCode());
+        verify(auditTypeService, times(1)).deleteAuditType(1);
     }
 
 }

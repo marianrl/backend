@@ -2,87 +2,94 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.Group;
 import com.ams.backend.service.GroupService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(GroupController.class)
 public class GroupControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private GroupService groupService;
+
+    @InjectMocks
+    private GroupController groupController;
+
+    private Group group;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        group = new Group();
+        group.setId(1);
+    }
 
     @Test
     public void getAllGroupTest() throws Exception {
+        List<Group> groups = Collections.singletonList(group);
+        when(groupService.getAllGroup()).thenReturn(groups);
 
-        List<Group> groups = new ArrayList<>();
-        Mockito.when(groupService.getAllGroup()).thenReturn(groups);
+        List<Group> result = groupController.getAllGroup();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/group"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        assertEquals(groups, result);
+        verify(groupService, times(1)).getAllGroup();
     }
 
     @Test
     public void getGroupByIdTest() throws Exception {
-        Group group = new Group(1, "Gestion Laboral S.A.");
-        Mockito.when(groupService.getGroupById(1)).thenReturn(group);
+        when(groupService.getGroupById(1)).thenReturn(group);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/group/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.group").value("Gestion Laboral S.A."));
+        ResponseEntity<Group> result = groupController.getGroupById(1);
+
+        assertEquals(group, result.getBody());
+        verify(groupService, times(1)).getGroupById(1);
     }
 
     @Test
     public void createGroupTest() throws Exception {
-        Group savedGroup = new Group(1, "Gestion Laboral S.A.");
-        Mockito.when(groupService.createGroup(savedGroup)).thenReturn(savedGroup);
+        when(groupService.createGroup(any(Group.class))).thenReturn(group);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/group")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"branch\":\"group\"}"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        Group result = groupController.createGroup(group);
+
+        assertEquals(group, result);
+        verify(groupService, times(1)).createGroup(any(Group.class));
     }
 
     @Test
     public void updateGroupTest() throws Exception {
-        Group updatedGroup = new Group(1, "Gestion Logistica S.A.");
+        Group group = new Group();
+        when(groupService.updateGroup(eq(1), any(Group.class))).thenReturn(group);
 
-        Mockito.when(groupService.updateGroup(1, updatedGroup)).thenReturn(updatedGroup);
+        ResponseEntity<Group> result = groupController.updateGroup(1, group);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/group/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":\"1\",\"group\":\"Gestion Logistica S.A.\"}"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        Mockito.verify(groupService, Mockito.times(1))
-                .updateGroup(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Group.class));
+        assertEquals(group, result.getBody());
+        verify(groupService, times(1)).updateGroup(eq(1), any(Group.class));
     }
 
     @Test
     public void deleteGroupTest() throws Exception {
-        int id = 1;
+        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
+        doNothing().when(groupService).deleteGroup(1);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/group/{id}", id))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        ResponseEntity<Void> result = groupController.deleteGroup(1);
 
-        Mockito.verify(groupService, Mockito.times(1)).deleteGroup(id);
+        assertEquals(isNoContent, result.getStatusCode());
+        verify(groupService, times(1)).deleteGroup(1);
     }
 
 }

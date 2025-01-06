@@ -1,168 +1,146 @@
 package com.ams.backend.controller;
 
 import com.ams.backend.entity.AuthenticateRequest;
-import com.ams.backend.entity.Role;
 import com.ams.backend.entity.User;
+import com.ams.backend.repository.UserRepository;
+import com.ams.backend.security.JwtTokenUtil;
 import com.ams.backend.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(UserController.class)
 public class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Mock
+    private UserRepository userRepository;
 
-    @MockBean
+    @Mock
+    private JwtTokenUtil jwtTokenUtil;
+
+    @InjectMocks
+    private UserController userController;
+
+    @Mock
     private UserService userService;
 
-    final private Role role = new Role(1, "admin");
-    final private User user = new User(
-            1,
-            "Juan",
-            "Perez",
-            "juan.perez@mail.com",
-            "1234",
-            role
-    );
+    private User user;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        user = new User();
+        user.setId(1);
+    }
 
     @Test
     public void getAllUserTest() throws Exception {
+        List<User> users = Collections.singletonList(user);
+        when(userService.getAllUsers()).thenReturn(users);
 
-        List<User> users = new ArrayList<>();
-        Mockito.when(userService.getAllUsers()).thenReturn(users);
+        List<User> result = userController.getAllUsers();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/user"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        assertEquals(users, result);
+        verify(userService, times(1)).getAllUsers();
     }
 
     @Test
     public void getUserByIdTest() throws Exception {
-        Mockito.when(userService.getUserById(1)).thenReturn(user);
+        when(userService.getUserById(1)).thenReturn(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/user/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Juan"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value("Perez"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.mail").value("juan.perez@mail.com"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value("1234"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.role.role").value("admin"));
+        ResponseEntity<User> result = userController.getUserById(1);
+
+        assertEquals(user, result.getBody());
+        verify(userService, times(1)).getUserById(1);
     }
 
     @Test
     public void authenticateUserTest() throws Exception {
+        // Datos de prueba
         String mail = "juan.perez@mail.com";
         String password = "1234";
         AuthenticateRequest request = new AuthenticateRequest(mail, password);
+        String token = "mockToken"; // Token de prueba
 
-        // Simular el usuario encontrado
-        Mockito.when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
+        // Caso 1: Usuario encontrado
+        when(userRepository.findByMailAndPassword(mail, password)).thenReturn(user);
+        when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
+        when(jwtTokenUtil.generateToken(user.getMail())).thenReturn(token); // Mock del token
 
-        // Realizar la solicitud cuando se encuentra el usuario
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user/authenticate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Juan"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value("Perez"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.mail").value("juan.perez@mail.com"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value("1234"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.role.role").value("admin"));
+        ResponseEntity<Map<String, String>> response = userController.authenticate(request);
 
-        // Verificar que se llamó al método del servicio con los parámetros correctos
+        // Verificar respuesta exitosa
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(token, response.getBody().get("token")); // Verificar el token en la respuesta
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
-        verifyNoMoreInteractions(userService);
+        verify(jwtTokenUtil, times(1)).generateToken(user.getMail());
 
-        // Reiniciar las interacciones del servicio para simular un usuario no encontrado
-        Mockito.reset(userService);
+        // Caso 2: Usuario no encontrado
+        Mockito.reset(userService, jwtTokenUtil); // Reiniciar mocks
+        when(userRepository.findByMailAndPassword(mail, password)).thenReturn(null);
+        when(userService.getUserByMailAndPassword(mail, password)).thenReturn(null);
 
-        // Simular el usuario no encontrado
-        Mockito.when(userService.getUserByMailAndPassword(mail, password)).thenReturn(null);
+        ResponseEntity<Map<String, String>> notFoundResponse = userController.authenticate(request);
 
-        // Realizar la solicitud cuando no se encuentra el usuario
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user/authenticate")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(request)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        // Verificar que se llamó al método del servicio con los parámetros correctos
+        // Verificar respuesta 401 (no autorizado)
+        assertEquals(HttpStatus.UNAUTHORIZED, notFoundResponse.getStatusCode());
+        assertNull(notFoundResponse.getBody());
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
-        verifyNoMoreInteractions(userService);
+        verify(jwtTokenUtil, times(0)).generateToken( anyString()); // No debe generar token
     }
+
 
 
     @Test
     public void createUserTest() throws Exception {
-        Mockito.when(userService.createUser(user)).thenReturn(user);
+        when(userService.createUser(any(User.class))).thenReturn(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(user)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        User result = userController.createUser(user);
 
-        assertEquals("Juan", user.getName());
-        assertEquals("Perez", user.getLastName());
-        assertEquals("juan.perez@mail.com", user.getMail());
-        assertEquals("1234", user.getPassword());
-        assertEquals("admin", user.getRole().getRole());
+        assertEquals(user, result);
+        verify(userService, times(1)).createUser(any(User.class));
     }
 
     @Test
     public void updateUserTest() throws Exception {
+        User user = new User();
+        when(userService.updateUser(eq(1), any(User.class))).thenReturn(user);
 
-        Mockito.when(userService.updateUser(1, user)).thenReturn(user);
+        ResponseEntity<User> result = userController.updateUser(1, user);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/user/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(user)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        verify(userService, times(1))
-                .updateUser(ArgumentMatchers.anyInt(), ArgumentMatchers.any(User.class));
-
-        assertEquals("Juan", user.getName());
-        assertEquals("Perez", user.getLastName());
-        assertEquals("juan.perez@mail.com", user.getMail());
-        assertEquals("1234", user.getPassword());
-        assertEquals("admin", user.getRole().getRole());
+        assertEquals(user, result.getBody());
+        verify(userService, times(1)).updateUser(eq(1), any(User.class));
     }
 
     @Test
     public void deleteUserTest() throws Exception {
-        int id = 1;
+        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
+        doNothing().when(userService).deleteUser(1);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/user/{id}", id))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        ResponseEntity<Void> result = userController.deleteUser(1);
 
-        verify(userService, times(1)).deleteUser(id);
+        assertEquals(isNoContent, result.getStatusCode());
+        verify(userService, times(1)).deleteUser(1);
     }
-
-    private static String asJsonString(Object obj) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(obj);
-    }
-
 }

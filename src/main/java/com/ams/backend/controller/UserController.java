@@ -3,9 +3,11 @@ package com.ams.backend.controller;
 import com.ams.backend.entity.AuthenticateRequest;
 import com.ams.backend.entity.User;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.security.JwtTokenUtil;
 import com.ams.backend.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -24,6 +28,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @GetMapping("/user")
     public List<User> getAllUsers() {
@@ -40,14 +47,20 @@ public class UserController {
     }
 
     @PostMapping("/user/authenticate")
-    public ResponseEntity<User> authenticate(@RequestBody AuthenticateRequest request) {
+    public ResponseEntity<Map<String, String>> authenticate(@RequestBody AuthenticateRequest request) {
         User user = userService.getUserByMailAndPassword(request.getMail(), request.getPassword());
 
-        if(user != null) {
-            return ResponseEntity.ok().body(user);
-        }
-        else {
-            return ResponseEntity.notFound().build();
+        if (user.getMail() != null) {
+            String currentUser = user.getMail();
+            // Generar el token JWT
+            String token = jwtTokenUtil.generateToken(currentUser);
+
+            // Devolver el token en el cuerpo de la respuesta
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 

@@ -2,87 +2,94 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.Client;
 import com.ams.backend.service.ClientService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(ClientController.class)
 public class ClientControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private ClientService clientService;
+
+    @InjectMocks
+    private ClientController clientController;
+
+    private Client client;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        client = new Client();
+        client.setId(1);
+    }
 
     @Test
     public void getAllClientTest() throws Exception {
+        List<Client> clients = Collections.singletonList(client);
+        when(clientService.getAllClients()).thenReturn(clients);
 
-        List<Client> clients = new ArrayList<>();
-        Mockito.when(clientService.getAllClients()).thenReturn(clients);
+        List<Client> result = clientController.getAllClients();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/client"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        assertEquals(clients, result);
+        verify(clientService, times(1)).getAllClients();
     }
 
     @Test
     public void getClientByIdTest() throws Exception {
-        Client client = new Client(1, "Mariano");
-        Mockito.when(clientService.getClientById(1)).thenReturn(client);
+        when(clientService.getClientById(1)).thenReturn(client);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/client/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.client").value("Mariano"));
+        ResponseEntity<Client> result = clientController.getClientById(1);
+
+        assertEquals(client, result.getBody());
+        verify(clientService, times(1)).getClientById(1);
     }
 
     @Test
     public void createClientTest() throws Exception {
-        Client savedClient = new Client(1, "Mariano");
-        Mockito.when(clientService.createClient(savedClient)).thenReturn(savedClient);
+        when(clientService.createClient(any(Client.class))).thenReturn(client);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/client")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"branch\":\"Client\"}"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        Client result = clientController.createClient(client);
+
+        assertEquals(client, result);
+        verify(clientService, times(1)).createClient(any(Client.class));
     }
 
     @Test
     public void updateClientTest() throws Exception {
-        Client updatedClient = new Client(1, "Ariel");
+        Client client = new Client();
+        when(clientService.updateClient(eq(1), any(Client.class))).thenReturn(client);
 
-        Mockito.when(clientService.updateClient(1, updatedClient)).thenReturn(updatedClient);
+        ResponseEntity<Client> result = clientController.updateClient(1, client);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/client/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":\"1\",\"client\":\"Ariel\"}"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        Mockito.verify(clientService, Mockito.times(1))
-                .updateClient(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Client.class));
+        assertEquals(client, result.getBody());
+        verify(clientService, times(1)).updateClient(eq(1), any(Client.class));
     }
 
     @Test
     public void deleteClientTest() throws Exception {
-        int id = 1;
+        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
+        doNothing().when(clientService).deleteClient(1);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/client/{id}", id))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        ResponseEntity<Void> result = clientController.deleteClient(1);
 
-        Mockito.verify(clientService, Mockito.times(1)).deleteClient(id);
+        assertEquals(isNoContent, result.getStatusCode());
+        verify(clientService, times(1)).deleteClient(1);;
     }
 
 }

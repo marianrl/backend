@@ -31,7 +31,6 @@ public class AfipInputController {
 
     @GetMapping("/afipInput")
     public List<AfipInput> getAllAfipAudits() {
-
         return afipInputService.getAllAfipInputs();
     }
 

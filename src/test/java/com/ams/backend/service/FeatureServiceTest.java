@@ -5,12 +5,13 @@ import com.ams.backend.entity.AuditType;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.FeaturesRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FeatureServiceTest {
 
     @Mock
@@ -27,7 +28,7 @@ public class FeatureServiceTest {
 
     private FeaturesService featuresService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         featuresService = new FeaturesService(featuresRepository);
     }

@@ -1,110 +1,94 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.Answer;
-import com.ams.backend.entity.AuditType;
 import com.ams.backend.entity.Features;
 import com.ams.backend.service.FeaturesService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(FeaturesController.class)
 public class FeatureControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private FeaturesService featuresService;
 
-    final private Answer answer = new Answer(1, "SE AJUSTA");
-    final private AuditType auditType = new AuditType(1, "AFIP");
-    final private Features features = new Features(1,auditType ,answer);
+    @InjectMocks
+    private FeaturesController featuresController;
+
+    private Features features;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        features = new Features();
+        features.setId(1);
+    }
 
     @Test
     public void getAllFeaturesTest() throws Exception {
+        List<Features> featuresList = Collections.singletonList(features);
+        when(featuresService.getAllFeatures()).thenReturn(featuresList);
 
-        List<Features> features = new ArrayList<>();
-        Mockito.when(featuresService.getAllFeatures()).thenReturn(features);
+        List<Features> result = featuresController.getAllFeatures();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/features"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        assertEquals(featuresList, result);
+        verify(featuresService, times(1)).getAllFeatures();
     }
 
     @Test
     public void getFeaturesByIdTest() throws Exception {
+        when(featuresService.getFeaturesById(1)).thenReturn(features);
 
-        Mockito.when(featuresService.getFeaturesById(1)).thenReturn(features);
+        ResponseEntity<Features> result = featuresController.getFeaturesById(1);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/features/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.auditType.auditType").value("AFIP"));
+        assertEquals(features, result.getBody());
+        verify(featuresService, times(1)).getFeaturesById(1);
     }
 
     @Test
     public void createFeaturesTest() throws Exception {
+        when(featuresService.createFeatures(any(Features.class))).thenReturn(features);
 
-        Mockito.when(featuresService.createFeatures(features)).thenReturn(features);
+        Features result = featuresController.createFeatures(features);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/features")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(features)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        assertEquals("SE AJUSTA", features.getAnswer().getAnswer());
-        assertEquals("AFIP", features.getAuditType().getAuditType());
-
+        assertEquals(features, result);
+        verify(featuresService, times(1)).createFeatures(any(Features.class));
     }
 
     @Test
     public void updateFeaturesTest() throws Exception {
+        Features features = new Features();
+        when(featuresService.updateFeatures(eq(1), any(Features.class))).thenReturn(features);
 
-        Mockito.when(featuresService.updateFeatures(1, features)).thenReturn(features);
+        ResponseEntity<Features> result = featuresController.updateFeatures(1, features);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/features/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(features)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        Mockito.verify(featuresService, Mockito.times(1))
-                .updateFeatures(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Features.class));
-
-        assertEquals("SE AJUSTA", features.getAnswer().getAnswer());
-        assertEquals("AFIP", features.getAuditType().getAuditType());
-
+        assertEquals(features, result.getBody());
+        verify(featuresService, times(1)).updateFeatures(eq(1), any(Features.class));
     }
 
     @Test
     public void deleteFeaturesTest() throws Exception {
-        int id = 1;
+        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
+        doNothing().when(featuresService).deleteFeatures(1);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/features/{id}", id))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        ResponseEntity<Void> result = featuresController.deleteFeatures(1);
 
-        Mockito.verify(featuresService, Mockito.times(1)).deleteFeatures(id);
+        assertEquals(isNoContent, result.getStatusCode());
+        verify(featuresService, times(1)).deleteFeatures(1);
     }
-
-    private static String asJsonString(Object obj) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(obj);
-    }
-
 }

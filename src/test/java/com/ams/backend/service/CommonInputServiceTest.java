@@ -7,11 +7,12 @@ import com.ams.backend.repository.AnswerRepository;
 import com.ams.backend.repository.AuditTypeRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.CommonInputUpdateRequest;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -27,7 +28,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CommonInputServiceTest {
 
     @Mock
@@ -87,7 +88,7 @@ public class CommonInputServiceTest {
             audit
     );
 
-    @Before
+    @BeforeEach
     public void setup() {
         commonInputService = new CommonInputService(
                 commonInputRepository,

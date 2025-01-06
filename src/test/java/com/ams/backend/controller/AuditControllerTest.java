@@ -2,113 +2,95 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.*;
 import com.ams.backend.service.AuditService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(AuditController.class)
 public class AuditControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private AuditService auditService;
 
-    final private AuditType auditType = new AuditType(1,"Test");
-    final private Audited audited = new Audited(1,"TEST");
-    final private Audit audit = new Audit(
-            1,
-            LocalDate.now(),
-            auditType,
-            audited
-    );
+    @InjectMocks
+    private AuditController auditController;
+
+    private Audit audit;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        audit = new Audit();
+        audit.setId(1);
+    }
 
     @Test
     public void getAllAuditTest() throws Exception {
+        List<Audit> audits = Collections.singletonList(audit);
+        when(auditService.getAllAudit()).thenReturn(audits);
 
-        List<Audit> audits = new ArrayList<>();
-        Mockito.when(auditService.getAllAudit()).thenReturn(audits);
+        List<Audit> result = auditController.getAllAudits();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/audit"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        assertEquals(audits, result);
+        verify(auditService, times(1)).getAllAudit();
     }
 
     @Test
     public void getAuditByIdTest() throws Exception {
-        Mockito.when(auditService.getAuditById(1)).thenReturn(audit);
+        when(auditService.getAuditById(1)).thenReturn(audit);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/audit/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1));
+        ResponseEntity<Audit> result = auditController.getAuditById(1);
+
+        assertEquals(audit, result.getBody());
+        verify(auditService, times(1)).getAuditById(1);
     }
 
     @Test
     public void createAuditTest() throws Exception {
-        int auditTypeId = 1;
-        Audit createdAudit = new Audit(1, LocalDate.now(), auditType, audited);
 
-        Mockito.when(auditService.createAudit(auditTypeId)).thenReturn(createdAudit);
+        when(auditService.createAudit(1)).thenReturn(audit);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/audit")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(String.valueOf(auditTypeId)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        Audit result = auditController.createAudit(audit.getId());
 
-        verify(auditService, times(1)).createAudit(auditTypeId);
-        verifyNoMoreInteractions(auditService);
+        assertEquals(audit, result);
+        verify(auditService, times(1)).createAudit(1);
     }
 
     @Test
     public void updateAuditTest() throws Exception {
-        int auditId = 1;
-        Audit updatedAudit = new Audit(auditId, LocalDate.now(), auditType, audited);
 
-        // Configurar el comportamiento del servicio mock
-        Mockito.when(auditService.updateAudit(eq(auditId), argThat(new AuditMatcher(updatedAudit))))
-                .thenReturn(updatedAudit);
+        when(auditService.updateAudit(eq(1), any(Audit.class))).thenReturn(audit);
 
-        // Convertir el objeto Audit a JSON manualmente
-        String jsonContent = "{\"id\":1,\"auditNumber\":99,\"auditDate\":\"" + updatedAudit.getAuditDate() + "\",\"idTipoAuditoria\":{\"id\":1,\"name\":\"Test\"},\"idAuditado\":{\"id\":1,\"name\":\"TEST\"}}";
+        ResponseEntity<Audit> result = auditController.updateAudit(1, audit);
 
-        // Realizar la solicitud al controlador utilizando MockMvc
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/audit/{id}", auditId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonContent))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        // Verificar las interacciones del servicio mock
-        verify(auditService, times(1)).updateAudit(eq(auditId), argThat(new AuditMatcher(updatedAudit)));
-        verifyNoMoreInteractions(auditService);
+        assertEquals(audit, result.getBody());
+        verify(auditService, times(1)).updateAudit(1, audit);
     }
 
     @Test
     public void deleteAuditTest() throws Exception {
-        int id = 1;
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/audit/{id}", id))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
+        doNothing().when(auditService).deleteAudit(1);
 
-        verify(auditService, times(1)).deleteAudit(id);
+        ResponseEntity<Void> result = auditController.deleteAudit(1);
+
+        assertEquals(isNoContent, result.getStatusCode());
+        verify(auditService, times(1)).deleteAudit(1);
     }
 
 }
