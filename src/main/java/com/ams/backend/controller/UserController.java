@@ -50,19 +50,23 @@ public class UserController {
     public ResponseEntity<Map<String, String>> authenticate(@RequestBody AuthenticateRequest request) {
         User user = userService.getUserByMailAndPassword(request.getMail(), request.getPassword());
 
-        if (user.getMail() != null) {
+        if (user != null && user.getMail() != null) {
             String currentUser = user.getMail();
-            // Generar el token JWT
             String token = jwtTokenUtil.generateToken(currentUser);
 
-            // Devolver el token en el cuerpo de la respuesta
+            // Verificar el token generado
+            System.out.println("Token generado: " + token); // Verifica aquí
+
             Map<String, String> response = new HashMap<>();
-            response.put("token", token);
+            response.put("token", token); // Agregar el token al mapa
+            System.out.println("Map response antes de devolver: " + response); // Verificar el contenido del mapa
+
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
 
     @PostMapping("/user")
     public User createUser(@Valid @RequestBody User user) {

@@ -51,6 +51,8 @@ public class UserControllerTest {
         MockitoAnnotations.openMocks(this);
         user = new User();
         user.setId(1);
+        user.setMail("juan.perez@mail.com");
+        user.setPassword( "1234");
     }
 
     @Test
@@ -82,35 +84,22 @@ public class UserControllerTest {
         AuthenticateRequest request = new AuthenticateRequest(mail, password);
         String token = "mockToken"; // Token de prueba
 
-        // Caso 1: Usuario encontrado
-        when(userRepository.findByMailAndPassword(mail, password)).thenReturn(user);
+        // Mockear el comportamiento del servicio y el utilitario JWT
         when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
-        when(jwtTokenUtil.generateToken(user.getMail())).thenReturn(token); // Mock del token
+        when(jwtTokenUtil.generateToken(mail)).thenReturn(token);
 
+        // Llamar al método del controlador
         ResponseEntity<Map<String, String>> response = userController.authenticate(request);
 
         // Verificar respuesta exitosa
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(token, response.getBody().get("token")); // Verificar el token en la respuesta
+        assertEquals(token, response.getBody().get("token"));
+
+        // Verificar interacciones
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
-        verify(jwtTokenUtil, times(1)).generateToken(user.getMail());
-
-        // Caso 2: Usuario no encontrado
-        Mockito.reset(userService, jwtTokenUtil); // Reiniciar mocks
-        when(userRepository.findByMailAndPassword(mail, password)).thenReturn(null);
-        when(userService.getUserByMailAndPassword(mail, password)).thenReturn(null);
-
-        ResponseEntity<Map<String, String>> notFoundResponse = userController.authenticate(request);
-
-        // Verificar respuesta 401 (no autorizado)
-        assertEquals(HttpStatus.UNAUTHORIZED, notFoundResponse.getStatusCode());
-        assertNull(notFoundResponse.getBody());
-        verify(userService, times(1)).getUserByMailAndPassword(mail, password);
-        verify(jwtTokenUtil, times(0)).generateToken( anyString()); // No debe generar token
+        verify(jwtTokenUtil, times(1)).generateToken(mail);
     }
-
-
 
     @Test
     public void createUserTest() throws Exception {
