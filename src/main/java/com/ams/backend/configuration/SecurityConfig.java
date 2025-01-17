@@ -34,7 +34,7 @@ public class SecurityConfig {
                 "/swagger-ui/**",       // Rutas de Swagger UI
                 "/v3/api-docs/**",      // Documentación de OpenAPI
                 "/swagger-ui.html",     // Entrada principal de Swagger
-                "/api/v1/authenticate", // Endpoint de autenticación
+                "/api/v1/user/authenticate", // Endpoint de autenticación
                 "/api/v1/register"      // Endpoint de registro
             ).permitAll()
             // Proteger cualquier otra ruta

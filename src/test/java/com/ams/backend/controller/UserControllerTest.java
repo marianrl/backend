@@ -86,7 +86,7 @@ public class UserControllerTest {
 
         // Mockear el comportamiento del servicio y el utilitario JWT
         when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
-        when(jwtTokenUtil.generateToken(mail)).thenReturn(token);
+        when(jwtTokenUtil.generateToken(mail, user.getName(), user.getLastName())).thenReturn(token);
 
         // Llamar al método del controlador
         ResponseEntity<Map<String, String>> response = userController.authenticate(request);
@@ -98,7 +98,7 @@ public class UserControllerTest {
 
         // Verificar interacciones
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
-        verify(jwtTokenUtil, times(1)).generateToken(mail);
+        verify(jwtTokenUtil, times(1)).generateToken(mail, user.getName(), user.getLastName());
     }
 
     @Test

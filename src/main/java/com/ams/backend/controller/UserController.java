@@ -51,22 +51,19 @@ public class UserController {
         User user = userService.getUserByMailAndPassword(request.getMail(), request.getPassword());
 
         if (user != null && user.getMail() != null) {
-            String currentUser = user.getMail();
-            String token = jwtTokenUtil.generateToken(currentUser);
-
-            // Verificar el token generado
-            System.out.println("Token generado: " + token); // Verifica aquí
+            String token = jwtTokenUtil.generateToken(user.getMail(), user.getName(), user.getLastName());
 
             Map<String, String> response = new HashMap<>();
-            response.put("token", token); // Agregar el token al mapa
-            System.out.println("Map response antes de devolver: " + response); // Verificar el contenido del mapa
+            response.put("token", token);
 
             return ResponseEntity.ok(response);
+        } else if(user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        
     }
-
 
     @PostMapping("/user")
     public User createUser(@Valid @RequestBody User user) {
