@@ -23,21 +23,31 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = request.getHeader("Authorization");
+        String authorizationHeader = request.getHeader("Authorization");
 
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // Eliminar 'Bearer ' del token
-            if (jwtTokenUtil.validateToken(token)) {
-                String username = jwtTokenUtil.getUsernameFromToken(token);
-                // Puedes agregar el usuario al contexto si es necesario
-                UsernamePasswordAuthenticationToken authentication = 
-                    new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7); // Eliminar 'Bearer ' del token
+
+            try {
+                // Validar el token
+                if (jwtTokenUtil.validateToken(token)) {
+                    String username = jwtTokenUtil.getUsernameFromToken(token);
+
+                    // Verificar si no hay ya una autenticación configurada
+                    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                        // Configurar autenticación con el usuario
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            username, null, new ArrayList<>()); // Lista vacía para permisos
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
+            } catch (Exception e) {
+                // Manejar errores de token inválido (opcional: registrar detalles o enviar una respuesta específica)
+                System.out.println("Token inválido: " + e.getMessage());
             }
         }
 
+        // Continuar con el filtro
         filterChain.doFilter(request, response);
     }
 }
-
-

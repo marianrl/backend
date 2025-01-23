@@ -27,7 +27,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.cors() // Habilitar CORS
+            .and()
+            .csrf().disable()
             .authorizeHttpRequests()
             // Permitir acceso sin autenticación a las rutas de Swagger y otras específicas
             .requestMatchers(
