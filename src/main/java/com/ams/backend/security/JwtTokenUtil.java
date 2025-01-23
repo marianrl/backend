@@ -36,21 +36,35 @@ public class JwtTokenUtil {
     }
 
     public String getUsernameFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(key)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        // Crear un JwtParser usando JwtParserBuilder
+        Claims claims = Jwts.parserBuilder()
+        .setSigningKey(key) // Usa la clave de firma para verificar el token
+        .build() // Construir el parser
+        .parseClaimsJws(token) // Analizar el token JWT
+        .getBody(); // Obtener el cuerpo (claims)
+
+        return claims.getSubject(); // Obtener el "subject" del token
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(key).parseClaimsJws(token);
-            return true;
-        } catch (ExpiredJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
-            e.printStackTrace();
+            Jwts.parserBuilder()
+                .setSigningKey(key) // Configura la clave de firma
+                .build() // Construye el parser
+                .parseClaimsJws(token); // Valida y analiza el token
+    
+            return true; // Si no lanza excepción, el token es válido
+        } catch (ExpiredJwtException e) {
+            System.out.println("El token ha expirado: " + e.getMessage());
+        } catch (MalformedJwtException e) {
+            System.out.println("El token está mal formado: " + e.getMessage());
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            System.out.println("La firma del token no es válida: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("El token está vacío o es nulo: " + e.getMessage());
         }
-        return false;
+    
+        return false; // Si alguna excepción se lanza, el token no es válido
     }
 }
 
