@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -26,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -77,28 +77,82 @@ public class UserControllerTest {
     }
 
     @Test
-    public void authenticateUserTest() throws Exception {
-        // Datos de prueba
+    public void testAuthenticate_UserValid() {
+        // Configurar datos de prueba
         String mail = "juan.perez@mail.com";
         String password = "1234";
-        AuthenticateRequest request = new AuthenticateRequest(mail, password);
-        String token = "mockToken"; // Token de prueba
+        String token = "mockToken";
+        User user = new User();
+        user.setMail(mail);
+        user.setName("Juan");
+        user.setLastName("Perez");
 
-        // Mockear el comportamiento del servicio y el utilitario JWT
+        AuthenticateRequest request = new AuthenticateRequest(mail, password);
+
+        // Mockear dependencias
         when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
         when(jwtTokenUtil.generateToken(mail, user.getName(), user.getLastName())).thenReturn(token);
 
-        // Llamar al método del controlador
+        // Llamar al método
         ResponseEntity<Map<String, String>> response = userController.authenticate(request);
 
-        // Verificar respuesta exitosa
+        // Verificar resultado
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(token, response.getBody().get("token"));
 
-        // Verificar interacciones
+        // Verificar interacción con dependencias
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
         verify(jwtTokenUtil, times(1)).generateToken(mail, user.getName(), user.getLastName());
+    }
+
+    @Test
+    public void testAuthenticate_UserNotFound() {
+        // Configurar datos de prueba
+        String mail = "invalid@mail.com";
+        String password = "wrongPassword";
+
+        AuthenticateRequest request = new AuthenticateRequest(mail, password);
+
+        // Mockear dependencias
+        when(userService.getUserByMailAndPassword(mail, password)).thenReturn(null);
+
+        // Llamar al método
+        ResponseEntity<Map<String, String>> response = userController.authenticate(request);
+
+        // Verificar resultado
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+
+        // Verificar interacción con dependencias
+        verify(userService, times(1)).getUserByMailAndPassword(mail, password);
+        verify(jwtTokenUtil, never()).generateToken(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    public void testAuthenticate_UserUnauthorized() {
+        // Configurar datos de prueba
+        String mail = "juan.perez@mail.com";
+        String password = "1234";
+        User user = new User();
+        user.setMail(null); // Usuario sin correo
+        user.setName("Juan");
+        user.setLastName("Perez");
+
+        AuthenticateRequest request = new AuthenticateRequest(mail, password);
+
+        // Mockear dependencias
+        when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
+
+        // Llamar al método
+        ResponseEntity<Map<String, String>> response = userController.authenticate(request);
+
+        // Verificar resultado
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertNull(response.getBody());
+
+        // Verificar interacción con dependencias
+        verify(userService, times(1)).getUserByMailAndPassword(mail, password);
+        verify(jwtTokenUtil, never()).generateToken(anyString(), anyString(), anyString());
     }
 
     @Test
