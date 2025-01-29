@@ -24,11 +24,11 @@ public class AuditedServiceTest {
     @Mock
     private AuditedRepository auditedRepository;
 
-    private AuditedService auditedService;
+    private AuditedServiceImpl auditedService;
 
     @BeforeEach
     public void setup() {
-        auditedService = new AuditedService(auditedRepository);
+        auditedService = new AuditedServiceImpl(auditedRepository);
     }
 
     @Test

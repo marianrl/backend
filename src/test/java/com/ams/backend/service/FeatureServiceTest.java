@@ -26,11 +26,11 @@ public class FeatureServiceTest {
     @Mock
     private FeaturesRepository featuresRepository;
 
-    private FeaturesService featuresService;
+    private FeaturesServiceImpl featuresService;
 
     @BeforeEach
     public void setup() {
-        featuresService = new FeaturesService(featuresRepository);
+        featuresService = new FeaturesServiceImpl(featuresRepository);
     }
 
     @Test

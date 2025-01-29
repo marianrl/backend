@@ -3,7 +3,8 @@ package com.ams.backend.controller;
 import com.ams.backend.entity.AfipInput;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.request.AfipInputUpdateRequest;
-import com.ams.backend.service.AfipInputService;
+import com.ams.backend.service.interfaces.AfipInputService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

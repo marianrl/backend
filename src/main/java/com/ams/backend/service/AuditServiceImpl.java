@@ -6,6 +6,8 @@ import com.ams.backend.entity.Audited;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.AuditRepository;
 import com.ams.backend.repository.AuditTypeRepository;
+import com.ams.backend.service.interfaces.AuditService;
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class AuditService {
+public class AuditServiceImpl implements AuditService{
 
     @Autowired
     private AuditRepository auditRepository;

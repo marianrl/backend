@@ -3,6 +3,8 @@ package com.ams.backend.service;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.FeaturesRepository;
+import com.ams.backend.service.interfaces.FeaturesService;
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class FeaturesService {
+public class FeaturesServiceImpl implements FeaturesService{
 
     @Autowired
     private FeaturesRepository featuresRepository;

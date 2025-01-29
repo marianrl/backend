@@ -2,7 +2,8 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.service.FeaturesService;
+import com.ams.backend.service.interfaces.FeaturesService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

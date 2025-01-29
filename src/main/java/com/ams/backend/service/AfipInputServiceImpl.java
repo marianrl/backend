@@ -11,6 +11,8 @@ import com.ams.backend.repository.AnswerRepository;
 import com.ams.backend.repository.AuditTypeRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.AfipInputUpdateRequest;
+import com.ams.backend.service.interfaces.AfipInputService;
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,7 +24,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Service
-public class AfipInputService {
+public class AfipInputServiceImpl implements AfipInputService{
 
     @Autowired
     private AfipInputRepository afipInputRepository;

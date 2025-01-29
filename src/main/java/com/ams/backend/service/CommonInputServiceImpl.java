@@ -11,6 +11,8 @@ import com.ams.backend.repository.AuditTypeRepository;
 import com.ams.backend.repository.CommonInputRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.CommonInputUpdateRequest;
+import com.ams.backend.service.interfaces.CommonInputService;
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,7 +24,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Service
-public class CommonInputService {
+public class CommonInputServiceImpl implements CommonInputService {
 
     @Autowired
     private CommonInputRepository commonInputRepository;

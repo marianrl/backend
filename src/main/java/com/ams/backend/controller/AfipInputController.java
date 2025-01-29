@@ -3,7 +3,8 @@ package com.ams.backend.controller;
 import com.ams.backend.entity.AfipInput;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.request.AfipInputUpdateRequest;
-import com.ams.backend.service.AfipInputService;
+import com.ams.backend.service.interfaces.AfipInputService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;

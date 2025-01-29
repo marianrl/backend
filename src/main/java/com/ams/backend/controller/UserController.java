@@ -4,7 +4,8 @@ import com.ams.backend.entity.AuthenticateRequest;
 import com.ams.backend.entity.User;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.security.JwtTokenUtil;
-import com.ams.backend.service.UserService;
+import com.ams.backend.service.interfaces.UserService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

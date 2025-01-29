@@ -3,6 +3,8 @@ package com.ams.backend.service;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.entity.Client;
 import com.ams.backend.repository.ClientRepository;
+import com.ams.backend.service.interfaces.ClientService;
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class ClientService {
+public class ClientServiceImpl implements ClientService{
 
     @Autowired
     private ClientRepository clientRepository;

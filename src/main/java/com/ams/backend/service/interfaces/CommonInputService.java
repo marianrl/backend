@@ -1,0 +1,22 @@
+package com.ams.backend.service.interfaces;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import com.ams.backend.entity.CommonInput;
+import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.request.CommonInputUpdateRequest;
+
+public interface CommonInputService {
+  List<CommonInput> getAllCommonInputs();
+  List<CommonInput> getCommonInputByAuditNumber(int id);
+  Optional<CommonInput> getCommonInputById(int id);
+  List<CommonInput> getFilteredCommonInputs(
+      String apellido, String nombre, String cuil, String legajo, String asignacion,
+      Long idCliente, String uoc, Long idSucursal, LocalDate fechaIngreso, Long idCaracteristicas
+  );
+  CommonInput createCommonInput(CommonInput commonInput);
+  CommonInput updateCommonInput(int id, CommonInputUpdateRequest commonInputUpdateRequest) throws ResourceNotFoundException;
+  void deleteCommonInput(int id) throws ResourceNotFoundException;
+}

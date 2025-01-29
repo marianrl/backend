@@ -1,7 +1,7 @@
 package com.ams.backend.controller;
 
 import com.ams.backend.entity.Answer;
-import com.ams.backend.service.AnswerService;
+import com.ams.backend.service.interfaces.AnswerService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

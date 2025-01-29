@@ -3,7 +3,8 @@ package com.ams.backend.controller;
 import com.ams.backend.entity.*;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.request.CommonInputUpdateRequest;
-import com.ams.backend.service.CommonInputService;
+import com.ams.backend.service.interfaces.CommonInputService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

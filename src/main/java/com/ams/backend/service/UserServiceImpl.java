@@ -3,6 +3,8 @@ package com.ams.backend.service;
 import com.ams.backend.entity.User;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.UserRepository;
+import com.ams.backend.service.interfaces.UserService;
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;

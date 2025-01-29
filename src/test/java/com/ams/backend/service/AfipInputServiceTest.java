@@ -45,7 +45,7 @@ public class AfipInputServiceTest {
     private AuditTypeRepository auditTypeRepository;
 
     @MockBean
-    private AfipInputService afipInputService;
+    private AfipInputServiceImpl afipInputService;
 
     final private Client client = new Client(1, "hola");
     final private Branch branch = new Branch(1, "hola");
@@ -91,7 +91,7 @@ public class AfipInputServiceTest {
 
     @BeforeEach
     public void setup() {
-        afipInputService = new AfipInputService(
+        afipInputService = new AfipInputServiceImpl(
                 afipInputRepository,
                 featuresRepository,
                 answerRepository,

@@ -1,8 +1,8 @@
 package com.ams.backend.controller;
 
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.service.interfaces.AuditedService;
 import com.ams.backend.entity.Audited;
-import com.ams.backend.service.AuditedService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

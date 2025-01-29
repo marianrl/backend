@@ -1,7 +1,7 @@
 package com.ams.backend.controller;
 
 import com.ams.backend.entity.Features;
-import com.ams.backend.service.FeaturesService;
+import com.ams.backend.service.interfaces.FeaturesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

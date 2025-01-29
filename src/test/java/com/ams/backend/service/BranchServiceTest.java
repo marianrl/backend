@@ -24,11 +24,11 @@ public class BranchServiceTest {
     @Mock
     private BranchRepository branchRepository;
 
-    private BranchService branchService;
+    private BranchServiceImpl branchService;
 
     @BeforeEach
     public void setup() {
-        branchService = new BranchService(branchRepository);
+        branchService = new BranchServiceImpl(branchRepository);
     }
 
     @Test

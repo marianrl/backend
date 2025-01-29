@@ -24,11 +24,11 @@ public class GroupServiceTest {
     @Mock
     private GroupRepository groupRepository;
 
-    private GroupService groupService;
+    private GroupServiceImpl groupService;
 
     @BeforeEach
     public void setup() {
-        groupService = new GroupService(groupRepository);
+        groupService = new GroupServiceImpl(groupRepository);
     }
 
     @Test

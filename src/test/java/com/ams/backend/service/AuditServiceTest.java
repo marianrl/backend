@@ -30,7 +30,7 @@ public class AuditServiceTest {
     @Mock
     private AuditTypeRepository auditTypeRepository;
 
-    private AuditService auditService;
+    private AuditServiceImpl auditService;
 
     private int auditId;
     private int auditTypeId;
@@ -41,7 +41,7 @@ public class AuditServiceTest {
 
     @BeforeEach
     public void setup() {
-        auditService = new AuditService(auditRepository, auditTypeRepository);
+        auditService = new AuditServiceImpl(auditRepository, auditTypeRepository);
         auditId = 1;
         auditTypeId = 1;
         auditType = new AuditType(auditTypeId, "Audit Type");

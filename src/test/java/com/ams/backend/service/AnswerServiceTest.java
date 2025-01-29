@@ -24,11 +24,11 @@ public class AnswerServiceTest {
     @Mock
     private AnswerRepository answerRepository;
 
-    private AnswerService answerService;
+    private AnswerServiceImpl answerService;
 
     @BeforeEach
     public void setup() {
-        answerService = new AnswerService(answerRepository);
+        answerService = new AnswerServiceImpl(answerRepository);
     }
 
     @Test

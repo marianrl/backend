@@ -44,7 +44,7 @@ public class CommonInputServiceTest {
     private AuditTypeRepository auditTypeRepository;
 
     @MockBean
-    private CommonInputService commonInputService;
+    private CommonInputServiceImpl commonInputService;
 
     final private Client client = new Client(1, "hola");
     final private Branch branch = new Branch(1, "hola");
@@ -90,7 +90,7 @@ public class CommonInputServiceTest {
 
     @BeforeEach
     public void setup() {
-        commonInputService = new CommonInputService(
+        commonInputService = new CommonInputServiceImpl(
                 commonInputRepository,
                 answerRepository,
                 featuresRepository,

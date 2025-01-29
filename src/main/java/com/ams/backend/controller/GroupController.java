@@ -1,8 +1,8 @@
 package com.ams.backend.controller;
 
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.service.interfaces.GroupService;
 import com.ams.backend.entity.Group;
-import com.ams.backend.service.GroupService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

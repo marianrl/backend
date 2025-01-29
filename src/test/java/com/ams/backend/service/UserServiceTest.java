@@ -25,7 +25,7 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    private UserService userService;
+    private UserServiceImpl userService;
 
     final private Role role = new Role(1, "admin");
     final private User user = new User(
@@ -39,7 +39,7 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setup() {
-        userService = new UserService(userRepository);
+        userService = new UserServiceImpl(userRepository);
     }
 
     @Test

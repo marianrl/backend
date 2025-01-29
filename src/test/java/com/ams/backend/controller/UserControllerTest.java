@@ -4,7 +4,7 @@ import com.ams.backend.entity.AuthenticateRequest;
 import com.ams.backend.entity.User;
 import com.ams.backend.repository.UserRepository;
 import com.ams.backend.security.JwtTokenUtil;
-import com.ams.backend.service.UserService;
+import com.ams.backend.service.interfaces.UserService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

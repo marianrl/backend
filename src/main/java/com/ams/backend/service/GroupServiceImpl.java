@@ -3,6 +3,8 @@ package com.ams.backend.service;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.entity.Group;
 import com.ams.backend.repository.GroupRepository;
+import com.ams.backend.service.interfaces.GroupService;
+
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class GroupService {
+public class GroupServiceImpl implements GroupService{
 
     @Autowired
     private GroupRepository groupRepository;

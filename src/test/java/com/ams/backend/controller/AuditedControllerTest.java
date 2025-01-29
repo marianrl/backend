@@ -1,7 +1,7 @@
 package com.ams.backend.controller;
 
 import com.ams.backend.entity.Audited;
-import com.ams.backend.service.AuditedService;
+import com.ams.backend.service.interfaces.AuditedService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

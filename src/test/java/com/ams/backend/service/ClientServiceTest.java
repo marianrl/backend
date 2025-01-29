@@ -24,11 +24,11 @@ public class ClientServiceTest {
     @Mock
     private ClientRepository clientRepository;
 
-    private ClientService clientService;
+    private ClientServiceImpl clientService;
 
     @BeforeEach
     public void setup() {
-        clientService = new ClientService(clientRepository);
+        clientService = new ClientServiceImpl(clientRepository);
     }
 
     @Test

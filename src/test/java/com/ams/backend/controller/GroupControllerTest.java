@@ -1,7 +1,7 @@
 package com.ams.backend.controller;
 
 import com.ams.backend.entity.Group;
-import com.ams.backend.service.GroupService;
+import com.ams.backend.service.interfaces.GroupService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
