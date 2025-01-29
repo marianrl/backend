@@ -22,10 +22,6 @@ public class JwtTokenUtil {
         claims.put("name", name);
         claims.put("lastName", lastName);
 
-        // Log de la clave (solo para pruebas, eliminar en producción)
-        System.out.println("Clave segura generada: " + Base64.getEncoder().encodeToString(key.getEncoded()));
-
-
         return Jwts.builder()
                 .setClaims(claims) // Agregar los claims al token
                 .setSubject(username) // Usuario (email o username)
