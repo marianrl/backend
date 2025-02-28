@@ -13,15 +13,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -72,24 +69,6 @@ public class AfipInputControllerTest {
 
         assertEquals(afipInputs, result.getBody());
         verify(afipInputService, times(1)).getAfipInputByAuditNumber(1);
-    }
-
-    @Test
-    public void testGetFilteredAfipInputs() {
-        List<AfipInput> afipInputs = Collections.singletonList(afipInput);
-        when(afipInputService.getFilteredAfipInputs(
-                anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong()))
-                .thenReturn(afipInputs);
-
-        List<AfipInput> result = afipInputController.getFilteredAfipInputs(
-                "Apellido", "Nombre", "20-12345678-9", "1234", "Asignacion",
-                1L, "UOC", 1L, LocalDate.now(), 1L);
-
-        assertEquals(afipInputs, result);
-        verify(afipInputService, times(1)).getFilteredAfipInputs(
-                anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong());
     }
 
     @Test

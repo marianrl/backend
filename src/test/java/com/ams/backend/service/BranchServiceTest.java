@@ -1,22 +1,18 @@
 package com.ams.backend.service;
 
-import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.entity.Branch;
-import com.ams.backend.repository.BranchRepository;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+import com.ams.backend.entity.Branch;
+import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.repository.BranchRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BranchServiceTest {
@@ -26,64 +22,112 @@ public class BranchServiceTest {
 
     private BranchServiceImpl branchService;
 
+    private Branch branch;
+
     @BeforeEach
-    public void setup() {
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
         branchService = new BranchServiceImpl(branchRepository);
+
+        // Crear una sucursal de ejemplo
+        branch = new Branch();
+        branch.setId(1);
+        branch.setBranch("Test Branch");
     }
 
     @Test
     public void testGetAllBranches() {
-        List<Branch> expectedBranches = new ArrayList<>();
-        Mockito.when(branchRepository.findAll()).thenReturn(expectedBranches);
-        List<Branch> actualBranches = branchService.getAllBranches();
+        List<Branch> branches = Arrays.asList(branch);
 
-        assertEquals(expectedBranches, actualBranches);
+        when(branchRepository.findAll()).thenReturn(branches);
+
+        List<Branch> result = branchService.getAllBranches();
+
+        assertEquals(1, result.size());
+        assertEquals(branch.getBranch(), result.get(0).getBranch());
+        verify(branchRepository, times(1)).findAll();
     }
 
     @Test
-    public void testGetBranchById() throws ResourceNotFoundException {
-        int branchId = 1;
-        Branch expectedBranch = new Branch(branchId, "CABA");
+    public void testGetBranchById_BranchFound() throws ResourceNotFoundException {
+        when(branchRepository.findById(1)).thenReturn(Optional.of(branch));
 
-        Mockito.when(branchRepository.findById(branchId)).thenReturn(Optional.of(expectedBranch));
-        Branch actualBranch = branchService.getBranchById(branchId);
+        Branch result = branchService.getBranchById(1);
 
-        assertEquals(expectedBranch, actualBranch);
+        assertNotNull(result);
+        assertEquals(branch.getBranch(), result.getBranch());
+        verify(branchRepository, times(1)).findById(1);
+    }
+
+    @Test
+    public void testGetBranchById_BranchNotFound() {
+        when(branchRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> branchService.getBranchById(999));
+
+        verify(branchRepository, times(1)).findById(999);
     }
 
     @Test
     public void testCreateBranch() {
-        int branchId = 1;
-        Branch branch = new Branch(branchId, "CABA");
+        Branch newBranch = new Branch();
+        newBranch.setBranch("New Branch");
 
-        Mockito.when(branchRepository.save(branch)).thenReturn(branch);
-        Branch actualBranch = branchService.createBranch(branch);
+        when(branchRepository.save(newBranch)).thenReturn(newBranch);
 
-        assertEquals(actualBranch, branch);
+        Branch result = branchService.createBranch(newBranch);
+
+        assertNotNull(result);
+        assertEquals("New Branch", result.getBranch());
+        verify(branchRepository, times(1)).save(newBranch);
     }
 
     @Test
-    public void testUpdateBranch() throws ResourceNotFoundException {
-        int branchId = 1;
-        Branch branch = new Branch(branchId, "CABA");
-        Branch updatedBranch = new Branch(branchId, "GBA");
+    public void testUpdateBranch_BranchFound() throws ResourceNotFoundException {
+        Branch updatedBranch = new Branch();
+        updatedBranch.setBranch("Updated Branch");
 
-        Mockito.when(branchRepository.findById(1)).thenReturn(Optional.of(branch));
-        Branch actualBranch = branchService.updateBranch(branchId, updatedBranch);
+        when(branchRepository.findById(1)).thenReturn(Optional.of(branch));
+        when(branchRepository.save(any(Branch.class))).thenReturn(updatedBranch);
 
-        assertEquals(updatedBranch.getId(), actualBranch.getId());
-        assertEquals(updatedBranch.getBranch(), actualBranch.getBranch());
+        Branch result = branchService.updateBranch(1, updatedBranch);
+
+        assertNotNull(result);
+        assertEquals("Updated Branch", result.getBranch());
+        verify(branchRepository, times(1)).findById(1);
     }
 
     @Test
-    public void testDeleteBranch() throws ResourceNotFoundException {
-        int branchId = 1;
-        Branch branch = new Branch(branchId, "CABA");
+    public void testUpdateBranch_BranchNotFound() {
+        Branch updatedBranch = new Branch();
+        updatedBranch.setBranch("Updated Branch");
 
-        Mockito.when(branchRepository.findById(1)).thenReturn(Optional.of(branch));
-        branchService.deleteBranch(branchId);
+        when(branchRepository.findById(999)).thenReturn(Optional.empty());
 
-        verify(branchRepository).deleteById(1);
+        assertThrows(ResourceNotFoundException.class, () -> branchService.updateBranch(999, updatedBranch));
+
+        verify(branchRepository, times(1)).findById(999);
+        verify(branchRepository, times(0)).save(updatedBranch);  // No debe llamar a save
+    }
+
+    @Test
+    public void testDeleteBranch_BranchFound() throws ResourceNotFoundException {
+        when(branchRepository.findById(1)).thenReturn(Optional.of(branch));
+        doNothing().when(branchRepository).deleteById(1);
+
+        branchService.deleteBranch(1);
+
+        verify(branchRepository, times(1)).findById(1);
+        verify(branchRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    public void testDeleteBranch_BranchNotFound() {
+        when(branchRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> branchService.deleteBranch(999));
+
+        verify(branchRepository, times(1)).findById(999);
+        verify(branchRepository, times(0)).deleteById(999);  // No debe eliminarse
     }
 }
-

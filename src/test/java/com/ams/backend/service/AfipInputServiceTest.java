@@ -7,7 +7,6 @@ import com.ams.backend.repository.AnswerRepository;
 import com.ams.backend.repository.AuditTypeRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.AfipInputUpdateRequest;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,12 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AfipInputServiceTest {
@@ -50,14 +46,14 @@ public class AfipInputServiceTest {
     final private Client client = new Client(1, "hola");
     final private Branch branch = new Branch(1, "hola");
     final private Answer answer = new Answer(1, "SE AJUSTA");
-    final private AuditType auditType = new AuditType(1, "AFIP");
+    final private AuditType auditType = new AuditType(1, "INTERNA");
     final private Audited audited = new Audited(1,"NO");
-    final private Features features = new Features(1,auditType ,answer);
-    final private Audit audit = new Audit(1,LocalDate.now(),auditType,audited);
+    final private Features features = new Features(1, auditType, answer);
+    final private Audit audit = new Audit(1, LocalDate.now(), auditType, audited);
 
     private static Specification<AfipInput> anyAfipInputSpecification() {
-    return argThat(argument -> true); // Acepta cualquier Specification<AfipInput>
-}
+        return argThat(argument -> true);
+    }
 
     final private AfipInput afipInput = new AfipInput(
             1,
@@ -100,12 +96,12 @@ public class AfipInputServiceTest {
     }
 
     @Test
-    public void testGetAllAfipInputService() {
+    public void testGetAllAfipInputs() {
         List<AfipInput> afipInputs = new ArrayList<>();
         when(afipInputRepository.findAll()).thenReturn(afipInputs);
-        List<AfipInput> actualAfipInput = afipInputService.getAllAfipInputs();
+        List<AfipInput> actualAfipInputs = afipInputService.getAllAfipInputs();
 
-        assertEquals(afipInputs, actualAfipInput);
+        assertEquals(afipInputs, actualAfipInputs);
     }
 
     @Test
@@ -122,7 +118,6 @@ public class AfipInputServiceTest {
 
     @Test
     public void testGetAfipInputByAuditNumber() {
-
         List<AfipInput> afipInputList = new ArrayList<>();
         afipInputList.add(afipInput);
 
@@ -134,10 +129,8 @@ public class AfipInputServiceTest {
 
     @Test
     public void testGetFilteredAfipInputs_Success() {
-
         List<AfipInput> expectedAfipInputs = Arrays.asList(afipInput, afipInput2);
 
-        // Usa el matcher personalizado para evitar warnings
         when(afipInputRepository.findAll(anyAfipInputSpecification())).thenReturn(expectedAfipInputs);
 
         List<AfipInput> result = afipInputService.getFilteredAfipInputs(
@@ -149,9 +142,8 @@ public class AfipInputServiceTest {
         verify(afipInputRepository).findAll(anyAfipInputSpecification());
     }
 
-
     @Test
-    public void testCreateAfipAudit() {
+    public void testCreateAfipInput() {
         when(afipInputRepository.save(afipInput)).thenReturn(afipInput);
         AfipInput actualAfipInput = afipInputService.createAfipInput(afipInput);
 
@@ -159,7 +151,7 @@ public class AfipInputServiceTest {
     }
 
     @Test
-    public void testUpdateAfipAudit() throws ResourceNotFoundException {
+    public void testUpdateAfipInput() throws ResourceNotFoundException {
         AfipInputUpdateRequest afipInputUpdateRequest = new AfipInputUpdateRequest();
         afipInputUpdateRequest.setLastName("Gomez");
         afipInputUpdateRequest.setName("Carlos");
@@ -196,12 +188,42 @@ public class AfipInputServiceTest {
     }
 
     @Test
-    public void testDeleteAfipAudit() throws ResourceNotFoundException {
-
+    public void testDeleteAfipInput() throws ResourceNotFoundException {
         when(afipInputRepository.findById(1)).thenReturn(Optional.of(afipInput));
-        afipInputService.deleteAfipInput(afipInput.getId());
+        afipInputService.deleteAfipInput(1);
 
         verify(afipInputRepository).deleteById(1);
     }
-}
 
+    @Test
+    public void testUpdateAfipInput_AnswerNotFound() {
+        AfipInputUpdateRequest updateRequest = new AfipInputUpdateRequest();
+        updateRequest.setAnswerId(999);
+        updateRequest.setAuditTypeId(1);
+
+        when(afipInputRepository.findById(1)).thenReturn(Optional.of(afipInput));
+        when(answerRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> afipInputService.updateAfipInput(1, updateRequest));
+
+        verify(afipInputRepository, times(1)).findById(1);
+        verify(answerRepository, times(1)).findById(999);
+        verify(auditTypeRepository, times(0)).findById(1);
+    }
+
+    @Test
+    public void testUpdateAfipInput_AuditTypeNotFound() {
+        AfipInputUpdateRequest updateRequest = new AfipInputUpdateRequest();
+        updateRequest.setAnswerId(1);
+        updateRequest.setAuditTypeId(999);
+        when(afipInputRepository.findById(1)).thenReturn(Optional.of(afipInput));
+        when(answerRepository.findById(1)).thenReturn(Optional.of(answer));
+        when(auditTypeRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> afipInputService.updateAfipInput(1, updateRequest));
+
+        verify(afipInputRepository, times(1)).findById(1);
+        verify(answerRepository, times(1)).findById(1);
+        verify(auditTypeRepository, times(1)).findById(999);
+    }
+}

@@ -1,22 +1,18 @@
 package com.ams.backend.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import com.ams.backend.entity.Answer;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.AnswerRepository;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AnswerServiceTest {
@@ -25,81 +21,117 @@ public class AnswerServiceTest {
     private AnswerRepository answerRepository;
 
     private AnswerServiceImpl answerService;
+    private Answer answer;
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
         answerService = new AnswerServiceImpl(answerRepository);
+        answer = new Answer(1, "Yes"); 
     }
 
     @Test
     public void testGetAllAnswers() {
-        List<Answer> answers = new ArrayList<>();
-        Mockito.when(answerRepository.findAll()).thenReturn(answers);
-        List<Answer> actualAnswers = answerService.getAllAnswers();
+        List<Answer> answerList = Arrays.asList(answer);
 
-        assertEquals(answers, actualAnswers);
+        when(answerRepository.findAll()).thenReturn(answerList);
+
+        List<Answer> result = answerService.getAllAnswers();
+
+        assertEquals(1, result.size());
+        assertEquals(answer.getId(), result.get(0).getId());
+        verify(answerRepository, times(1)).findAll();
     }
 
     @Test
-    public void testGetAnswersById() throws ResourceNotFoundException {
-        int answersId = 1;
-        Answer expectedAnswer = new Answer(answersId, "CABA");
+    public void testGetAnswerById_AnswerFound() throws ResourceNotFoundException {
+        when(answerRepository.findById(1)).thenReturn(Optional.of(answer));
 
-        Mockito.when(answerRepository.findById(answersId)).thenReturn(Optional.of(expectedAnswer));
-        Answer actualAnswer = answerService.getAnswerById(answersId);
+        Answer result = answerService.getAnswerById(1);
 
-        assertEquals(expectedAnswer, actualAnswer);
+        assertNotNull(result);
+        assertEquals(answer.getId(), result.getId());
+        verify(answerRepository, times(1)).findById(1);
     }
 
     @Test
-    public void testGetAnswersByAuditType_Success() {
-        int auditTypeId = 1;
-        List<Answer> expectedAnswers = new ArrayList<>();
-        expectedAnswers.add(new Answer(1, "Answer 1"));
-        expectedAnswers.add(new Answer(2, "Answer 2"));
+    public void testGetAnswerById_AnswerNotFound() {
+        when(answerRepository.findById(999)).thenReturn(Optional.empty());
 
-        Mockito.when(answerRepository.findByAuditTypeId(auditTypeId)).thenReturn(expectedAnswers);
+        assertThrows(ResourceNotFoundException.class, () -> answerService.getAnswerById(999));
 
-        List<Answer> actualAnswers = answerService.getAnswersByAuditType(auditTypeId);
+        verify(answerRepository, times(1)).findById(999);
+    }
 
-        assertEquals(expectedAnswers, actualAnswers);
+    @Test
+    public void testGetAnswersByAuditType() {
+        List<Answer> answerList = Arrays.asList(answer);
 
-        verify(answerRepository).findByAuditTypeId(auditTypeId);
+        when(answerRepository.findByAuditTypeId(1)).thenReturn(answerList);
+
+        List<Answer> result = answerService.getAnswersByAuditType(1);
+
+        assertEquals(1, result.size());
+        assertEquals(answer.getId(), result.get(0).getId());
+        verify(answerRepository, times(1)).findByAuditTypeId(1);
     }
 
     @Test
     public void testCreateAnswer() {
-        int answerId = 1;
-        Answer answer = new Answer(answerId, "CABA");
+        when(answerRepository.save(any(Answer.class))).thenReturn(answer);
 
-        Mockito.when(answerRepository.save(answer)).thenReturn(answer);
-        Answer actualAnswer = answerService.createAnswer(answer);
+        Answer result = answerService.createAnswer(answer);
 
-        assertEquals(actualAnswer, answer);
+        assertNotNull(result);
+        assertEquals(answer.getId(), result.getId());
+        assertEquals(answer.getAnswer(), result.getAnswer());
+        verify(answerRepository, times(1)).save(answer);
     }
 
     @Test
-    public void testUpdateAnswer() throws ResourceNotFoundException {
-        int answerId = 1;
-        Answer answer = new Answer(answerId, "CABA");
-        Answer updatedAnswer = new Answer(answerId, "GBA");
+    public void testUpdateAnswer_AnswerFound() throws ResourceNotFoundException {
+        Answer updatedAnswer = new Answer(1, "No");
 
-        Mockito.when(answerRepository.findById(1)).thenReturn(Optional.of(answer));
-        Answer actualAnswer = answerService.updateAnswer(answerId, updatedAnswer);
+        when(answerRepository.findById(1)).thenReturn(Optional.of(answer));
+        when(answerRepository.save(any(Answer.class))).thenReturn(updatedAnswer);
 
-        assertEquals(updatedAnswer.getId(), actualAnswer.getId());
-        assertEquals(updatedAnswer.getAnswer(), actualAnswer.getAnswer());
+        Answer result = answerService.updateAnswer(1, updatedAnswer);
+
+        assertNotNull(result);
+        assertEquals(updatedAnswer.getAnswer(), result.getAnswer());
+        verify(answerRepository, times(1)).findById(1);
     }
 
     @Test
-    public void testDeleteAnswer() throws ResourceNotFoundException {
-        int answerId = 1;
-        Answer answer = new Answer(answerId, "CABA");
+    public void testUpdateAnswer_AnswerNotFound() {
+        Answer updatedAnswer = new Answer(1, "No");
 
-        Mockito.when(answerRepository.findById(1)).thenReturn(Optional.of(answer));
-        answerService.deleteAnswer(answerId);
+        when(answerRepository.findById(999)).thenReturn(Optional.empty());
 
-        verify(answerRepository).deleteById(1);
+        assertThrows(ResourceNotFoundException.class, () -> answerService.updateAnswer(999, updatedAnswer));
+
+        verify(answerRepository, times(1)).findById(999);
+        verify(answerRepository, times(0)).save(updatedAnswer);  // No debe llamar a save
+    }
+
+    @Test
+    public void testDeleteAnswer_AnswerFound() throws ResourceNotFoundException {
+        when(answerRepository.findById(1)).thenReturn(Optional.of(answer));
+        doNothing().when(answerRepository).deleteById(1);
+
+        answerService.deleteAnswer(1);
+
+        verify(answerRepository, times(1)).findById(1);
+        verify(answerRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    public void testDeleteAnswer_AnswerNotFound() {
+        when(answerRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> answerService.deleteAnswer(999));
+
+        verify(answerRepository, times(1)).findById(999);
+        verify(answerRepository, times(0)).deleteById(999);
     }
 }
-

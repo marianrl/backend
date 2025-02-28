@@ -1,7 +1,6 @@
 package com.ams.backend.service;
 
 import com.ams.backend.entity.User;
-import com.ams.backend.entity.Role;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.UserRepository;
 
@@ -9,15 +8,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -27,81 +26,108 @@ public class UserServiceTest {
 
     private UserServiceImpl userService;
 
-    final private Role role = new Role(1, "admin");
-    final private User user = new User(
-            1,
-            "Juan",
-            "Perez",
-            "juan.perez@mail.com",
-            "1234",
-            role
-    );
-
     @BeforeEach
     public void setup() {
         userService = new UserServiceImpl(userRepository);
     }
 
     @Test
-    public void testGetAllUserService() {
-        List<User> users = new ArrayList<>();
-        Mockito.when(userRepository.findAll()).thenReturn(users);
-        List<User> actualUser = userService.getAllUsers();
-
-        assertEquals(users, actualUser);
+    public void testGetAllUsers() {
+        List<User> expectedUsers = new ArrayList<>();
+        when(userRepository.findAll()).thenReturn(expectedUsers);
+        List<User> actualUsers = userService.getAllUsers();
+        assertEquals(expectedUsers, actualUsers);
     }
 
     @Test
     public void testGetUserById() throws ResourceNotFoundException {
+        int userId = 1;
+        User expectedUser = new User();
+        expectedUser.setId(userId);
+        
+        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+        User actualUser = userService.getUserById(userId);
+        assertEquals(expectedUser, actualUser);
+    }
 
-        Mockito.when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        User actualUser = userService.getUserById(user.getId());
-
-        assertEquals(user, actualUser);
+    @Test
+    public void testGetUserByIdNotFound() {
+        int userId = 1;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        
+        assertThrows(ResourceNotFoundException.class, () -> userService.getUserById(userId));
     }
 
     @Test
     public void testGetUserByMailAndPassword() {
-        String mail = "juan.perez@mail.com";
-        String password = "1234";
-
-        Mockito.when(userRepository.findByMailAndPassword(mail, password)).thenReturn(user);
-
+        String mail = "test@mail.com";
+        String password = "password123";
+        User expectedUser = new User();
+        expectedUser.setMail(mail);
+        expectedUser.setPassword(password);
+        
+        when(userRepository.findByMailAndPassword(mail, password)).thenReturn(expectedUser);
         User actualUser = userService.getUserByMailAndPassword(mail, password);
-
-        assertEquals(user, actualUser);
-        verify(userRepository).findByMailAndPassword(mail, password);
+        assertEquals(expectedUser, actualUser);
     }
 
     @Test
     public void testCreateUser() {
-        Mockito.when(userRepository.save(user)).thenReturn(user);
+        User user = new User();
+        when(userRepository.save(user)).thenReturn(user);
         User actualUser = userService.createUser(user);
-
         assertEquals(user, actualUser);
     }
 
     @Test
     public void testUpdateUser() throws ResourceNotFoundException {
-        Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(user));
+        int userId = 1;
+        User existingUser = new User();
+        existingUser.setId(userId);
+        
+        User updatedUser = new User();
+        updatedUser.setName("New Name");
+        updatedUser.setLastName("New LastName");
+        updatedUser.setMail("new@mail.com");
+        updatedUser.setPassword("newpassword");
+        updatedUser.setRole(null);
+        
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userRepository.save(existingUser)).thenReturn(existingUser);
+        
+        User actualUser = userService.updateUser(userId, updatedUser);
+        assertEquals(updatedUser.getName(), actualUser.getName());
+        assertEquals(updatedUser.getLastName(), actualUser.getLastName());
+        assertEquals(updatedUser.getMail(), actualUser.getMail());
+        assertEquals(updatedUser.getPassword(), actualUser.getPassword());
+        assertEquals(updatedUser.getRole(), actualUser.getRole());
+    }
 
-        User actualUser = userService
-                .updateUser(user.getId(), user);
-
-        assertEquals("Juan", actualUser.getName());
-        assertEquals("Perez", actualUser.getLastName());
-        assertEquals("juan.perez@mail.com", actualUser.getMail());
-        assertEquals("1234", actualUser.getPassword());
-        assertEquals("admin", actualUser.getRole().getRole());
+    @Test
+    public void testUpdateUserNotFound() {
+        int userId = 1;
+        User updatedUser = new User();
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        
+        assertThrows(ResourceNotFoundException.class, () -> userService.updateUser(userId, updatedUser));
     }
 
     @Test
     public void testDeleteUser() throws ResourceNotFoundException {
+        int userId = 1;
+        User user = new User();
+        user.setId(userId);
+        
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        userService.deleteUser(userId);
+        verify(userRepository).deleteById(userId);
+    }
 
-        Mockito.when(userRepository.findById(1)).thenReturn(Optional.of(user));
-        userService.deleteUser(user.getId());
-
-        verify(userRepository).deleteById(1);
+    @Test
+    public void testDeleteUserNotFound() {
+        int userId = 1;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        
+        assertThrows(ResourceNotFoundException.class, () -> userService.deleteUser(userId));
     }
 }
-

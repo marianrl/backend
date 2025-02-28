@@ -23,8 +23,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -201,6 +203,36 @@ public class CommonInputServiceTest {
         verify(commonInputRepository).deleteById(1);
     }
     
-    
+    @Test
+    public void testUpdateCommonInput_AnswerNotFound() {
+        CommonInputUpdateRequest updateRequest = new CommonInputUpdateRequest();
+        updateRequest.setAnswerId(999);
+        updateRequest.setAuditTypeId(1);
+
+        when(commonInputRepository.findById(1)).thenReturn(Optional.of(commonInput));
+        when(answerRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> commonInputService.updateCommonInput(1, updateRequest));
+
+        verify(commonInputRepository, times(1)).findById(1);
+        verify(answerRepository, times(1)).findById(999);
+        verify(auditTypeRepository, times(0)).findById(1);
+    }
+
+    @Test
+    public void testUpdateCommonInput_AuditTypeNotFound() {
+        CommonInputUpdateRequest updateRequest = new CommonInputUpdateRequest();
+        updateRequest.setAnswerId(1);
+        updateRequest.setAuditTypeId(999);
+        when(commonInputRepository.findById(1)).thenReturn(Optional.of(commonInput));
+        when(answerRepository.findById(1)).thenReturn(Optional.of(answer));
+        when(auditTypeRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> commonInputService.updateCommonInput(1, updateRequest));
+
+        verify(commonInputRepository, times(1)).findById(1);
+        verify(answerRepository, times(1)).findById(1);
+        verify(auditTypeRepository, times(1)).findById(999);
+    }
 }
 

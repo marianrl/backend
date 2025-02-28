@@ -1,5 +1,8 @@
 package com.ams.backend.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import com.ams.backend.entity.Audit;
 import com.ams.backend.entity.AuditType;
 import com.ams.backend.entity.Audited;
@@ -9,17 +12,11 @@ import com.ams.backend.repository.AuditTypeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuditServiceTest {
@@ -32,87 +29,129 @@ public class AuditServiceTest {
 
     private AuditServiceImpl auditService;
 
-    private int auditId;
-    private int auditTypeId;
     private Audit audit;
-    private Audit updatedAudit;
     private AuditType auditType;
-    private List<Audit> expectedAudits;
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
         auditService = new AuditServiceImpl(auditRepository, auditTypeRepository);
-        auditId = 1;
-        auditTypeId = 1;
-        auditType = new AuditType(auditTypeId, "Audit Type");
+
+        // Crear un tipo de auditoría y una auditoría de ejemplo
+        auditType = new AuditType();
+        auditType.setId(1);
+        auditType.setAuditType("Financial Audit");
+
         audit = new Audit();
-        audit.setId(auditId);
+        audit.setId(1);
         audit.setAuditDate(LocalDate.now());
         audit.setIdTipoAuditoria(auditType);
         audit.setIdAuditado(new Audited(2, "No"));
+    }
 
-        updatedAudit = new Audit();
-        updatedAudit.setId(auditId);
+    @Test
+    public void testGetAllAudit() {
+        List<Audit> audits = Arrays.asList(audit);
+
+        when(auditRepository.findAll()).thenReturn(audits);
+
+        List<Audit> result = auditService.getAllAudit();
+
+        assertEquals(1, result.size());
+        assertEquals(audit.getId(), result.get(0).getId());
+        verify(auditRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testGetAuditById_AuditFound() throws ResourceNotFoundException {
+        when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+
+        Audit result = auditService.getAuditById(1);
+
+        assertNotNull(result);
+        assertEquals(audit.getId(), result.getId());
+        verify(auditRepository, times(1)).findById(1);
+    }
+
+    @Test
+    public void testGetAuditById_AuditNotFound() {
+        when(auditRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> auditService.getAuditById(999));
+
+        verify(auditRepository, times(1)).findById(999);
+    }
+
+    @Test
+    public void testCreateAudit_AuditTypeFound() throws ResourceNotFoundException {
+        when(auditTypeRepository.findById(1)).thenReturn(Optional.of(auditType));
+        when(auditRepository.save(any(Audit.class))).thenReturn(audit);
+
+        Audit result = auditService.createAudit(1);
+
+        assertNotNull(result);
+        assertEquals(audit.getId(), result.getId());
+        assertEquals(auditType.getId(), result.getIdTipoAuditoria().getId());
+        verify(auditTypeRepository, times(1)).findById(1);
+        verify(auditRepository, times(1)).save(any(Audit.class));
+    }
+
+    @Test
+    public void testCreateAudit_AuditTypeNotFound() {
+        when(auditTypeRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> auditService.createAudit(999));
+
+        verify(auditTypeRepository, times(1)).findById(999);
+        verify(auditRepository, times(0)).save(any(Audit.class));  // No debe llamar a save
+    }
+
+    @Test
+    public void testUpdateAudit_AuditFound() throws ResourceNotFoundException {
+        Audit updatedAudit = new Audit();
         updatedAudit.setAuditDate(LocalDate.now().plusDays(1));
-        updatedAudit.setIdTipoAuditoria(auditType);
-        updatedAudit.setIdAuditado(new Audited(2, "Yes"));
 
-        expectedAudits = new ArrayList<>();
-        expectedAudits.add(audit);
+        when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+        when(auditRepository.save(any(Audit.class))).thenReturn(updatedAudit);
+
+        Audit result = auditService.updateAudit(1, updatedAudit);
+
+        assertNotNull(result);
+        assertEquals(updatedAudit.getAuditDate(), result.getAuditDate());
+        verify(auditRepository, times(1)).findById(1);
     }
 
     @Test
-    public void testGetAllAudit_Success() {
-        Mockito.when(auditRepository.findAll()).thenReturn(expectedAudits);
+    public void testUpdateAudit_AuditNotFound() {
+        Audit updatedAudit = new Audit();
+        updatedAudit.setAuditDate(LocalDate.now().plusDays(1));
 
-        List<Audit> actualAudits = auditService.getAllAudit();
+        when(auditRepository.findById(999)).thenReturn(Optional.empty());
 
-        assertEquals(expectedAudits, actualAudits);
-        verify(auditRepository).findAll();
+        assertThrows(ResourceNotFoundException.class, () -> auditService.updateAudit(999, updatedAudit));
+
+        verify(auditRepository, times(1)).findById(999);
+        verify(auditRepository, times(0)).save(updatedAudit);  // No debe llamar a save
     }
 
     @Test
-    public void testGetAuditById_Success() throws ResourceNotFoundException {
-        Mockito.when(auditRepository.findById(auditId)).thenReturn(Optional.of(audit));
+    public void testDeleteAudit_AuditFound() throws ResourceNotFoundException {
+        when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+        doNothing().when(auditRepository).deleteById(1);
 
-        Audit actualAudit = auditService.getAuditById(auditId);
+        auditService.deleteAudit(1);
 
-        assertEquals(audit, actualAudit);
-        verify(auditRepository).findById(auditId);
+        verify(auditRepository, times(1)).findById(1);
+        verify(auditRepository, times(1)).deleteById(1);
     }
 
     @Test
-    public void testCreateAudit_Success() throws ResourceNotFoundException {
-        Mockito.when(auditTypeRepository.findById(auditTypeId)).thenReturn(Optional.of(auditType));
-        Mockito.when(auditRepository.save(Mockito.any(Audit.class))).thenReturn(audit);
+    public void testDeleteAudit_AuditNotFound() {
+        when(auditRepository.findById(999)).thenReturn(Optional.empty());
 
-        Audit actualAudit = auditService.createAudit(auditTypeId);
+        assertThrows(ResourceNotFoundException.class, () -> auditService.deleteAudit(999));
 
-        assertEquals(audit.getAuditDate(), actualAudit.getAuditDate());
-        assertEquals(audit.getIdTipoAuditoria(), actualAudit.getIdTipoAuditoria());
-        verify(auditTypeRepository).findById(auditTypeId);
-        verify(auditRepository).save(Mockito.any(Audit.class));
-    }
-
-    @Test
-    public void testUpdateAudit_Success() throws ResourceNotFoundException {
-        Mockito.when(auditRepository.findById(auditId)).thenReturn(Optional.of(audit));
-        Mockito.when(auditRepository.save(audit)).thenReturn(updatedAudit);
-
-        Audit actualAudit = auditService.updateAudit(auditId, updatedAudit);
-
-        assertEquals(updatedAudit.getAuditDate(), actualAudit.getAuditDate());
-        verify(auditRepository).findById(auditId);
-        verify(auditRepository).save(audit);
-    }
-
-    @Test
-    public void testDeleteAudit_Success() throws ResourceNotFoundException {
-        Mockito.when(auditRepository.findById(auditId)).thenReturn(Optional.of(audit));
-
-        auditService.deleteAudit(auditId);
-
-        verify(auditRepository).findById(auditId);
-        verify(auditRepository).deleteById(auditId);
+        verify(auditRepository, times(1)).findById(999);
+        verify(auditRepository, times(0)).deleteById(999);  // No debe eliminarse
     }
 }

@@ -1,22 +1,18 @@
 package com.ams.backend.service;
 
-import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.entity.Client;
-import com.ams.backend.repository.ClientRepository;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+import com.ams.backend.entity.Client;
+import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.repository.ClientRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ClientServiceTest {
@@ -26,64 +22,112 @@ public class ClientServiceTest {
 
     private ClientServiceImpl clientService;
 
+    private Client client;
+
     @BeforeEach
-    public void setup() {
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
         clientService = new ClientServiceImpl(clientRepository);
+
+        // Crear un cliente de ejemplo
+        client = new Client();
+        client.setId(1);
+        client.setClient("Test Client");
     }
 
     @Test
-    public void testGetAllClientes() {
-        List<Client> expectedClientes = new ArrayList<>();
-        Mockito.when(clientRepository.findAll()).thenReturn(expectedClientes);
-        List<Client> actualClientes = clientService.getAllClients();
+    public void testGetAllClients() {
+        List<Client> clients = Arrays.asList(client);
 
-        assertEquals(expectedClientes, actualClientes);
+        when(clientRepository.findAll()).thenReturn(clients);
+
+        List<Client> result = clientService.getAllClients();
+
+        assertEquals(1, result.size());
+        assertEquals(client.getClient(), result.get(0).getClient());
+        verify(clientRepository, times(1)).findAll();
     }
 
     @Test
-    public void testGetClientById() throws ResourceNotFoundException {
-        int clientId = 1;
-        Client expectedClient = new Client(clientId, "CABA");
+    public void testGetClientById_ClientFound() throws ResourceNotFoundException {
+        when(clientRepository.findById(1)).thenReturn(Optional.of(client));
 
-        Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(expectedClient));
-        Client actualClient = clientService.getClientById(clientId);
+        Client result = clientService.getClientById(1);
 
-        assertEquals(expectedClient, actualClient);
+        assertNotNull(result);
+        assertEquals(client.getClient(), result.getClient());
+        verify(clientRepository, times(1)).findById(1);
+    }
+
+    @Test
+    public void testGetClientById_ClientNotFound() {
+        when(clientRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> clientService.getClientById(999));
+
+        verify(clientRepository, times(1)).findById(999);
     }
 
     @Test
     public void testCreateClient() {
-        int clientId = 1;
-        Client client = new Client(clientId, "CABA");
+        Client newClient = new Client();
+        newClient.setClient("New Client");
 
-        Mockito.when(clientRepository.save(client)).thenReturn(client);
-        Client actualClient = clientService.createClient(client);
+        when(clientRepository.save(newClient)).thenReturn(newClient);
 
-        assertEquals(actualClient, client);
+        Client result = clientService.createClient(newClient);
+
+        assertNotNull(result);
+        assertEquals("New Client", result.getClient());
+        verify(clientRepository, times(1)).save(newClient);
     }
 
     @Test
-    public void testUpdateClient() throws ResourceNotFoundException {
-        int clientId = 1;
-        Client client = new Client(clientId, "CABA");
-        Client updatedClient = new Client(clientId, "GBA");
+    public void testUpdateClient_ClientFound() throws ResourceNotFoundException {
+        Client updatedClient = new Client();
+        updatedClient.setClient("Updated Client");
 
-        Mockito.when(clientRepository.findById(1)).thenReturn(Optional.of(client));
-        Client actualClient = clientService.updateClient(clientId, updatedClient);
+        when(clientRepository.findById(1)).thenReturn(Optional.of(client));
+        when(clientRepository.save(any(Client.class))).thenReturn(updatedClient);
 
-        assertEquals(updatedClient.getId(), actualClient.getId());
-        assertEquals(updatedClient.getClient(), actualClient.getClient());
+        Client result = clientService.updateClient(1, updatedClient);
+
+        assertNotNull(result);
+        assertEquals("Updated Client", result.getClient());
+        verify(clientRepository, times(1)).findById(1);
     }
 
     @Test
-    public void testDeleteClient() throws ResourceNotFoundException {
-        int clientId = 1;
-        Client client = new Client(clientId, "CABA");
+    public void testUpdateClient_ClientNotFound() {
+        Client updatedClient = new Client();
+        updatedClient.setClient("Updated Client");
 
-        Mockito.when(clientRepository.findById(1)).thenReturn(Optional.of(client));
-        clientService.deleteClient(clientId);
+        when(clientRepository.findById(999)).thenReturn(Optional.empty());
 
-        verify(clientRepository).deleteById(1);
+        assertThrows(ResourceNotFoundException.class, () -> clientService.updateClient(999, updatedClient));
+
+        verify(clientRepository, times(1)).findById(999);
+        verify(clientRepository, times(0)).save(updatedClient);  // No debe llamar a save
+    }
+
+    @Test
+    public void testDeleteClient_ClientFound() throws ResourceNotFoundException {
+        when(clientRepository.findById(1)).thenReturn(Optional.of(client));
+        doNothing().when(clientRepository).deleteById(1);
+
+        clientService.deleteClient(1);
+
+        verify(clientRepository, times(1)).findById(1);
+        verify(clientRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    public void testDeleteClient_ClientNotFound() {
+        when(clientRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> clientService.deleteClient(999));
+
+        verify(clientRepository, times(1)).findById(999);
+        verify(clientRepository, times(0)).deleteById(999);  // No debe eliminarse
     }
 }
-
