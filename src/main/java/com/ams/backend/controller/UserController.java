@@ -3,6 +3,7 @@ package com.ams.backend.controller;
 import com.ams.backend.entity.AuthenticateRequest;
 import com.ams.backend.entity.User;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.request.UserMail;
 import com.ams.backend.security.JwtTokenUtil;
 import com.ams.backend.service.interfaces.UserService;
 
@@ -63,7 +64,12 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+    }
+
+    @PostMapping("/user/exists")
+    public ResponseEntity<Boolean> userExists(@RequestBody UserMail request) {
+        boolean exists = userService.getUserByMail(request) != null;
+        return ResponseEntity.ok(exists);
     }
 
     @PostMapping("/user")

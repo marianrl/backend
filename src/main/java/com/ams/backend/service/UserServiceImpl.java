@@ -3,6 +3,7 @@ package com.ams.backend.service;
 import com.ams.backend.entity.User;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.UserRepository;
+import com.ams.backend.request.UserMail;
 import com.ams.backend.service.interfaces.UserService;
 
 import lombok.AllArgsConstructor;
@@ -29,6 +30,10 @@ public class UserServiceImpl implements UserService {
 
     public User getUserByMailAndPassword(String mail, String password) {
         return userRepository.findByMailAndPassword(mail, password);
+    }
+
+    public User getUserByMail(UserMail mail) {
+        return userRepository.findByMail(mail.getMail());
     }
 
     public User createUser(User user) {
