@@ -44,7 +44,7 @@ public class AfipInputControllerTest {
         List<AfipInput> afipInputs = Collections.singletonList(afipInput);
         when(afipInputService.getAllAfipInputs()).thenReturn(afipInputs);
 
-        List<AfipInput> result = afipInputController.getAllAfipAudits();
+        List<AfipInput> result = afipInputController.getAllAfipInputs();
 
         assertEquals(afipInputs, result);
         verify(afipInputService, times(1)).getAllAfipInputs();
@@ -65,7 +65,7 @@ public class AfipInputControllerTest {
         List<AfipInput> afipInputs = Collections.singletonList(afipInput);
         when(afipInputService.getAfipInputByAuditNumber(1)).thenReturn(afipInputs);
 
-        ResponseEntity<List<AfipInput>> result = afipInputController.getAfipAuditByAuditNumber(1);
+        ResponseEntity<List<AfipInput>> result = afipInputController.getAfipInputByAuditNumber(1);
 
         assertEquals(afipInputs, result.getBody());
         verify(afipInputService, times(1)).getAfipInputByAuditNumber(1);
@@ -75,7 +75,7 @@ public class AfipInputControllerTest {
     public void testCreateAfipAudit() {
         when(afipInputService.createAfipInput(any(AfipInput.class))).thenReturn(afipInput);
 
-        AfipInput result = afipInputController.createAfipAudit(afipInput);
+        AfipInput result = afipInputController.createAfipInput(afipInput);
 
         assertEquals(afipInput, result);
         verify(afipInputService, times(1)).createAfipInput(any(AfipInput.class));
@@ -86,7 +86,7 @@ public class AfipInputControllerTest {
         AfipInputUpdateRequest afipInputUpdateRequest = new AfipInputUpdateRequest();
         when(afipInputService.updateAfipInput(eq(1), any(AfipInputUpdateRequest.class))).thenReturn(afipInput);
 
-        ResponseEntity<AfipInput> result = afipInputController.updateAfipAudit(1, afipInputUpdateRequest);
+        ResponseEntity<AfipInput> result = afipInputController.updateAfipInput(1, afipInputUpdateRequest);
 
         assertEquals(afipInput, result.getBody());
         verify(afipInputService, times(1)).updateAfipInput(eq(1), any(AfipInputUpdateRequest.class));
@@ -97,7 +97,7 @@ public class AfipInputControllerTest {
         HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
         doNothing().when(afipInputService).deleteAfipInput(1);
 
-        ResponseEntity<Void> result = afipInputController.deleteAfipAudit(1);
+        ResponseEntity<Void> result = afipInputController.deleteAfipInput(1);
 
         assertEquals(isNoContent, result.getStatusCode());
         verify(afipInputService, times(1)).deleteAfipInput(1);

@@ -31,7 +31,7 @@ public class AfipInputController {
     private AfipInputService afipInputService;
 
     @GetMapping("/afipInput")
-    public List<AfipInput> getAllAfipAudits() {
+    public List<AfipInput> getAllAfipInputs() {
         return afipInputService.getAllAfipInputs();
     }
 
@@ -42,8 +42,7 @@ public class AfipInputController {
     }
 
     @GetMapping("/afipInput/{id}")
-    public ResponseEntity<List<AfipInput>> getAfipAuditByAuditNumber(@PathVariable(value = "id") int auditNumber)
-    {
+    public ResponseEntity<List<AfipInput>> getAfipInputByAuditNumber(@PathVariable(value = "id") int auditNumber) {
         List<AfipInput> afipInput = afipInputService.getAfipInputByAuditNumber(auditNumber);
 
         return ResponseEntity.ok().body(afipInput);
@@ -60,8 +59,7 @@ public class AfipInputController {
             @RequestParam(required = false) String uoc,
             @RequestParam(required = false) Long idSucursal,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaIngreso,
-            @RequestParam(required = false) Long idCaracteristicas
-    ) {
+            @RequestParam(required = false) Long idCaracteristicas) {
 
         return afipInputService.getFilteredAfipInputs(
                 apellido,
@@ -73,17 +71,16 @@ public class AfipInputController {
                 uoc,
                 idSucursal,
                 fechaIngreso,
-                idCaracteristicas
-        );
+                idCaracteristicas);
     }
 
     @PostMapping("/afipInput")
-    public AfipInput createAfipAudit(@Valid @RequestBody AfipInput afipInput) {
+    public AfipInput createAfipInput(@Valid @RequestBody AfipInput afipInput) {
         return afipInputService.createAfipInput(afipInput);
     }
 
     @PutMapping("/afipInput/{id}")
-    public ResponseEntity<AfipInput> updateAfipAudit(
+    public ResponseEntity<AfipInput> updateAfipInput(
             @PathVariable(value = "id") int afipInputId,
             @Valid @RequestBody AfipInputUpdateRequest afipInputUpdateRequest) throws ResourceNotFoundException {
         final AfipInput updatedAfipInput = afipInputService.updateAfipInput(afipInputId, afipInputUpdateRequest);
@@ -92,7 +89,7 @@ public class AfipInputController {
     }
 
     @DeleteMapping("/afipInput/{id}")
-    public ResponseEntity<Void> deleteAfipAudit(@PathVariable(value = "id") int afipAuditId)
+    public ResponseEntity<Void> deleteAfipInput(@PathVariable(value = "id") int afipAuditId)
             throws ResourceNotFoundException {
         afipInputService.deleteAfipInput(afipAuditId);
 
