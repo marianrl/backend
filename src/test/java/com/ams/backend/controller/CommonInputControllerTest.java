@@ -1,15 +1,18 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.*;
+import com.ams.backend.entity.CommonInput;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.request.CommonInputUpdateRequest;
 import com.ams.backend.service.interfaces.CommonInputService;
+import com.ams.backend.request.InputRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
@@ -19,15 +22,19 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class CommonInputControllerTest {
 
     @Mock
@@ -37,12 +44,33 @@ public class CommonInputControllerTest {
     private CommonInputController commonInputController;
 
     private CommonInput commonInput;
+    private InputRequest inputRequest;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         commonInput = new CommonInput();
         commonInput.setId(1);
+
+        inputRequest = new InputRequest();
+        inputRequest.setLastName("Doe");
+        inputRequest.setName("John");
+        inputRequest.setCuil("20-12345678-9");
+        inputRequest.setFile("12345");
+        inputRequest.setAllocation("IT");
+        inputRequest.setUoc("UOC1");
+        inputRequest.setAdmissionDate(LocalDate.now());
+        inputRequest.setClient(1);
+        inputRequest.setBranch(1);
+        inputRequest.setAuditId(1);
+
+        commonInput.setLastName(inputRequest.getLastName());
+        commonInput.setName(inputRequest.getName());
+        commonInput.setCuil(inputRequest.getCuil());
+        commonInput.setFile(inputRequest.getFile());
+        commonInput.setAllocation(inputRequest.getAllocation());
+        commonInput.setUoc(inputRequest.getUoc());
+        commonInput.setAdmissionDate(inputRequest.getAdmissionDate());
     }
 
     @Test
@@ -96,13 +124,45 @@ public class CommonInputControllerTest {
     }
 
     @Test
-    public void testCreateCommonAudit() {
-        when(commonInputService.createCommonInput(any(CommonInput.class))).thenReturn(commonInput);
+    public void testCreateCommonInput_Success() throws ResourceNotFoundException {
+        List<InputRequest> inputRequests = Collections.singletonList(inputRequest);
+        List<CommonInput> expectedCommonInputs = Collections.singletonList(commonInput);
 
-        CommonInput result = commonInputController.createCommonInput(commonInput);
+        when(commonInputService.createCommonInputs(anyList())).thenReturn(expectedCommonInputs);
 
-        assertEquals(commonInput, result);
-        verify(commonInputService, times(1)).createCommonInput(any(CommonInput.class));
+        List<CommonInput> result = commonInputController.createCommonInput(inputRequests);
+
+        assertNotNull(result);
+        assertEquals(expectedCommonInputs, result);
+        verify(commonInputService).createCommonInputs(inputRequests);
+    }
+
+    @Test
+    public void testCreateCommonInput_AuditNotFound() throws ResourceNotFoundException {
+        List<InputRequest> inputRequests = Collections.singletonList(inputRequest);
+
+        when(commonInputService.createCommonInputs(anyList()))
+                .thenThrow(new ResourceNotFoundException("Audit not found"));
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            commonInputController.createCommonInput(inputRequests);
+        });
+
+        verify(commonInputService).createCommonInputs(inputRequests);
+    }
+
+    @Test
+    public void testCreateCommonInput_FeaturesNotFound() throws ResourceNotFoundException {
+        List<InputRequest> inputRequests = Collections.singletonList(inputRequest);
+
+        when(commonInputService.createCommonInputs(anyList()))
+                .thenThrow(new ResourceNotFoundException("Features not found"));
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            commonInputController.createCommonInput(inputRequests);
+        });
+
+        verify(commonInputService).createCommonInputs(inputRequests);
     }
 
     @Test

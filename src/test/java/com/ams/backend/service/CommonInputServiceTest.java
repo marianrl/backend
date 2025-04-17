@@ -4,9 +4,11 @@ import com.ams.backend.entity.*;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.repository.CommonInputRepository;
 import com.ams.backend.repository.AnswerRepository;
+import com.ams.backend.repository.AuditRepository;
 import com.ams.backend.repository.AuditTypeRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.CommonInputUpdateRequest;
+import com.ams.backend.request.InputRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,16 +21,21 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 public class CommonInputServiceTest {
@@ -45,6 +52,9 @@ public class CommonInputServiceTest {
     @Mock
     private AuditTypeRepository auditTypeRepository;
 
+    @Mock
+    private AuditRepository auditRepository;
+
     @MockBean
     private CommonInputServiceImpl commonInputService;
 
@@ -52,9 +62,9 @@ public class CommonInputServiceTest {
     final private Branch branch = new Branch(1, "hola");
     final private Answer answer = new Answer(1, "SE AJUSTA");
     final private AuditType auditType = new AuditType(1, "INTERNA");
-    final private Audited audited = new Audited(1,"NO");
-    final private Features features = new Features(1,auditType ,answer);
-    final private Audit audit = new Audit(1,LocalDate.now(),auditType,audited);
+    final private Audited audited = new Audited(1, "NO");
+    final private Features features = new Features(1, auditType, answer);
+    final private Audit audit = new Audit(1, LocalDate.now(), auditType, audited);
 
     private static Specification<CommonInput> anyCommonInputSpecification() {
         return argThat(argument -> true); // Acepta cualquier Specification<AfipInput>
@@ -72,8 +82,7 @@ public class CommonInputServiceTest {
             branch,
             LocalDate.now(),
             features,
-            audit
-    );
+            audit);
 
     final private CommonInput commonInput2 = new CommonInput(
             2,
@@ -87,8 +96,7 @@ public class CommonInputServiceTest {
             branch,
             LocalDate.of(2023, 1, 1),
             features,
-            audit
-    );
+            audit);
 
     @BeforeEach
     public void setup() {
@@ -96,8 +104,8 @@ public class CommonInputServiceTest {
                 commonInputRepository,
                 answerRepository,
                 featuresRepository,
-                auditTypeRepository
-        );
+                auditTypeRepository,
+                auditRepository);
     }
 
     @Test
@@ -141,8 +149,7 @@ public class CommonInputServiceTest {
         when(commonInputRepository.findAll(anyCommonInputSpecification())).thenReturn(expectedCommonInputs);
 
         List<CommonInput> result = commonInputService.getFilteredCommonInputs(
-                "Perez", "Juan", "20-45125484-7", "4568", "1248", 1L, "UOC-123", 1L, LocalDate.now(), 1L
-        );
+                "Perez", "Juan", "20-45125484-7", "4568", "1248", 1L, "UOC-123", 1L, LocalDate.now(), 1L);
 
         assertEquals(expectedCommonInputs, result);
 
@@ -150,11 +157,70 @@ public class CommonInputServiceTest {
     }
 
     @Test
-    public void testCreateCommonAudit() {
-        when(commonInputRepository.save(commonInput)).thenReturn(commonInput);
-        CommonInput actualCommonInput = commonInputService.createCommonInput(commonInput);
+    public void testCreateCommonInput() throws ResourceNotFoundException {
+        // Arrange
+        InputRequest inputRequest = new InputRequest();
+        inputRequest.setLastName("Perez");
+        inputRequest.setName("Juan");
+        inputRequest.setCuil("20-45125484-7");
+        inputRequest.setFile("4568");
+        inputRequest.setAllocation("1248");
+        inputRequest.setUoc("UOC-123");
+        inputRequest.setAdmissionDate(LocalDate.now());
+        inputRequest.setClient(1);
+        inputRequest.setBranch(1);
+        inputRequest.setAuditId(1);
 
-        assertEquals(commonInput, actualCommonInput);
+        when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+        when(featuresRepository.findById(49)).thenReturn(Optional.of(features));
+        when(commonInputRepository.save(any(CommonInput.class))).thenReturn(commonInput);
+
+        // Act
+        CommonInput result = commonInputService.createCommonInput(inputRequest);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(commonInput, result);
+        verify(auditRepository).findById(1);
+        verify(featuresRepository).findById(49);
+        verify(commonInputRepository).save(any(CommonInput.class));
+    }
+
+    @Test
+    public void testCreateCommonInput_AuditNotFound() {
+        // Arrange
+        InputRequest inputRequest = new InputRequest();
+        inputRequest.setAuditId(1);
+
+        when(auditRepository.findById(1)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            commonInputService.createCommonInput(inputRequest);
+        });
+
+        verify(auditRepository).findById(1);
+        verify(featuresRepository, never()).findById(anyInt());
+        verify(commonInputRepository, never()).save(any(CommonInput.class));
+    }
+
+    @Test
+    public void testCreateCommonInput_FeaturesNotFound() {
+        // Arrange
+        InputRequest inputRequest = new InputRequest();
+        inputRequest.setAuditId(1);
+
+        when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+        when(featuresRepository.findById(49)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            commonInputService.createCommonInput(inputRequest);
+        });
+
+        verify(auditRepository).findById(1);
+        verify(featuresRepository).findById(49);
+        verify(commonInputRepository, never()).save(any(CommonInput.class));
     }
 
     @Test
@@ -202,7 +268,7 @@ public class CommonInputServiceTest {
 
         verify(commonInputRepository).deleteById(1);
     }
-    
+
     @Test
     public void testUpdateCommonInput_AnswerNotFound() {
         CommonInputUpdateRequest updateRequest = new CommonInputUpdateRequest();
@@ -234,5 +300,92 @@ public class CommonInputServiceTest {
         verify(answerRepository, times(1)).findById(1);
         verify(auditTypeRepository, times(1)).findById(999);
     }
-}
 
+    @Test
+    public void testCreateCommonInputs_Success() throws ResourceNotFoundException {
+        // Arrange
+        List<InputRequest> inputRequests = new ArrayList<>();
+        InputRequest inputRequest1 = new InputRequest();
+        inputRequest1.setLastName("Perez");
+        inputRequest1.setName("Juan");
+        inputRequest1.setCuil("20-45125484-7");
+        inputRequest1.setFile("4568");
+        inputRequest1.setAllocation("1248");
+        inputRequest1.setUoc("UOC-123");
+        inputRequest1.setAdmissionDate(LocalDate.now());
+        inputRequest1.setClient(1);
+        inputRequest1.setBranch(1);
+        inputRequest1.setAuditId(1);
+
+        InputRequest inputRequest2 = new InputRequest();
+        inputRequest2.setLastName("Gomez");
+        inputRequest2.setName("Maria");
+        inputRequest2.setCuil("27-12345678-9");
+        inputRequest2.setFile("7890");
+        inputRequest2.setAllocation("5678");
+        inputRequest2.setUoc("UOC-456");
+        inputRequest2.setAdmissionDate(LocalDate.now());
+        inputRequest2.setClient(1);
+        inputRequest2.setBranch(1);
+        inputRequest2.setAuditId(1);
+
+        inputRequests.add(inputRequest1);
+        inputRequests.add(inputRequest2);
+
+        List<CommonInput> expectedCommonInputs = Arrays.asList(commonInput, commonInput2);
+
+        when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+        when(featuresRepository.findById(49)).thenReturn(Optional.of(features));
+        when(commonInputRepository.save(any(CommonInput.class)))
+                .thenReturn(commonInput)
+                .thenReturn(commonInput2);
+
+        // Act
+        List<CommonInput> result = commonInputService.createCommonInputs(inputRequests);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(expectedCommonInputs, result);
+        verify(auditRepository, times(2)).findById(1);
+        verify(featuresRepository, times(2)).findById(49);
+        verify(commonInputRepository, times(2)).save(any(CommonInput.class));
+    }
+
+    @Test
+    public void testCreateCommonInputs_AuditNotFound() {
+        // Arrange
+        InputRequest inputRequest1 = new InputRequest();
+        inputRequest1.setAuditId(1);
+        List<InputRequest> inputRequests = Collections.singletonList(inputRequest1);
+        when(auditRepository.findById(1)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            commonInputService.createCommonInputs(inputRequests);
+        });
+
+        verify(auditRepository).findById(1);
+        verify(featuresRepository, never()).findById(anyInt());
+        verify(commonInputRepository, never()).save(any(CommonInput.class));
+    }
+
+    @Test
+    public void testCreateCommonInputs_FeaturesNotFound() {
+        // Arrange
+        InputRequest inputRequest1 = new InputRequest();
+        inputRequest1.setAuditId(1);
+        List<InputRequest> inputRequests = Collections.singletonList(inputRequest1);
+        when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+        when(featuresRepository.findById(49)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class, () -> {
+            commonInputService.createCommonInputs(inputRequests);
+        });
+
+        verify(auditRepository).findById(1);
+        verify(featuresRepository).findById(49);
+        verify(commonInputRepository, never()).save(any(CommonInput.class));
+    }
+}

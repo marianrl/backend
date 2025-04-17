@@ -3,6 +3,7 @@ package com.ams.backend.controller;
 import com.ams.backend.entity.AfipInput;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.request.AfipInputUpdateRequest;
+import com.ams.backend.request.InputRequest;
 import com.ams.backend.service.interfaces.AfipInputService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,12 +14,15 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -31,12 +35,25 @@ public class AfipInputControllerTest {
     private AfipInputController afipInputController;
 
     private AfipInput afipInput;
+    private InputRequest inputRequest;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         afipInput = new AfipInput();
         afipInput.setId(1);
+
+        inputRequest = new InputRequest();
+        inputRequest.setLastName("Perez");
+        inputRequest.setName("Juan");
+        inputRequest.setCuil("20-45125484-7");
+        inputRequest.setFile("4568");
+        inputRequest.setAllocation("1248");
+        inputRequest.setClient(1);
+        inputRequest.setUoc("Capital Federal");
+        inputRequest.setBranch(1);
+        inputRequest.setAuditId(1);
+        inputRequest.setAdmissionDate(LocalDate.now());
     }
 
     @Test
@@ -72,13 +89,27 @@ public class AfipInputControllerTest {
     }
 
     @Test
-    public void testCreateAfipAudit() {
-        when(afipInputService.createAfipInput(any(AfipInput.class))).thenReturn(afipInput);
+    public void testCreateAfipInput() throws ResourceNotFoundException {
+        List<InputRequest> inputRequests = Collections.singletonList(inputRequest);
+        List<AfipInput> expectedAfipInputs = Collections.singletonList(afipInput);
 
-        AfipInput result = afipInputController.createAfipInput(afipInput);
+        when(afipInputService.createAfipInputs(anyList())).thenReturn(expectedAfipInputs);
 
-        assertEquals(afipInput, result);
-        verify(afipInputService, times(1)).createAfipInput(any(AfipInput.class));
+        List<AfipInput> result = afipInputController.createAfipInput(inputRequests);
+
+        assertEquals(expectedAfipInputs, result);
+        verify(afipInputService, times(1)).createAfipInputs(anyList());
+    }
+
+    @Test
+    public void testCreateAfipInput_ResourceNotFound() throws ResourceNotFoundException {
+        List<InputRequest> inputRequests = Collections.singletonList(inputRequest);
+
+        when(afipInputService.createAfipInputs(anyList()))
+                .thenThrow(new ResourceNotFoundException("Resource not found"));
+
+        assertThrows(ResourceNotFoundException.class, () -> afipInputController.createAfipInput(inputRequests));
+        verify(afipInputService, times(1)).createAfipInputs(anyList());
     }
 
     @Test

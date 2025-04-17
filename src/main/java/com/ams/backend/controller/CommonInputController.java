@@ -3,6 +3,7 @@ package com.ams.backend.controller;
 import com.ams.backend.entity.CommonInput;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.request.CommonInputUpdateRequest;
+import com.ams.backend.request.InputRequest;
 import com.ams.backend.service.interfaces.CommonInputService;
 
 import jakarta.validation.Valid;
@@ -43,8 +44,7 @@ public class CommonInputController {
     }
 
     @GetMapping("/commonInput/{id}")
-    public ResponseEntity<List<CommonInput>> getCommonAuditByAuditNumber(@PathVariable(value = "id") int auditNumber)
-    {
+    public ResponseEntity<List<CommonInput>> getCommonAuditByAuditNumber(@PathVariable(value = "id") int auditNumber) {
         List<CommonInput> commonInputs = commonInputService.getCommonInputByAuditNumber(auditNumber);
 
         return ResponseEntity.ok().body(commonInputs);
@@ -61,8 +61,7 @@ public class CommonInputController {
             @RequestParam(required = false) String uoc,
             @RequestParam(required = false) Long idSucursal,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaIngreso,
-            @RequestParam(required = false) Long idCaracteristicas
-    ) {
+            @RequestParam(required = false) Long idCaracteristicas) {
 
         return commonInputService.getFilteredCommonInputs(
                 apellido,
@@ -74,20 +73,21 @@ public class CommonInputController {
                 uoc,
                 idSucursal,
                 fechaIngreso,
-                idCaracteristicas
-        );
+                idCaracteristicas);
     }
 
     @PostMapping("/commonInput")
-    public CommonInput createCommonInput(@Valid @RequestBody CommonInput commonInput) {
-        return commonInputService.createCommonInput(commonInput);
+    public List<CommonInput> createCommonInput(@Valid @RequestBody List<InputRequest> inputRequests)
+            throws ResourceNotFoundException {
+        return commonInputService.createCommonInputs(inputRequests);
     }
 
     @PutMapping("/commonInput/{id}")
     public ResponseEntity<CommonInput> updateCommonInput(
             @PathVariable(value = "id") int commonInputId,
             @Valid @RequestBody CommonInputUpdateRequest commonInputUpdateRequest) throws ResourceNotFoundException {
-        final CommonInput updatedCommonInput = commonInputService.updateCommonInput(commonInputId, commonInputUpdateRequest);
+        final CommonInput updatedCommonInput = commonInputService.updateCommonInput(commonInputId,
+                commonInputUpdateRequest);
 
         return ResponseEntity.ok(updatedCommonInput);
     }

@@ -30,6 +30,4 @@ public class Audit {
     @ManyToOne
     @JoinColumn(name = "id_auditado")
     private Audited idAuditado;
-
-
 }

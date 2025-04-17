@@ -3,6 +3,7 @@ package com.ams.backend.controller;
 import com.ams.backend.entity.AfipInput;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.request.AfipInputUpdateRequest;
+import com.ams.backend.request.InputRequest;
 import com.ams.backend.service.interfaces.AfipInputService;
 
 import jakarta.validation.Valid;
@@ -75,8 +76,9 @@ public class AfipInputController {
     }
 
     @PostMapping("/afipInput")
-    public AfipInput createAfipInput(@Valid @RequestBody AfipInput afipInput) {
-        return afipInputService.createAfipInput(afipInput);
+    public List<AfipInput> createAfipInput(@Valid @RequestBody List<InputRequest> inputRequests)
+            throws ResourceNotFoundException {
+        return afipInputService.createAfipInputs(inputRequests);
     }
 
     @PutMapping("/afipInput/{id}")
