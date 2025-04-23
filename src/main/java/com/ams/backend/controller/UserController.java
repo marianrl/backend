@@ -42,7 +42,7 @@ public class UserController {
 
     @GetMapping("/user/{id}")
     public ResponseEntity<User> getUserById(@PathVariable(value = "id") int userId)
-            throws ResourceNotFoundException{
+            throws ResourceNotFoundException {
         User user = userService.getUserById(userId);
 
         return ResponseEntity.ok().body(user);
@@ -53,13 +53,14 @@ public class UserController {
         User user = userService.getUserByMailAndPassword(request.getMail(), request.getPassword());
 
         if (user != null && user.getMail() != null) {
-            String token = jwtTokenUtil.generateToken(user.getMail(), user.getName(), user.getLastName());
+            String token = jwtTokenUtil.generateToken(user.getMail(), user.getName(), user.getLastName(),
+                    user.getRole().getId());
 
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
 
             return ResponseEntity.ok(response);
-        } else if(user == null) {
+        } else if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

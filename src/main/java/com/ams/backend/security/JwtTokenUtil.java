@@ -15,11 +15,12 @@ public class JwtTokenUtil {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // Genera una clave segura
     private static final long EXPIRATION_TIME = 86400000; // 1 día
 
-    public String generateToken(String username, String name, String lastName) {
+    public String generateToken(String username, String name, String lastName, int roleId) {
         // Crear un mapa de claims para incluir información adicional
         Map<String, Object> claims = new HashMap<>();
         claims.put("name", name);
         claims.put("lastName", lastName);
+        claims.put("role", roleId);
 
         return Jwts.builder()
                 .setClaims(claims) // Agregar los claims al token
@@ -33,10 +34,10 @@ public class JwtTokenUtil {
     public String getUsernameFromToken(String token) {
         // Crear un JwtParser usando JwtParserBuilder
         Claims claims = Jwts.parserBuilder()
-        .setSigningKey(key) // Usa la clave de firma para verificar el token
-        .build() // Construir el parser
-        .parseClaimsJws(token) // Analizar el token JWT
-        .getBody(); // Obtener el cuerpo (claims)
+                .setSigningKey(key) // Usa la clave de firma para verificar el token
+                .build() // Construir el parser
+                .parseClaimsJws(token) // Analizar el token JWT
+                .getBody(); // Obtener el cuerpo (claims)
 
         return claims.getSubject(); // Obtener el "subject" del token
     }
@@ -44,10 +45,10 @@ public class JwtTokenUtil {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                .setSigningKey(key) // Configura la clave de firma
-                .build() // Construye el parser
-                .parseClaimsJws(token); // Valida y analiza el token
-    
+                    .setSigningKey(key) // Configura la clave de firma
+                    .build() // Construye el parser
+                    .parseClaimsJws(token); // Valida y analiza el token
+
             return true; // Si no lanza excepción, el token es válido
         } catch (ExpiredJwtException e) {
             System.out.println("El token ha expirado: " + e.getMessage());
@@ -58,8 +59,7 @@ public class JwtTokenUtil {
         } catch (IllegalArgumentException e) {
             System.out.println("El token está vacío o es nulo: " + e.getMessage());
         }
-    
+
         return false; // Si alguna excepción se lanza, el token no es válido
     }
 }
-

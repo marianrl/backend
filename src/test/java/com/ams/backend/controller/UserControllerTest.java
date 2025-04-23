@@ -2,6 +2,7 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.AuthenticateRequest;
 import com.ams.backend.entity.User;
+import com.ams.backend.entity.Role;
 import com.ams.backend.repository.UserRepository;
 import com.ams.backend.security.JwtTokenUtil;
 import com.ams.backend.service.interfaces.UserService;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -52,7 +54,14 @@ public class UserControllerTest {
         user = new User();
         user.setId(1);
         user.setMail("juan.perez@mail.com");
-        user.setPassword( "1234");
+        user.setPassword("1234");
+        user.setName("Juan");
+        user.setLastName("Perez");
+
+        Role role = new Role();
+        role.setId(1);
+        role.setRole("USER");
+        user.setRole(role);
     }
 
     @Test
@@ -82,16 +91,13 @@ public class UserControllerTest {
         String mail = "juan.perez@mail.com";
         String password = "1234";
         String token = "mockToken";
-        User user = new User();
-        user.setMail(mail);
-        user.setName("Juan");
-        user.setLastName("Perez");
 
         AuthenticateRequest request = new AuthenticateRequest(mail, password);
 
         // Mockear dependencias
         when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
-        when(jwtTokenUtil.generateToken(mail, user.getName(), user.getLastName())).thenReturn(token);
+        when(jwtTokenUtil.generateToken(mail, user.getName(), user.getLastName(), user.getRole().getId()))
+                .thenReturn(token);
 
         // Llamar al método
         ResponseEntity<Map<String, String>> response = userController.authenticate(request);
@@ -102,7 +108,7 @@ public class UserControllerTest {
 
         // Verificar interacción con dependencias
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
-        verify(jwtTokenUtil, times(1)).generateToken(mail, user.getName(), user.getLastName());
+        verify(jwtTokenUtil, times(1)).generateToken(mail, user.getName(), user.getLastName(), user.getRole().getId());
     }
 
     @Test
@@ -125,7 +131,7 @@ public class UserControllerTest {
 
         // Verificar interacción con dependencias
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
-        verify(jwtTokenUtil, never()).generateToken(anyString(), anyString(), anyString());
+        verify(jwtTokenUtil, never()).generateToken(anyString(), anyString(), anyString(), anyInt());
     }
 
     @Test
@@ -152,7 +158,7 @@ public class UserControllerTest {
 
         // Verificar interacción con dependencias
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
-        verify(jwtTokenUtil, never()).generateToken(anyString(), anyString(), anyString());
+        verify(jwtTokenUtil, never()).generateToken(anyString(), anyString(), anyString(), anyInt());
     }
 
     @Test
