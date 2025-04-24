@@ -50,20 +50,26 @@ public class UserController {
 
     @PostMapping("/user/authenticate")
     public ResponseEntity<Map<String, String>> authenticate(@RequestBody AuthenticateRequest request) {
-        User user = userService.getUserByMailAndPassword(request.getMail(), request.getPassword());
+        try {
+            User user = userService.getUserByMailAndPassword(request.getMail(), request.getPassword());
 
-        if (user != null && user.getMail() != null) {
-            String token = jwtTokenUtil.generateToken(user.getMail(), user.getName(), user.getLastName(),
-                    user.getRole().getId());
+            if (user != null && user.getMail() != null) {
+                String token = jwtTokenUtil.generateToken(user.getMail(), user.getName(), user.getLastName(),
+                        user.getRole().getId());
 
-            Map<String, String> response = new HashMap<>();
-            response.put("token", token);
+                Map<String, String> response = new HashMap<>();
+                response.put("token", token);
 
-            return ResponseEntity.ok(response);
-        } else if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                return ResponseEntity.ok(response);
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("error", "Usuario o contraseña incorrecta");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            }
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Error al procesar la solicitud");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 

@@ -17,7 +17,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class AuditServiceImpl implements AuditService{
+public class AuditServiceImpl implements AuditService {
 
     @Autowired
     private AuditRepository auditRepository;
@@ -52,12 +52,13 @@ public class AuditServiceImpl implements AuditService{
                 .orElseThrow(() -> new ResourceNotFoundException("Audit not found for this id :: " + id));
 
         audit.setAuditDate(providedAudit.getAuditDate());
+        audit.setIdAuditado(providedAudit.getIdAuditado());
         auditRepository.save(audit);
 
         return audit;
     }
 
-    public void deleteAudit(int id) throws ResourceNotFoundException{
+    public void deleteAudit(int id) throws ResourceNotFoundException {
         auditRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audit not found for this id :: " + id));
 
