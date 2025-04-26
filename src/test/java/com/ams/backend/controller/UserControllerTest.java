@@ -126,8 +126,10 @@ public class UserControllerTest {
         ResponseEntity<Map<String, String>> response = userController.authenticate(request);
 
         // Verificar resultado
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        Map<String, String> responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals("Usuario o contraseña incorrecta", responseBody.get("error"));
 
         // Verificar interacción con dependencias
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
@@ -154,7 +156,9 @@ public class UserControllerTest {
 
         // Verificar resultado
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertNull(response.getBody());
+        Map<String, String> responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals("Usuario o contraseña incorrecta", responseBody.get("error"));
 
         // Verificar interacción con dependencias
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
