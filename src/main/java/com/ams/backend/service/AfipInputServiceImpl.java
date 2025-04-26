@@ -9,6 +9,7 @@ import com.ams.backend.entity.Branch;
 import com.ams.backend.entity.Client;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.mapper.AfipInputMapper;
 import com.ams.backend.repository.AfipInputRepository;
 import com.ams.backend.repository.AnswerRepository;
 import com.ams.backend.repository.AuditRepository;
@@ -16,6 +17,7 @@ import com.ams.backend.repository.AuditTypeRepository;
 import com.ams.backend.repository.FeaturesRepository;
 import com.ams.backend.request.AfipInputUpdateRequest;
 import com.ams.backend.request.InputRequest;
+import com.ams.backend.response.AfipInputResponse;
 import com.ams.backend.service.interfaces.AfipInputService;
 
 import lombok.AllArgsConstructor;
@@ -27,6 +29,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -47,19 +50,27 @@ public class AfipInputServiceImpl implements AfipInputService {
     @Autowired
     private AuditRepository auditRepository;
 
-    public List<AfipInput> getAllAfipInputs() {
-        return afipInputRepository.findAll();
+    @Autowired
+    private AfipInputMapper afipInputMapper;
+
+    public List<AfipInputResponse> getAllAfipInputs() {
+        return afipInputRepository.findAll().stream()
+                .map(afipInputMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public Optional<AfipInput> getAfipInputById(int id) {
-        return afipInputRepository.findById(id);
+    public Optional<AfipInputResponse> getAfipInputById(int id) {
+        return afipInputRepository.findById(id)
+                .map(afipInputMapper::toResponse);
     }
 
-    public List<AfipInput> getAfipInputByAuditNumber(int id) {
-        return afipInputRepository.findByAudit_Id(id);
+    public List<AfipInputResponse> getAfipInputByAuditNumber(int id) {
+        return afipInputRepository.findByAudit_Id(id).stream()
+                .map(afipInputMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<AfipInput> getFilteredAfipInputs(
+    public List<AfipInputResponse> getFilteredAfipInputs(
             String apellido,
             String nombre,
             String cuil,
@@ -75,10 +86,12 @@ public class AfipInputServiceImpl implements AfipInputService {
                 apellido, nombre, cuil, legajo, asignacion, idCliente, uoc, idSucursal, fechaIngreso,
                 idCaracteristicas);
 
-        return afipInputRepository.findAll(specification);
+        return afipInputRepository.findAll(specification).stream()
+                .map(afipInputMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public AfipInput createAfipInput(InputRequest inputRequest) throws ResourceNotFoundException {
+    public AfipInputResponse createAfipInput(InputRequest inputRequest) throws ResourceNotFoundException {
         AfipInput afipInput = new AfipInput();
 
         afipInput.setLastName(inputRequest.getLastName());
@@ -110,10 +123,10 @@ public class AfipInputServiceImpl implements AfipInputService {
                 .orElseThrow(() -> new ResourceNotFoundException("Features not found for id :: 49"));
         afipInput.setFeatures(features);
 
-        return afipInputRepository.save(afipInput);
+        return afipInputMapper.toResponse(afipInputRepository.save(afipInput));
     }
 
-    public AfipInput updateAfipInput(int id, AfipInputUpdateRequest afipInputUpdateRequest)
+    public AfipInputResponse updateAfipInput(int id, AfipInputUpdateRequest afipInputUpdateRequest)
             throws ResourceNotFoundException {
 
         AfipInput afipInputToUpdate = afipInputRepository.findById(id)
@@ -143,7 +156,7 @@ public class AfipInputServiceImpl implements AfipInputService {
         afipInputToUpdate.setFeatures(updatedFeature);
 
         // Guardar CommonInput actualizado en la base de datos
-        return afipInputRepository.save(afipInputToUpdate);
+        return afipInputMapper.toResponse(afipInputRepository.save(afipInputToUpdate));
     }
 
     public void deleteAfipInput(int id) throws ResourceNotFoundException {
@@ -154,8 +167,8 @@ public class AfipInputServiceImpl implements AfipInputService {
     }
 
     @Override
-    public List<AfipInput> createAfipInputs(List<InputRequest> inputRequests) throws ResourceNotFoundException {
-        List<AfipInput> createdInputs = new ArrayList<>();
+    public List<AfipInputResponse> createAfipInputs(List<InputRequest> inputRequests) throws ResourceNotFoundException {
+        List<AfipInputResponse> createdInputs = new ArrayList<>();
 
         for (InputRequest inputRequest : inputRequests) {
             AfipInput afipInput = new AfipInput();
@@ -189,7 +202,7 @@ public class AfipInputServiceImpl implements AfipInputService {
                     .orElseThrow(() -> new ResourceNotFoundException("Features not found for id :: 49"));
             afipInput.setFeatures(features);
 
-            createdInputs.add(afipInputRepository.save(afipInput));
+            createdInputs.add(afipInputMapper.toResponse(afipInputRepository.save(afipInput)));
         }
 
         return createdInputs;

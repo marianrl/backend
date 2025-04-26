@@ -1,24 +1,17 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.AfipInput;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.request.AfipInputRequest;
 import com.ams.backend.request.AfipInputUpdateRequest;
 import com.ams.backend.request.InputRequest;
+import com.ams.backend.response.AfipInputResponse;
 import com.ams.backend.service.interfaces.AfipInputService;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,25 +25,24 @@ public class AfipInputController {
     private AfipInputService afipInputService;
 
     @GetMapping("/afipInput")
-    public List<AfipInput> getAllAfipInputs() {
+    public List<AfipInputResponse> getAllAfipInputs() {
         return afipInputService.getAllAfipInputs();
     }
 
     @GetMapping("/afipInputById/{id}")
-    public Optional<AfipInput> getAfipInputById(@PathVariable(value = "id") int afipInputId) {
-
+    public Optional<AfipInputResponse> getAfipInputById(@PathVariable(value = "id") int afipInputId) {
         return afipInputService.getAfipInputById(afipInputId);
     }
 
     @GetMapping("/afipInput/{id}")
-    public ResponseEntity<List<AfipInput>> getAfipInputByAuditNumber(@PathVariable(value = "id") int auditNumber) {
-        List<AfipInput> afipInput = afipInputService.getAfipInputByAuditNumber(auditNumber);
-
+    public ResponseEntity<List<AfipInputResponse>> getAfipInputByAuditNumber(
+            @PathVariable(value = "id") int auditNumber) {
+        List<AfipInputResponse> afipInput = afipInputService.getAfipInputByAuditNumber(auditNumber);
         return ResponseEntity.ok().body(afipInput);
     }
 
     @GetMapping("/afipInput/filtered")
-    public List<AfipInput> getFilteredAfipInputs(
+    public List<AfipInputResponse> getFilteredAfipInputs(
             @RequestParam(required = false) String apellido,
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String cuil,
@@ -76,17 +68,17 @@ public class AfipInputController {
     }
 
     @PostMapping("/afipInput")
-    public List<AfipInput> createAfipInput(@Valid @RequestBody List<InputRequest> inputRequests)
+    public List<AfipInputResponse> createAfipInput(@Valid @RequestBody List<InputRequest> inputRequests)
             throws ResourceNotFoundException {
         return afipInputService.createAfipInputs(inputRequests);
     }
 
     @PutMapping("/afipInput/{id}")
-    public ResponseEntity<AfipInput> updateAfipInput(
+    public ResponseEntity<AfipInputResponse> updateAfipInput(
             @PathVariable(value = "id") int afipInputId,
             @Valid @RequestBody AfipInputUpdateRequest afipInputUpdateRequest) throws ResourceNotFoundException {
-        final AfipInput updatedAfipInput = afipInputService.updateAfipInput(afipInputId, afipInputUpdateRequest);
-
+        final AfipInputResponse updatedAfipInput = afipInputService.updateAfipInput(afipInputId,
+                afipInputUpdateRequest);
         return ResponseEntity.ok(updatedAfipInput);
     }
 
@@ -94,7 +86,6 @@ public class AfipInputController {
     public ResponseEntity<Void> deleteAfipInput(@PathVariable(value = "id") int afipAuditId)
             throws ResourceNotFoundException {
         afipInputService.deleteAfipInput(afipAuditId);
-
         return ResponseEntity.noContent().build();
     }
 }

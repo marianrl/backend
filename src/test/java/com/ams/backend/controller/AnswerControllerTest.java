@@ -1,6 +1,7 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.Answer;
+import com.ams.backend.request.AnswerRequest;
+import com.ams.backend.response.AnswerResponse;
 import com.ams.backend.service.interfaces.AnswerService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,21 +28,23 @@ public class AnswerControllerTest {
     @InjectMocks
     private AnswerController answerController;
 
-    private Answer answer;
+    private AnswerResponse answerResponse;
+    private AnswerRequest answerRequest;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        answer = new Answer();
-        answer.setId(1);
+        answerResponse = new AnswerResponse(1, "Test Answer");
+        answerRequest = new AnswerRequest();
+        answerRequest.setAnswer("Test Answer");
     }
 
     @Test
     public void testGetAllAnswers() {
-        List<Answer> answers = Collections.singletonList(answer);
+        List<AnswerResponse> answers = Collections.singletonList(answerResponse);
         when(answerService.getAllAnswers()).thenReturn(answers);
 
-        List<Answer> result = answerController.getAllAnswers();
+        List<AnswerResponse> result = answerController.getAllAnswers();
 
         assertEquals(answers, result);
         verify(answerService, times(1)).getAllAnswers();
@@ -49,34 +52,32 @@ public class AnswerControllerTest {
 
     @Test
     public void testGetAnswerById() throws Exception {
-        when(answerService.getAnswerById(1)).thenReturn(answer);
+        when(answerService.getAnswerById(1)).thenReturn(answerResponse);
 
-        ResponseEntity<Answer> result = answerController.getAnswerById(1);
+        ResponseEntity<AnswerResponse> result = answerController.getAnswerById(1);
 
-        assertEquals(answer, result.getBody());
+        assertEquals(answerResponse, result.getBody());
         verify(answerService, times(1)).getAnswerById(1);
     }
 
     @Test
     public void testCreateAnswer() throws Exception {
-        when(answerService.createAnswer(any(Answer.class))).thenReturn(answer);
+        when(answerService.createAnswer(any(AnswerRequest.class))).thenReturn(answerResponse);
 
-        Answer result = answerController.createAnswer(answer);
+        AnswerResponse result = answerController.createAnswer(answerRequest);
 
-        assertEquals(answer, result);
-        verify(answerService, times(1)).createAnswer(any(Answer.class));
+        assertEquals(answerResponse, result);
+        verify(answerService, times(1)).createAnswer(any(AnswerRequest.class));
     }
 
     @Test
     public void testUpdateAnswer() throws Exception {
-        Answer answer = new Answer();
-        when(answerService.updateAnswer(eq(1), any(Answer.class))).thenReturn(answer);
+        when(answerService.updateAnswer(eq(1), any(AnswerRequest.class))).thenReturn(answerResponse);
 
-        ResponseEntity<Answer> result = answerController.updateAnswer(1, answer);
+        ResponseEntity<AnswerResponse> result = answerController.updateAnswer(1, answerRequest);
 
-        assertEquals(answer, result.getBody());
-        verify(answerService, times(1)).updateAnswer(eq(1), any(Answer.class));
-
+        assertEquals(answerResponse, result.getBody());
+        verify(answerService, times(1)).updateAnswer(eq(1), any(AnswerRequest.class));
     }
 
     @Test
@@ -92,10 +93,10 @@ public class AnswerControllerTest {
 
     @Test
     public void testGetAnswersByAuditType() throws Exception {
-        List<Answer> answers = Collections.singletonList(answer);
+        List<AnswerResponse> answers = Collections.singletonList(answerResponse);
         when(answerService.getAnswersByAuditType(1)).thenReturn(answers);
 
-        List<Answer> result = answerController.getAnswersByAuditType(1);
+        List<AnswerResponse> result = answerController.getAnswersByAuditType(1);
 
         assertEquals(answers, result);
         verify(answerService, times(1)).getAnswersByAuditType(1);
