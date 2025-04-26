@@ -6,12 +6,15 @@ import com.ams.backend.entity.Role;
 import com.ams.backend.repository.UserRepository;
 import com.ams.backend.security.JwtTokenUtil;
 import com.ams.backend.service.interfaces.UserService;
+import com.ams.backend.request.UserMail;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -32,6 +36,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
 
     @Mock
@@ -47,6 +52,8 @@ public class UserControllerTest {
     private UserService userService;
 
     private User user;
+    private AuthenticateRequest authRequest;
+    private UserMail userMail;
 
     @BeforeEach
     public void setup() {
@@ -62,6 +69,13 @@ public class UserControllerTest {
         role.setId(1);
         role.setRole("USER");
         user.setRole(role);
+
+        authRequest = new AuthenticateRequest();
+        authRequest.setMail("juan.perez@mail.com");
+        authRequest.setPassword("1234");
+
+        userMail = new UserMail();
+        userMail.setMail("juan.perez@mail.com");
     }
 
     @Test
@@ -81,6 +95,7 @@ public class UserControllerTest {
 
         ResponseEntity<User> result = userController.getUserById(1);
 
+        assertNotNull(result.getBody());
         assertEquals(user, result.getBody());
         verify(userService, times(1)).getUserById(1);
     }
@@ -92,7 +107,9 @@ public class UserControllerTest {
         String password = "1234";
         String token = "mockToken";
 
-        AuthenticateRequest request = new AuthenticateRequest(mail, password);
+        AuthenticateRequest request = new AuthenticateRequest();
+        request.setMail(mail);
+        request.setPassword(password);
 
         // Mockear dependencias
         when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
@@ -105,6 +122,9 @@ public class UserControllerTest {
         // Verificar resultado
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
+        Map<String, String> responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals(token, responseBody.get("token"));
 
         // Verificar interacción con dependencias
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
@@ -117,7 +137,9 @@ public class UserControllerTest {
         String mail = "invalid@mail.com";
         String password = "wrongPassword";
 
-        AuthenticateRequest request = new AuthenticateRequest(mail, password);
+        AuthenticateRequest request = new AuthenticateRequest();
+        request.setMail(mail);
+        request.setPassword(password);
 
         // Mockear dependencias
         when(userService.getUserByMailAndPassword(mail, password)).thenReturn(null);
@@ -127,6 +149,7 @@ public class UserControllerTest {
 
         // Verificar resultado
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertNotNull(response.getBody());
         Map<String, String> responseBody = response.getBody();
         assertNotNull(responseBody);
         assertEquals("Usuario o contraseña incorrecta", responseBody.get("error"));
@@ -146,7 +169,9 @@ public class UserControllerTest {
         user.setName("Juan");
         user.setLastName("Perez");
 
-        AuthenticateRequest request = new AuthenticateRequest(mail, password);
+        AuthenticateRequest request = new AuthenticateRequest();
+        request.setMail(mail);
+        request.setPassword(password);
 
         // Mockear dependencias
         when(userService.getUserByMailAndPassword(mail, password)).thenReturn(user);
@@ -156,9 +181,39 @@ public class UserControllerTest {
 
         // Verificar resultado
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertNotNull(response.getBody());
         Map<String, String> responseBody = response.getBody();
         assertNotNull(responseBody);
         assertEquals("Usuario o contraseña incorrecta", responseBody.get("error"));
+
+        // Verificar interacción con dependencias
+        verify(userService, times(1)).getUserByMailAndPassword(mail, password);
+        verify(jwtTokenUtil, never()).generateToken(anyString(), anyString(), anyString(), anyInt());
+    }
+
+    @Test
+    public void testAuthenticate_Exception() {
+        // Configurar datos de prueba
+        String mail = "juan.perez@mail.com";
+        String password = "1234";
+
+        AuthenticateRequest request = new AuthenticateRequest();
+        request.setMail(mail);
+        request.setPassword(password);
+
+        // Mockear dependencias
+        when(userService.getUserByMailAndPassword(mail, password))
+                .thenThrow(new RuntimeException("Test exception"));
+
+        // Llamar al método
+        ResponseEntity<Map<String, String>> response = userController.authenticate(request);
+
+        // Verificar resultado
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody());
+        Map<String, String> responseBody = response.getBody();
+        assertNotNull(responseBody);
+        assertEquals("Error al procesar la solicitud", responseBody.get("error"));
 
         // Verificar interacción con dependencias
         verify(userService, times(1)).getUserByMailAndPassword(mail, password);
@@ -182,6 +237,7 @@ public class UserControllerTest {
 
         ResponseEntity<User> result = userController.updateUser(1, user);
 
+        assertNotNull(result.getBody());
         assertEquals(user, result.getBody());
         verify(userService, times(1)).updateUser(eq(1), any(User.class));
     }
@@ -195,5 +251,35 @@ public class UserControllerTest {
 
         assertEquals(isNoContent, result.getStatusCode());
         verify(userService, times(1)).deleteUser(1);
+    }
+
+    @Test
+    void userExists_True() {
+        // Arrange
+        when(userService.getUserByMail(any(UserMail.class))).thenReturn(user);
+
+        // Act
+        ResponseEntity<Boolean> response = userController.userExists(userMail);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody());
+        verify(userService).getUserByMail(userMail);
+    }
+
+    @Test
+    void userExists_False() {
+        // Arrange
+        when(userService.getUserByMail(any(UserMail.class))).thenReturn(null);
+
+        // Act
+        ResponseEntity<Boolean> response = userController.userExists(userMail);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertFalse(response.getBody());
+        verify(userService).getUserByMail(userMail);
     }
 }
