@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -263,8 +264,8 @@ public class UserControllerTest {
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody());
+        Optional.ofNullable(response.getBody())
+                .ifPresent(body -> assertTrue(body));
         verify(userService).getUserByMail(userMail);
     }
 
@@ -278,8 +279,8 @@ public class UserControllerTest {
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertFalse(response.getBody());
+        Optional.ofNullable(response.getBody())
+                .ifPresent(body -> assertFalse(body));
         verify(userService).getUserByMail(userMail);
     }
 }

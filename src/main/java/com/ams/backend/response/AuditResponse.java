@@ -8,10 +8,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Setter
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuditResponse {
   private int id;
   private @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate auditDate;

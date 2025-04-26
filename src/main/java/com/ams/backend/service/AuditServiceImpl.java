@@ -4,16 +4,19 @@ import com.ams.backend.entity.Audit;
 import com.ams.backend.entity.AuditType;
 import com.ams.backend.entity.Audited;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.mapper.AuditMapper;
 import com.ams.backend.repository.AuditRepository;
 import com.ams.backend.repository.AuditTypeRepository;
+import com.ams.backend.request.AuditRequest;
+import com.ams.backend.response.AuditResponse;
 import com.ams.backend.service.interfaces.AuditService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -25,37 +28,46 @@ public class AuditServiceImpl implements AuditService {
     @Autowired
     private AuditTypeRepository auditTypeRepository;
 
-    public List<Audit> getAllAudit() {
-        return auditRepository.findAll();
+    @Autowired
+    private AuditMapper auditMapper;
+
+    public List<AuditResponse> getAllAudit() {
+        return auditRepository.findAll().stream()
+                .map(auditMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public Audit getAuditById(int id) throws ResourceNotFoundException {
-        return auditRepository.findById(id)
+    public AuditResponse getAuditById(int id) throws ResourceNotFoundException {
+        Audit audit = auditRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audit not found for this id :: " + id));
+        return auditMapper.toResponse(audit);
     }
 
-    public Audit createAudit(int auditTypeId) throws ResourceNotFoundException {
+    public AuditResponse createAudit(AuditRequest auditRequest) throws ResourceNotFoundException {
+        AuditType auditType = auditTypeRepository.findById(auditRequest.getAuditTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "AuditType not found for this id :: " + auditRequest.getAuditTypeId()));
 
-        AuditType auditType = auditTypeRepository.findById(auditTypeId)
-                .orElseThrow(() -> new ResourceNotFoundException("AuditType not found for this id :: " + auditTypeId));
-
-        Audit audit = new Audit();
-        audit.setAuditDate(LocalDate.now());
+        Audit audit = auditMapper.toEntity(auditRequest);
         audit.setIdTipoAuditoria(auditType);
         audit.setIdAuditado(new Audited(2, "No"));
 
-        return auditRepository.save(audit);
+        Audit savedAudit = auditRepository.save(audit);
+        return auditMapper.toResponse(savedAudit);
     }
 
-    public Audit updateAudit(int id, Audit providedAudit) throws ResourceNotFoundException {
+    public AuditResponse updateAudit(int id, AuditRequest auditRequest) throws ResourceNotFoundException {
         Audit audit = auditRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audit not found for this id :: " + id));
 
-        audit.setAuditDate(providedAudit.getAuditDate());
-        audit.setIdAuditado(providedAudit.getIdAuditado());
-        auditRepository.save(audit);
+        AuditType auditType = auditTypeRepository.findById(auditRequest.getAuditTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "AuditType not found for this id :: " + auditRequest.getAuditTypeId()));
 
-        return audit;
+        audit.setIdTipoAuditoria(auditType);
+        Audit updatedAudit = auditRepository.save(audit);
+
+        return auditMapper.toResponse(updatedAudit);
     }
 
     public void deleteAudit(int id) throws ResourceNotFoundException {

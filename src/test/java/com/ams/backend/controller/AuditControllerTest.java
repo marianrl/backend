@@ -1,6 +1,9 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.*;
+import com.ams.backend.request.AuditRequest;
+import com.ams.backend.response.AuditResponse;
+import com.ams.backend.response.AuditTypeResponse;
+import com.ams.backend.response.AuditedResponse;
 import com.ams.backend.service.interfaces.AuditService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,21 +33,26 @@ public class AuditControllerTest {
     @InjectMocks
     private AuditController auditController;
 
-    private Audit audit;
+    private AuditResponse auditResponse;
+    private AuditRequest auditRequest;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        audit = new Audit();
-        audit.setId(1);
+
+        AuditTypeResponse auditTypeResponse = new AuditTypeResponse(1, "Financial Audit");
+        AuditedResponse auditedResponse = new AuditedResponse(2, "No");
+
+        auditResponse = new AuditResponse(1, LocalDate.now(), auditTypeResponse, auditedResponse);
+        auditRequest = new AuditRequest(1);
     }
 
     @Test
     public void getAllAuditTest() throws Exception {
-        List<Audit> audits = Collections.singletonList(audit);
+        List<AuditResponse> audits = Collections.singletonList(auditResponse);
         when(auditService.getAllAudit()).thenReturn(audits);
 
-        List<Audit> result = auditController.getAllAudits();
+        List<AuditResponse> result = auditController.getAllAudits();
 
         assertEquals(audits, result);
         verify(auditService, times(1)).getAllAudit();
@@ -51,39 +60,36 @@ public class AuditControllerTest {
 
     @Test
     public void getAuditByIdTest() throws Exception {
-        when(auditService.getAuditById(1)).thenReturn(audit);
+        when(auditService.getAuditById(1)).thenReturn(auditResponse);
 
-        ResponseEntity<Audit> result = auditController.getAuditById(1);
+        ResponseEntity<AuditResponse> result = auditController.getAuditById(1);
 
-        assertEquals(audit, result.getBody());
+        assertEquals(auditResponse, result.getBody());
         verify(auditService, times(1)).getAuditById(1);
     }
 
     @Test
     public void createAuditTest() throws Exception {
+        when(auditService.createAudit(any(AuditRequest.class))).thenReturn(auditResponse);
 
-        when(auditService.createAudit(1)).thenReturn(audit);
+        AuditResponse result = auditController.createAudit(auditRequest);
 
-        Audit result = auditController.createAudit(audit.getId());
-
-        assertEquals(audit, result);
-        verify(auditService, times(1)).createAudit(1);
+        assertEquals(auditResponse, result);
+        verify(auditService, times(1)).createAudit(any(AuditRequest.class));
     }
 
     @Test
     public void updateAuditTest() throws Exception {
+        when(auditService.updateAudit(eq(1), any(AuditRequest.class))).thenReturn(auditResponse);
 
-        when(auditService.updateAudit(eq(1), any(Audit.class))).thenReturn(audit);
+        ResponseEntity<AuditResponse> result = auditController.updateAudit(1, auditRequest);
 
-        ResponseEntity<Audit> result = auditController.updateAudit(1, audit);
-
-        assertEquals(audit, result.getBody());
-        verify(auditService, times(1)).updateAudit(1, audit);
+        assertEquals(auditResponse, result.getBody());
+        verify(auditService, times(1)).updateAudit(1, auditRequest);
     }
 
     @Test
     public void deleteAuditTest() throws Exception {
-
         HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
         doNothing().when(auditService).deleteAudit(1);
 
@@ -92,5 +98,4 @@ public class AuditControllerTest {
         assertEquals(isNoContent, result.getStatusCode());
         verify(auditService, times(1)).deleteAudit(1);
     }
-
 }

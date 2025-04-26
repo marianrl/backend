@@ -7,8 +7,13 @@ import com.ams.backend.entity.Audit;
 import com.ams.backend.entity.AuditType;
 import com.ams.backend.entity.Audited;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.mapper.AuditMapper;
 import com.ams.backend.repository.AuditRepository;
 import com.ams.backend.repository.AuditTypeRepository;
+import com.ams.backend.request.AuditRequest;
+import com.ams.backend.response.AuditResponse;
+import com.ams.backend.response.AuditTypeResponse;
+import com.ams.backend.response.AuditedResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,17 +32,22 @@ public class AuditServiceTest {
     @Mock
     private AuditTypeRepository auditTypeRepository;
 
+    @Mock
+    private AuditMapper auditMapper;
+
     private AuditServiceImpl auditService;
 
     private Audit audit;
     private AuditType auditType;
+    private AuditResponse auditResponse;
+    private AuditRequest auditRequest;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        auditService = new AuditServiceImpl(auditRepository, auditTypeRepository);
+        auditService = new AuditServiceImpl(auditRepository, auditTypeRepository, auditMapper);
 
-        // Crear un tipo de auditoría y una auditoría de ejemplo
+        // Create sample entities and DTOs
         auditType = new AuditType();
         auditType.setId(1);
         auditType.setAuditType("Financial Audit");
@@ -47,30 +57,38 @@ public class AuditServiceTest {
         audit.setAuditDate(LocalDate.now());
         audit.setIdTipoAuditoria(auditType);
         audit.setIdAuditado(new Audited(2, "No"));
+
+        AuditTypeResponse auditTypeResponse = new AuditTypeResponse(1, "Financial Audit");
+        AuditedResponse auditedResponse = new AuditedResponse(2, "No");
+        auditResponse = new AuditResponse(1, LocalDate.now(), auditTypeResponse, auditedResponse);
+        auditRequest = new AuditRequest(1);
     }
 
     @Test
     public void testGetAllAudit() {
         List<Audit> audits = Arrays.asList(audit);
-
         when(auditRepository.findAll()).thenReturn(audits);
+        when(auditMapper.toResponse(audit)).thenReturn(auditResponse);
 
-        List<Audit> result = auditService.getAllAudit();
+        List<AuditResponse> result = auditService.getAllAudit();
 
         assertEquals(1, result.size());
-        assertEquals(audit.getId(), result.get(0).getId());
+        assertEquals(auditResponse, result.get(0));
         verify(auditRepository, times(1)).findAll();
+        verify(auditMapper, times(1)).toResponse(audit);
     }
 
     @Test
     public void testGetAuditById_AuditFound() throws ResourceNotFoundException {
         when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+        when(auditMapper.toResponse(audit)).thenReturn(auditResponse);
 
-        Audit result = auditService.getAuditById(1);
+        AuditResponse result = auditService.getAuditById(1);
 
         assertNotNull(result);
-        assertEquals(audit.getId(), result.getId());
+        assertEquals(auditResponse, result);
         verify(auditRepository, times(1)).findById(1);
+        verify(auditMapper, times(1)).toResponse(audit);
     }
 
     @Test
@@ -80,58 +98,73 @@ public class AuditServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> auditService.getAuditById(999));
 
         verify(auditRepository, times(1)).findById(999);
+        verify(auditMapper, times(0)).toResponse(any());
     }
 
     @Test
     public void testCreateAudit_AuditTypeFound() throws ResourceNotFoundException {
         when(auditTypeRepository.findById(1)).thenReturn(Optional.of(auditType));
-        when(auditRepository.save(any(Audit.class))).thenReturn(audit);
+        when(auditMapper.toEntity(auditRequest)).thenReturn(audit);
+        when(auditRepository.save(audit)).thenReturn(audit);
+        when(auditMapper.toResponse(audit)).thenReturn(auditResponse);
 
-        Audit result = auditService.createAudit(1);
+        AuditResponse result = auditService.createAudit(auditRequest);
 
         assertNotNull(result);
-        assertEquals(audit.getId(), result.getId());
-        assertEquals(auditType.getId(), result.getIdTipoAuditoria().getId());
+        assertEquals(auditResponse, result);
         verify(auditTypeRepository, times(1)).findById(1);
-        verify(auditRepository, times(1)).save(any(Audit.class));
+        verify(auditMapper, times(1)).toEntity(auditRequest);
+        verify(auditRepository, times(1)).save(audit);
+        verify(auditMapper, times(1)).toResponse(audit);
     }
 
     @Test
     public void testCreateAudit_AuditTypeNotFound() {
         when(auditTypeRepository.findById(999)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> auditService.createAudit(999));
+        assertThrows(ResourceNotFoundException.class, () -> auditService.createAudit(new AuditRequest(999)));
 
         verify(auditTypeRepository, times(1)).findById(999);
-        verify(auditRepository, times(0)).save(any(Audit.class));  // No debe llamar a save
+        verify(auditRepository, times(0)).save(any());
     }
 
     @Test
     public void testUpdateAudit_AuditFound() throws ResourceNotFoundException {
         Audit updatedAudit = new Audit();
+        updatedAudit.setId(1);
         updatedAudit.setAuditDate(LocalDate.now().plusDays(1));
+        updatedAudit.setIdTipoAuditoria(auditType);
+        updatedAudit.setIdAuditado(new Audited(2, "No"));
+
+        AuditResponse updatedResponse = new AuditResponse(
+                1,
+                LocalDate.now().plusDays(1),
+                new AuditTypeResponse(1, "Financial Audit"),
+                new AuditedResponse(2, "No"));
 
         when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
+        when(auditTypeRepository.findById(1)).thenReturn(Optional.of(auditType));
         when(auditRepository.save(any(Audit.class))).thenReturn(updatedAudit);
+        when(auditMapper.toResponse(updatedAudit)).thenReturn(updatedResponse);
 
-        Audit result = auditService.updateAudit(1, updatedAudit);
+        AuditResponse result = auditService.updateAudit(1, auditRequest);
 
         assertNotNull(result);
-        assertEquals(updatedAudit.getAuditDate(), result.getAuditDate());
+        assertEquals(updatedResponse, result);
         verify(auditRepository, times(1)).findById(1);
+        verify(auditTypeRepository, times(1)).findById(1);
+        verify(auditRepository, times(1)).save(any(Audit.class));
+        verify(auditMapper, times(1)).toResponse(updatedAudit);
     }
 
     @Test
     public void testUpdateAudit_AuditNotFound() {
-        Audit updatedAudit = new Audit();
-        updatedAudit.setAuditDate(LocalDate.now().plusDays(1));
-
         when(auditRepository.findById(999)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> auditService.updateAudit(999, updatedAudit));
+        assertThrows(ResourceNotFoundException.class, () -> auditService.updateAudit(999, auditRequest));
 
         verify(auditRepository, times(1)).findById(999);
-        verify(auditRepository, times(0)).save(updatedAudit);  // No debe llamar a save
+        verify(auditRepository, times(0)).save(any());
     }
 
     @Test
@@ -152,6 +185,6 @@ public class AuditServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> auditService.deleteAudit(999));
 
         verify(auditRepository, times(1)).findById(999);
-        verify(auditRepository, times(0)).deleteById(999);  // No debe eliminarse
+        verify(auditRepository, times(0)).deleteById(999);
     }
 }

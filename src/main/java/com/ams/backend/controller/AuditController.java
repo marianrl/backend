@@ -1,7 +1,8 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.Audit;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.request.AuditRequest;
+import com.ams.backend.response.AuditResponse;
 import com.ams.backend.service.interfaces.AuditService;
 
 import jakarta.validation.Valid;
@@ -19,29 +20,27 @@ public class AuditController {
     private AuditService auditService;
 
     @GetMapping("/audit")
-    public List<Audit> getAllAudits() {
-
+    public List<AuditResponse> getAllAudits() {
         return auditService.getAllAudit();
     }
 
     @GetMapping("/audit/{id}")
-    public ResponseEntity<Audit> getAuditById(@PathVariable(value = "id") int auditId)
-            throws ResourceNotFoundException{
-        Audit audit = auditService.getAuditById(auditId);
-
+    public ResponseEntity<AuditResponse> getAuditById(@PathVariable(value = "id") int auditId)
+            throws ResourceNotFoundException {
+        AuditResponse audit = auditService.getAuditById(auditId);
         return ResponseEntity.ok().body(audit);
     }
+
     @PostMapping("/audit")
-    public Audit createAudit(@Valid @RequestBody int auditTypeId) throws ResourceNotFoundException {
-        return auditService.createAudit(auditTypeId);
+    public AuditResponse createAudit(@Valid @RequestBody AuditRequest auditRequest) throws ResourceNotFoundException {
+        return auditService.createAudit(auditRequest);
     }
 
     @PutMapping("/audit/{id}")
-    public ResponseEntity<Audit> updateAudit(
+    public ResponseEntity<AuditResponse> updateAudit(
             @PathVariable(value = "id") int auditId,
-            @Valid @RequestBody Audit auditDetails) throws ResourceNotFoundException {
-        final Audit updatedAudit = auditService.updateAudit(auditId, auditDetails);
-
+            @Valid @RequestBody AuditRequest auditRequest) throws ResourceNotFoundException {
+        AuditResponse updatedAudit = auditService.updateAudit(auditId, auditRequest);
         return ResponseEntity.ok(updatedAudit);
     }
 
@@ -49,7 +48,6 @@ public class AuditController {
     public ResponseEntity<Void> deleteAudit(@PathVariable(value = "id") int auditId)
             throws ResourceNotFoundException {
         auditService.deleteAudit(auditId);
-
         return ResponseEntity.noContent().build();
     }
 }

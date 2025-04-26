@@ -1,7 +1,6 @@
 package com.ams.backend.controller;
 
 import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.request.AfipInputRequest;
 import com.ams.backend.request.AfipInputUpdateRequest;
 import com.ams.backend.request.InputRequest;
 import com.ams.backend.response.AfipInputResponse;
