@@ -7,6 +7,7 @@ import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.mapper.AuditMapper;
 import com.ams.backend.repository.AuditRepository;
 import com.ams.backend.repository.AuditTypeRepository;
+import com.ams.backend.repository.AuditedRepository;
 import com.ams.backend.request.AuditRequest;
 import com.ams.backend.response.AuditResponse;
 import com.ams.backend.service.interfaces.AuditService;
@@ -27,6 +28,9 @@ public class AuditServiceImpl implements AuditService {
 
     @Autowired
     private AuditTypeRepository auditTypeRepository;
+
+    @Autowired
+    private AuditedRepository auditedRepository;
 
     @Autowired
     private AuditMapper auditMapper;
@@ -60,11 +64,10 @@ public class AuditServiceImpl implements AuditService {
         Audit audit = auditRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audit not found for this id :: " + id));
 
-        AuditType auditType = auditTypeRepository.findById(auditRequest.getAuditTypeId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "AuditType not found for this id :: " + auditRequest.getAuditTypeId()));
+        Audited audited = auditedRepository.findById(1)
+                .orElseThrow(() -> new ResourceNotFoundException("Audited not found for this id :: 1"));
 
-        audit.setIdTipoAuditoria(auditType);
+        audit.setIdAuditado(audited);
         Audit updatedAudit = auditRepository.save(audit);
 
         return auditMapper.toResponse(updatedAudit);
