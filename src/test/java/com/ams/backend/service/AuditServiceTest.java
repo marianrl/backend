@@ -10,6 +10,7 @@ import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.mapper.AuditMapper;
 import com.ams.backend.repository.AuditRepository;
 import com.ams.backend.repository.AuditTypeRepository;
+import com.ams.backend.repository.AuditedRepository;
 import com.ams.backend.request.AuditRequest;
 import com.ams.backend.response.AuditResponse;
 import com.ams.backend.response.AuditTypeResponse;
@@ -33,6 +34,9 @@ public class AuditServiceTest {
     private AuditTypeRepository auditTypeRepository;
 
     @Mock
+    private AuditedRepository auditedRepository;
+
+    @Mock
     private AuditMapper auditMapper;
 
     private AuditServiceImpl auditService;
@@ -45,7 +49,7 @@ public class AuditServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        auditService = new AuditServiceImpl(auditRepository, auditTypeRepository, auditMapper);
+        auditService = new AuditServiceImpl(auditRepository, auditTypeRepository, auditedRepository, auditMapper);
 
         // Create sample entities and DTOs
         auditType = new AuditType();
@@ -143,7 +147,7 @@ public class AuditServiceTest {
                 new AuditedResponse(2, "No"));
 
         when(auditRepository.findById(1)).thenReturn(Optional.of(audit));
-        when(auditTypeRepository.findById(1)).thenReturn(Optional.of(auditType));
+        when(auditedRepository.findById(1)).thenReturn(Optional.of(new Audited(1, "Yes")));
         when(auditRepository.save(any(Audit.class))).thenReturn(updatedAudit);
         when(auditMapper.toResponse(updatedAudit)).thenReturn(updatedResponse);
 
@@ -152,7 +156,7 @@ public class AuditServiceTest {
         assertNotNull(result);
         assertEquals(updatedResponse, result);
         verify(auditRepository, times(1)).findById(1);
-        verify(auditTypeRepository, times(1)).findById(1);
+        verify(auditedRepository, times(1)).findById(1);
         verify(auditRepository, times(1)).save(any(Audit.class));
         verify(auditMapper, times(1)).toResponse(updatedAudit);
     }
