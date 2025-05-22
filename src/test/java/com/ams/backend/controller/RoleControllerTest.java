@@ -16,14 +16,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.ams.backend.entity.Role;
+import com.ams.backend.mapper.RoleMapper;
+import com.ams.backend.request.RoleRequest;
+import com.ams.backend.response.RoleResponse;
 import com.ams.backend.service.interfaces.RoleService;
-
 
 @ExtendWith(MockitoExtension.class)
 public class RoleControllerTest {
@@ -31,16 +30,34 @@ public class RoleControllerTest {
     @Mock
     private RoleService roleService;
 
+    @Mock
+    private RoleMapper mapper;
+
     @InjectMocks
     private RoleController roleController;
 
     private Role role;
+    private RoleResponse roleResponse;
+    private RoleRequest roleRequest;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
         role = new Role();
         role.setId(1);
+        role.setRole("Admin");
+
+        roleResponse = new RoleResponse();
+        roleResponse.setId(1);
+        roleResponse.setRole("Admin");
+
+        roleRequest = new RoleRequest();
+        roleRequest.setId(1);
+        roleRequest.setRole("Admin");
+
+        when(roleService.getMapper()).thenReturn(mapper);
+        when(mapper.toResponse(any(Role.class))).thenReturn(roleResponse);
+        when(mapper.toEntity(any(RoleRequest.class))).thenReturn(role);
     }
 
     @Test
@@ -48,9 +65,10 @@ public class RoleControllerTest {
         List<Role> roles = Collections.singletonList(role);
         when(roleService.getAllRoles()).thenReturn(roles);
 
-        List<Role> result = roleController.getAllRoles();
+        List<RoleResponse> result = roleController.getAllRoles();
 
-        assertEquals(roles, result);
+        assertEquals(1, result.size());
+        assertEquals(roleResponse, result.get(0));
         verify(roleService, times(1)).getAllRoles();
     }
 
@@ -58,9 +76,9 @@ public class RoleControllerTest {
     public void getRoleByIdTest() throws Exception {
         when(roleService.getRoleById(1)).thenReturn(role);
 
-        ResponseEntity<Role> result = roleController.getRoleById(1);
+        ResponseEntity<RoleResponse> result = roleController.getRoleById(1);
 
-        assertEquals(role, result.getBody());
+        assertEquals(roleResponse, result.getBody());
         verify(roleService, times(1)).getRoleById(1);
     }
 
@@ -68,20 +86,22 @@ public class RoleControllerTest {
     public void createRoleTest() throws Exception {
         when(roleService.createRole(any(Role.class))).thenReturn(role);
 
-        Role result = roleController.createRole(role);
+        RoleResponse result = roleController.createRole(roleRequest);
 
-        assertEquals(role, result);
+        assertEquals(roleResponse, result);
         verify(roleService, times(1)).createRole(any(Role.class));
     }
 
     @Test
     public void updateRoleTest() throws Exception {
         Role updatedRole = new Role();
+        updatedRole.setId(1);
+        updatedRole.setRole("Updated Admin");
         when(roleService.updateRole(eq(1), any(Role.class))).thenReturn(updatedRole);
 
-        ResponseEntity<Role> result = roleController.updateRole(1, updatedRole);
+        ResponseEntity<RoleResponse> result = roleController.updateRole(1, roleRequest);
 
-        assertEquals(updatedRole, result.getBody());
+        assertEquals(roleResponse, result.getBody());
         verify(roleService, times(1)).updateRole(eq(1), any(Role.class));
     }
 
