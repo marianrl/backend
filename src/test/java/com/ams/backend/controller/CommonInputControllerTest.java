@@ -2,9 +2,11 @@ package com.ams.backend.controller;
 
 import com.ams.backend.entity.CommonInput;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.mapper.CommonInputMapper;
 import com.ams.backend.request.CommonInputUpdateRequest;
-import com.ams.backend.service.interfaces.CommonInputService;
 import com.ams.backend.request.InputRequest;
+import com.ams.backend.response.CommonInputResponse;
+import com.ams.backend.service.interfaces.CommonInputService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,10 +42,14 @@ public class CommonInputControllerTest {
     @Mock
     private CommonInputService commonInputService;
 
+    @Mock
+    private CommonInputMapper mapper;
+
     @InjectMocks
     private CommonInputController commonInputController;
 
     private CommonInput commonInput;
+    private CommonInputResponse commonInputResponse;
     private InputRequest inputRequest;
 
     @BeforeEach
@@ -51,6 +57,9 @@ public class CommonInputControllerTest {
         MockitoAnnotations.openMocks(this);
         commonInput = new CommonInput();
         commonInput.setId(1);
+
+        commonInputResponse = new CommonInputResponse();
+        commonInputResponse.setId(1);
 
         inputRequest = new InputRequest();
         inputRequest.setLastName("Doe");
@@ -71,6 +80,9 @@ public class CommonInputControllerTest {
         commonInput.setAllocation(inputRequest.getAllocation());
         commonInput.setUoc(inputRequest.getUoc());
         commonInput.setAdmissionDate(inputRequest.getAdmissionDate());
+
+        when(commonInputService.getMapper()).thenReturn(mapper);
+        when(mapper.toResponse(any(CommonInput.class))).thenReturn(commonInputResponse);
     }
 
     @Test
@@ -78,9 +90,9 @@ public class CommonInputControllerTest {
         List<CommonInput> commonInputs = Collections.singletonList(commonInput);
         when(commonInputService.getAllCommonInputs()).thenReturn(commonInputs);
 
-        List<CommonInput> result = commonInputController.getAllCommonInputs();
+        List<CommonInputResponse> result = commonInputController.getAllCommonInputs();
 
-        assertEquals(commonInputs, result);
+        assertEquals(Collections.singletonList(commonInputResponse), result);
         verify(commonInputService, times(1)).getAllCommonInputs();
     }
 
@@ -88,9 +100,9 @@ public class CommonInputControllerTest {
     public void testGetCommonInputById() {
         when(commonInputService.getCommonInputById(1)).thenReturn(Optional.of(commonInput));
 
-        Optional<CommonInput> result = commonInputController.getCommonInputById(1);
+        Optional<CommonInputResponse> result = commonInputController.getCommonInputById(1);
 
-        assertEquals(Optional.of(commonInput), result);
+        assertEquals(Optional.of(commonInputResponse), result);
         verify(commonInputService, times(1)).getCommonInputById(1);
     }
 
@@ -99,9 +111,9 @@ public class CommonInputControllerTest {
         List<CommonInput> commonInputs = Collections.singletonList(commonInput);
         when(commonInputService.getCommonInputByAuditNumber(1)).thenReturn(commonInputs);
 
-        ResponseEntity<List<CommonInput>> result = commonInputController.getCommonAuditByAuditNumber(1);
+        ResponseEntity<List<CommonInputResponse>> result = commonInputController.getCommonAuditByAuditNumber(1);
 
-        assertEquals(commonInputs, result.getBody());
+        assertEquals(Collections.singletonList(commonInputResponse), result.getBody());
         verify(commonInputService, times(1)).getCommonInputByAuditNumber(1);
     }
 
@@ -113,11 +125,11 @@ public class CommonInputControllerTest {
                 anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong()))
                 .thenReturn(commonInputs);
 
-        List<CommonInput> result = commonInputController.getFilteredCommonInputs(
+        List<CommonInputResponse> result = commonInputController.getFilteredCommonInputs(
                 "Apellido", "Nombre", "20-12345678-9", "1234", "Asignacion",
                 1L, "UOC", 1L, LocalDate.now(), 1L);
 
-        assertEquals(commonInputs, result);
+        assertEquals(Collections.singletonList(commonInputResponse), result);
         verify(commonInputService, times(1)).getFilteredCommonInputs(
                 anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong());

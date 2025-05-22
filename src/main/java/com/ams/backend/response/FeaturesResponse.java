@@ -1,14 +1,12 @@
 package com.ams.backend.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-@Setter
-@Getter
+@AllArgsConstructor
 public class FeaturesResponse {
   private int id;
   private AuditTypeResponse auditType;

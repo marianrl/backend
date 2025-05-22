@@ -5,7 +5,10 @@ import static org.mockito.Mockito.*;
 
 import com.ams.backend.entity.AuditType;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.mapper.AuditTypeMapper;
 import com.ams.backend.repository.AuditTypeRepository;
+import com.ams.backend.request.AuditTypeRequest;
+import com.ams.backend.response.AuditTypeResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,43 +23,56 @@ public class AuditTypeServiceTest {
     @Mock
     private AuditTypeRepository auditTypeRepository;
 
+    @Mock
+    private AuditTypeMapper auditTypeMapper;
+
     private AuditTypeServiceImpl auditTypeService;
 
     private AuditType auditType;
+    private AuditTypeRequest auditTypeRequest;
+    private AuditTypeResponse auditTypeResponse;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        auditTypeService = new AuditTypeServiceImpl(auditTypeRepository);
+        auditTypeService = new AuditTypeServiceImpl(auditTypeRepository, auditTypeMapper);
 
-        // Crear un tipo de auditoría de ejemplo
+        // Create test data
         auditType = new AuditType();
         auditType.setId(1);
         auditType.setAuditType("Financial Audit");
+
+        auditTypeRequest = new AuditTypeRequest(1, "Financial Audit");
+        auditTypeResponse = new AuditTypeResponse(1, "Financial Audit");
     }
 
     @Test
     public void testGetAllAuditType() {
         List<AuditType> auditTypes = Arrays.asList(auditType);
+        List<AuditTypeResponse> expectedResponses = Arrays.asList(auditTypeResponse);
 
         when(auditTypeRepository.findAll()).thenReturn(auditTypes);
+        when(auditTypeMapper.toResponse(auditType)).thenReturn(auditTypeResponse);
 
-        List<AuditType> result = auditTypeService.getAllAuditType();
+        List<AuditTypeResponse> result = auditTypeService.getAllAuditType();
 
         assertEquals(1, result.size());
-        assertEquals(auditType.getAuditType(), result.get(0).getAuditType());
+        assertEquals(auditTypeResponse.getAuditType(), result.get(0).getAuditType());
         verify(auditTypeRepository, times(1)).findAll();
+        verify(auditTypeMapper, times(1)).toResponse(auditType);
     }
 
     @Test
     public void testGetAuditTypeById_AuditTypeFound() throws ResourceNotFoundException {
         when(auditTypeRepository.findById(1)).thenReturn(Optional.of(auditType));
+        when(auditTypeMapper.toResponse(auditType)).thenReturn(auditTypeResponse);
 
-        AuditType result = auditTypeService.getAuditTypeById(1);
+        AuditTypeResponse result = auditTypeService.getAuditTypeById(1);
 
         assertNotNull(result);
-        assertEquals(auditType.getAuditType(), result.getAuditType());
+        assertEquals(auditTypeResponse.getAuditType(), result.getAuditType());
         verify(auditTypeRepository, times(1)).findById(1);
+        verify(auditTypeMapper, times(1)).toResponse(auditType);
     }
 
     @Test
@@ -70,44 +86,54 @@ public class AuditTypeServiceTest {
 
     @Test
     public void testCreateAuditType() {
+        AuditTypeRequest newRequest = new AuditTypeRequest(0, "Operational Audit");
         AuditType newAuditType = new AuditType();
         newAuditType.setAuditType("Operational Audit");
+        AuditTypeResponse newResponse = new AuditTypeResponse(1, "Operational Audit");
 
+        when(auditTypeMapper.toEntity(newRequest)).thenReturn(newAuditType);
         when(auditTypeRepository.save(newAuditType)).thenReturn(newAuditType);
+        when(auditTypeMapper.toResponse(newAuditType)).thenReturn(newResponse);
 
-        AuditType result = auditTypeService.createAuditType(newAuditType);
+        AuditTypeResponse result = auditTypeService.createAuditType(newRequest);
 
         assertNotNull(result);
         assertEquals("Operational Audit", result.getAuditType());
         verify(auditTypeRepository, times(1)).save(newAuditType);
+        verify(auditTypeMapper, times(1)).toEntity(newRequest);
+        verify(auditTypeMapper, times(1)).toResponse(newAuditType);
     }
 
     @Test
     public void testUpdateAuditType_AuditTypeFound() throws ResourceNotFoundException {
+        AuditTypeRequest updateRequest = new AuditTypeRequest(1, "Updated Financial Audit");
         AuditType updatedAuditType = new AuditType();
         updatedAuditType.setAuditType("Updated Financial Audit");
+        AuditTypeResponse updatedResponse = new AuditTypeResponse(1, "Updated Financial Audit");
 
         when(auditTypeRepository.findById(1)).thenReturn(Optional.of(auditType));
         when(auditTypeRepository.save(any(AuditType.class))).thenReturn(updatedAuditType);
+        when(auditTypeMapper.toResponse(updatedAuditType)).thenReturn(updatedResponse);
 
-        AuditType result = auditTypeService.updateAuditType(1, updatedAuditType);
+        AuditTypeResponse result = auditTypeService.updateAuditType(1, updateRequest);
 
         assertNotNull(result);
         assertEquals("Updated Financial Audit", result.getAuditType());
         verify(auditTypeRepository, times(1)).findById(1);
+        verify(auditTypeRepository, times(1)).save(any(AuditType.class));
+        verify(auditTypeMapper, times(1)).toResponse(updatedAuditType);
     }
 
     @Test
     public void testUpdateAuditType_AuditTypeNotFound() {
-        AuditType updatedAuditType = new AuditType();
-        updatedAuditType.setAuditType("Updated Financial Audit");
+        AuditTypeRequest updateRequest = new AuditTypeRequest(999, "Updated Financial Audit");
 
         when(auditTypeRepository.findById(999)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> auditTypeService.updateAuditType(999, updatedAuditType));
+        assertThrows(ResourceNotFoundException.class, () -> auditTypeService.updateAuditType(999, updateRequest));
 
         verify(auditTypeRepository, times(1)).findById(999);
-        verify(auditTypeRepository, times(0)).save(updatedAuditType);  // No debe llamar a save
+        verify(auditTypeRepository, times(0)).save(any(AuditType.class));
     }
 
     @Test
@@ -128,6 +154,6 @@ public class AuditTypeServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> auditTypeService.deleteAuditType(999));
 
         verify(auditTypeRepository, times(1)).findById(999);
-        verify(auditTypeRepository, times(0)).deleteById(999);  // No debe eliminarse
+        verify(auditTypeRepository, times(0)).deleteById(999);
     }
 }

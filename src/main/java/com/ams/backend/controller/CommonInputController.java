@@ -4,6 +4,7 @@ import com.ams.backend.entity.CommonInput;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.request.CommonInputUpdateRequest;
 import com.ams.backend.request.InputRequest;
+import com.ams.backend.response.CommonInputResponse;
 import com.ams.backend.service.interfaces.CommonInputService;
 
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -32,26 +34,29 @@ public class CommonInputController {
     private CommonInputService commonInputService;
 
     @GetMapping("/commonInput")
-    public List<CommonInput> getAllCommonInputs() {
-
-        return commonInputService.getAllCommonInputs();
+    public List<CommonInputResponse> getAllCommonInputs() {
+        return commonInputService.getAllCommonInputs().stream()
+                .map(commonInputService.getMapper()::toResponse)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/commonInputById/{id}")
-    public Optional<CommonInput> getCommonInputById(@PathVariable(value = "id") int commonInputId) {
-
-        return commonInputService.getCommonInputById(commonInputId);
+    public Optional<CommonInputResponse> getCommonInputById(@PathVariable(value = "id") int commonInputId) {
+        return commonInputService.getCommonInputById(commonInputId)
+                .map(commonInputService.getMapper()::toResponse);
     }
 
     @GetMapping("/commonInput/{id}")
-    public ResponseEntity<List<CommonInput>> getCommonAuditByAuditNumber(@PathVariable(value = "id") int auditNumber) {
-        List<CommonInput> commonInputs = commonInputService.getCommonInputByAuditNumber(auditNumber);
-
+    public ResponseEntity<List<CommonInputResponse>> getCommonAuditByAuditNumber(
+            @PathVariable(value = "id") int auditNumber) {
+        List<CommonInputResponse> commonInputs = commonInputService.getCommonInputByAuditNumber(auditNumber).stream()
+                .map(commonInputService.getMapper()::toResponse)
+                .collect(Collectors.toList());
         return ResponseEntity.ok().body(commonInputs);
     }
 
     @GetMapping("/commonInput/filtered")
-    public List<CommonInput> getFilteredCommonInputs(
+    public List<CommonInputResponse> getFilteredCommonInputs(
             @RequestParam(required = false) String apellido,
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String cuil,
@@ -73,7 +78,9 @@ public class CommonInputController {
                 uoc,
                 idSucursal,
                 fechaIngreso,
-                idCaracteristicas);
+                idCaracteristicas).stream()
+                .map(commonInputService.getMapper()::toResponse)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/commonInput")
@@ -88,7 +95,6 @@ public class CommonInputController {
             @Valid @RequestBody CommonInputUpdateRequest commonInputUpdateRequest) throws ResourceNotFoundException {
         final CommonInput updatedCommonInput = commonInputService.updateCommonInput(commonInputId,
                 commonInputUpdateRequest);
-
         return ResponseEntity.ok(updatedCommonInput);
     }
 
@@ -96,7 +102,6 @@ public class CommonInputController {
     public ResponseEntity<Void> deleteCommonInput(@PathVariable(value = "id") int commonInputId)
             throws ResourceNotFoundException {
         commonInputService.deleteCommonInput(commonInputId);
-
         return ResponseEntity.noContent().build();
     }
 }

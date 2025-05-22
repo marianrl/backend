@@ -1,5 +1,6 @@
-package com.ams.backend.response;
+package com.ams.backend.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuditTypeResponse {
+public class AuditTypeRequest {
   private int id;
+
+  @NotBlank(message = "Audit type is required")
   private String auditType;
 }

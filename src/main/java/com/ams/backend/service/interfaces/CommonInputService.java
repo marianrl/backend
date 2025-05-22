@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import com.ams.backend.entity.CommonInput;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.mapper.CommonInputMapper;
 import com.ams.backend.request.CommonInputUpdateRequest;
 import com.ams.backend.request.InputRequest;
 
@@ -28,4 +29,6 @@ public interface CommonInputService {
   void deleteCommonInput(int id) throws ResourceNotFoundException;
 
   List<CommonInput> createCommonInputs(List<InputRequest> inputRequests) throws ResourceNotFoundException;
+
+  CommonInputMapper getMapper();
 }

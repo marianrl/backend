@@ -2,11 +2,8 @@ package com.ams.backend.service;
 
 import com.ams.backend.entity.*;
 import com.ams.backend.exception.ResourceNotFoundException;
-import com.ams.backend.repository.CommonInputRepository;
-import com.ams.backend.repository.AnswerRepository;
-import com.ams.backend.repository.AuditRepository;
-import com.ams.backend.repository.AuditTypeRepository;
-import com.ams.backend.repository.FeaturesRepository;
+import com.ams.backend.mapper.CommonInputMapper;
+import com.ams.backend.repository.*;
 import com.ams.backend.request.CommonInputUpdateRequest;
 import com.ams.backend.request.InputRequest;
 
@@ -54,6 +51,9 @@ public class CommonInputServiceTest {
 
     @Mock
     private AuditRepository auditRepository;
+
+    @Mock
+    private CommonInputMapper mapper;
 
     @MockBean
     private CommonInputServiceImpl commonInputService;
@@ -105,7 +105,8 @@ public class CommonInputServiceTest {
                 answerRepository,
                 featuresRepository,
                 auditTypeRepository,
-                auditRepository);
+                auditRepository,
+                mapper);
     }
 
     @Test

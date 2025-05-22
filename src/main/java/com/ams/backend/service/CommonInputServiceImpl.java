@@ -9,6 +9,7 @@ import com.ams.backend.entity.CommonInput;
 import com.ams.backend.entity.CommonInputSpecification;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.mapper.CommonInputMapper;
 import com.ams.backend.repository.AnswerRepository;
 import com.ams.backend.repository.AuditRepository;
 import com.ams.backend.repository.AuditTypeRepository;
@@ -46,6 +47,14 @@ public class CommonInputServiceImpl implements CommonInputService {
 
     @Autowired
     private AuditRepository auditRepository;
+
+    @Autowired
+    private CommonInputMapper mapper;
+
+    @Override
+    public CommonInputMapper getMapper() {
+        return mapper;
+    }
 
     public List<CommonInput> getAllCommonInputs() {
         return commonInputRepository.findAll();

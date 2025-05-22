@@ -1,7 +1,8 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.AuditType;
 import com.ams.backend.exception.ResourceNotFoundException;
+import com.ams.backend.request.AuditTypeRequest;
+import com.ams.backend.response.AuditTypeResponse;
 import com.ams.backend.service.interfaces.AuditTypeService;
 
 import jakarta.validation.Valid;
@@ -26,31 +27,27 @@ public class AuditTypeController {
     private AuditTypeService auditTypeService;
 
     @GetMapping("/auditType")
-    public List<AuditType> getAllAuditType() {
-
+    public List<AuditTypeResponse> getAllAuditType() {
         return auditTypeService.getAllAuditType();
     }
 
     @GetMapping("/auditType/{id}")
-    public ResponseEntity<AuditType> getAuditTypeById(@PathVariable(value = "id") int auditTypeId)
-            throws ResourceNotFoundException{
-        AuditType auditType = auditTypeService.getAuditTypeById(auditTypeId);
-
+    public ResponseEntity<AuditTypeResponse> getAuditTypeById(@PathVariable(value = "id") int auditTypeId)
+            throws ResourceNotFoundException {
+        AuditTypeResponse auditType = auditTypeService.getAuditTypeById(auditTypeId);
         return ResponseEntity.ok().body(auditType);
     }
 
     @PostMapping("/auditType")
-    public AuditType createAuditType(@Valid @RequestBody AuditType auditType) {
-        return auditTypeService.createAuditType(auditType);
+    public AuditTypeResponse createAuditType(@Valid @RequestBody AuditTypeRequest auditTypeRequest) {
+        return auditTypeService.createAuditType(auditTypeRequest);
     }
 
     @PutMapping("/auditType/{id}")
-    public ResponseEntity<AuditType> updateAuditType(
+    public ResponseEntity<AuditTypeResponse> updateAuditType(
             @PathVariable(value = "id") int auditTypeId,
-            @Valid @RequestBody AuditType auditTypeDetails) throws ResourceNotFoundException {
-        final AuditType updatedAuditType = auditTypeService
-                .updateAuditType(auditTypeId, auditTypeDetails);
-
+            @Valid @RequestBody AuditTypeRequest auditTypeRequest) throws ResourceNotFoundException {
+        AuditTypeResponse updatedAuditType = auditTypeService.updateAuditType(auditTypeId, auditTypeRequest);
         return ResponseEntity.ok(updatedAuditType);
     }
 
@@ -58,7 +55,6 @@ public class AuditTypeController {
     public ResponseEntity<Void> deleteAuditType(@PathVariable(value = "id") int auditTypeId)
             throws ResourceNotFoundException {
         auditTypeService.deleteAuditType(auditTypeId);
-
         return ResponseEntity.noContent().build();
     }
 }

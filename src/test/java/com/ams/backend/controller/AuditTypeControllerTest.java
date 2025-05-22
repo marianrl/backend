@@ -1,6 +1,7 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.entity.AuditType;
+import com.ams.backend.request.AuditTypeRequest;
+import com.ams.backend.response.AuditTypeResponse;
 import com.ams.backend.service.interfaces.AuditTypeService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -30,22 +31,22 @@ public class AuditTypeControllerTest {
     @InjectMocks
     private AuditTypeController auditTypeController;
 
-    private AuditType auditType;
+    private AuditTypeResponse auditTypeResponse;
+    private AuditTypeRequest auditTypeRequest;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        auditType = new AuditType();
-        auditType.setId(1);
+        auditTypeResponse = new AuditTypeResponse(1, "Test Audit Type");
+        auditTypeRequest = new AuditTypeRequest(1, "Test Audit Type");
     }
 
     @Test
     public void getAllAuditTypesTest() throws Exception {
-
-        List<AuditType> auditTypes = Collections.singletonList(auditType);
+        List<AuditTypeResponse> auditTypes = Collections.singletonList(auditTypeResponse);
         when(auditTypeService.getAllAuditType()).thenReturn(auditTypes);
 
-        List<AuditType> result = auditTypeController.getAllAuditType();
+        List<AuditTypeResponse> result = auditTypeController.getAllAuditType();
 
         assertEquals(auditTypes, result);
         verify(auditTypeService, times(1)).getAllAuditType();
@@ -53,33 +54,32 @@ public class AuditTypeControllerTest {
 
     @Test
     public void getAuditTypeByIdTest() throws Exception {
-        when(auditTypeService.getAuditTypeById(1)).thenReturn(auditType);
+        when(auditTypeService.getAuditTypeById(1)).thenReturn(auditTypeResponse);
 
-        ResponseEntity<AuditType> result = auditTypeController.getAuditTypeById(1);
+        ResponseEntity<AuditTypeResponse> result = auditTypeController.getAuditTypeById(1);
 
-        assertEquals(auditType, result.getBody());
+        assertEquals(auditTypeResponse, result.getBody());
         verify(auditTypeService, times(1)).getAuditTypeById(1);
     }
 
     @Test
     public void createAuditTypeTest() throws Exception {
-        when(auditTypeService.createAuditType(any(AuditType.class))).thenReturn(auditType);
+        when(auditTypeService.createAuditType(any(AuditTypeRequest.class))).thenReturn(auditTypeResponse);
 
-        AuditType result = auditTypeController.createAuditType(auditType);
+        AuditTypeResponse result = auditTypeController.createAuditType(auditTypeRequest);
 
-        assertEquals(auditType, result);
-        verify(auditTypeService, times(1)).createAuditType(any(AuditType.class));
+        assertEquals(auditTypeResponse, result);
+        verify(auditTypeService, times(1)).createAuditType(any(AuditTypeRequest.class));
     }
 
     @Test
     public void updateAuditTypeTest() throws Exception {
-        AuditType auditType = new AuditType();
-        when(auditTypeService.updateAuditType(eq(1), any(AuditType.class))).thenReturn(auditType);
+        when(auditTypeService.updateAuditType(eq(1), any(AuditTypeRequest.class))).thenReturn(auditTypeResponse);
 
-        ResponseEntity<AuditType> result = auditTypeController.updateAuditType(1, auditType);
+        ResponseEntity<AuditTypeResponse> result = auditTypeController.updateAuditType(1, auditTypeRequest);
 
-        assertEquals(auditType, result.getBody());
-        verify(auditTypeService, times(1)).updateAuditType(eq(1), any(AuditType.class));
+        assertEquals(auditTypeResponse, result.getBody());
+        verify(auditTypeService, times(1)).updateAuditType(eq(1), any(AuditTypeRequest.class));
     }
 
     @Test
@@ -92,5 +92,4 @@ public class AuditTypeControllerTest {
         assertEquals(isNoContent, result.getStatusCode());
         verify(auditTypeService, times(1)).deleteAuditType(1);
     }
-
 }
