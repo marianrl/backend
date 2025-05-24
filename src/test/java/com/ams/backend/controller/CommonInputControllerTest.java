@@ -57,9 +57,23 @@ public class CommonInputControllerTest {
         MockitoAnnotations.openMocks(this);
         commonInput = new CommonInput();
         commonInput.setId(1);
+        commonInput.setLastName("Doe");
+        commonInput.setName("John");
+        commonInput.setCuil("20-12345678-9");
+        commonInput.setFile("12345");
+        commonInput.setAllocation("IT");
+        commonInput.setUoc("UOC1");
+        commonInput.setAdmissionDate(LocalDate.now());
 
         commonInputResponse = new CommonInputResponse();
         commonInputResponse.setId(1);
+        commonInputResponse.setLastName("Doe");
+        commonInputResponse.setName("John");
+        commonInputResponse.setCuil("20-12345678-9");
+        commonInputResponse.setFile("12345");
+        commonInputResponse.setAllocation("IT");
+        commonInputResponse.setUoc("UOC1");
+        commonInputResponse.setAdmissionDate(LocalDate.now());
 
         inputRequest = new InputRequest();
         inputRequest.setLastName("Doe");
@@ -72,23 +86,14 @@ public class CommonInputControllerTest {
         inputRequest.setClient(1);
         inputRequest.setBranch(1);
         inputRequest.setAuditId(1);
-
-        commonInput.setLastName(inputRequest.getLastName());
-        commonInput.setName(inputRequest.getName());
-        commonInput.setCuil(inputRequest.getCuil());
-        commonInput.setFile(inputRequest.getFile());
-        commonInput.setAllocation(inputRequest.getAllocation());
-        commonInput.setUoc(inputRequest.getUoc());
-        commonInput.setAdmissionDate(inputRequest.getAdmissionDate());
-
-        when(commonInputService.getMapper()).thenReturn(mapper);
-        when(mapper.toResponse(any(CommonInput.class))).thenReturn(commonInputResponse);
     }
 
     @Test
     public void testGetAllCommonAudits() {
         List<CommonInput> commonInputs = Collections.singletonList(commonInput);
+        when(commonInputService.getMapper()).thenReturn(mapper);
         when(commonInputService.getAllCommonInputs()).thenReturn(commonInputs);
+        when(mapper.toResponse(any(CommonInput.class))).thenReturn(commonInputResponse);
 
         List<CommonInputResponse> result = commonInputController.getAllCommonInputs();
 
@@ -98,7 +103,9 @@ public class CommonInputControllerTest {
 
     @Test
     public void testGetCommonInputById() {
+        when(commonInputService.getMapper()).thenReturn(mapper);
         when(commonInputService.getCommonInputById(1)).thenReturn(Optional.of(commonInput));
+        when(mapper.toResponse(any(CommonInput.class))).thenReturn(commonInputResponse);
 
         Optional<CommonInputResponse> result = commonInputController.getCommonInputById(1);
 
@@ -109,7 +116,9 @@ public class CommonInputControllerTest {
     @Test
     public void testGetCommonAuditByAuditNumber() {
         List<CommonInput> commonInputs = Collections.singletonList(commonInput);
+        when(commonInputService.getMapper()).thenReturn(mapper);
         when(commonInputService.getCommonInputByAuditNumber(1)).thenReturn(commonInputs);
+        when(mapper.toResponse(any(CommonInput.class))).thenReturn(commonInputResponse);
 
         ResponseEntity<List<CommonInputResponse>> result = commonInputController.getCommonAuditByAuditNumber(1);
 
@@ -120,10 +129,12 @@ public class CommonInputControllerTest {
     @Test
     public void testGetFilteredCommonInputs() {
         List<CommonInput> commonInputs = Collections.singletonList(commonInput);
+        when(commonInputService.getMapper()).thenReturn(mapper);
         when(commonInputService.getFilteredCommonInputs(
                 anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong()))
                 .thenReturn(commonInputs);
+        when(mapper.toResponse(any(CommonInput.class))).thenReturn(commonInputResponse);
 
         List<CommonInputResponse> result = commonInputController.getFilteredCommonInputs(
                 "Apellido", "Nombre", "20-12345678-9", "1234", "Asignacion",
@@ -190,13 +201,11 @@ public class CommonInputControllerTest {
 
     @Test
     public void testDeleteCommonAudit() throws ResourceNotFoundException {
-        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
         doNothing().when(commonInputService).deleteCommonInput(1);
 
         ResponseEntity<Void> result = commonInputController.deleteCommonInput(1);
 
-        assertEquals(isNoContent, result.getStatusCode());
+        assertEquals(HttpStatusCode.valueOf(204), result.getStatusCode());
         verify(commonInputService, times(1)).deleteCommonInput(1);
     }
-
 }

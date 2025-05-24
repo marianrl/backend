@@ -29,7 +29,6 @@ public class AuditTypeServiceTest {
     private AuditTypeServiceImpl auditTypeService;
 
     private AuditType auditType;
-    private AuditTypeRequest auditTypeRequest;
     private AuditTypeResponse auditTypeResponse;
 
     @BeforeEach
@@ -42,14 +41,12 @@ public class AuditTypeServiceTest {
         auditType.setId(1);
         auditType.setAuditType("Financial Audit");
 
-        auditTypeRequest = new AuditTypeRequest(1, "Financial Audit");
         auditTypeResponse = new AuditTypeResponse(1, "Financial Audit");
     }
 
     @Test
     public void testGetAllAuditType() {
         List<AuditType> auditTypes = Arrays.asList(auditType);
-        List<AuditTypeResponse> expectedResponses = Arrays.asList(auditTypeResponse);
 
         when(auditTypeRepository.findAll()).thenReturn(auditTypes);
         when(auditTypeMapper.toResponse(auditType)).thenReturn(auditTypeResponse);

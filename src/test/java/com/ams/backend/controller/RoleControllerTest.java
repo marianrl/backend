@@ -54,16 +54,14 @@ public class RoleControllerTest {
         roleRequest = new RoleRequest();
         roleRequest.setId(1);
         roleRequest.setRole("Admin");
-
-        when(roleService.getMapper()).thenReturn(mapper);
-        when(mapper.toResponse(any(Role.class))).thenReturn(roleResponse);
-        when(mapper.toEntity(any(RoleRequest.class))).thenReturn(role);
     }
 
     @Test
     public void getAllRolesTest() throws Exception {
+        when(roleService.getMapper()).thenReturn(mapper);
         List<Role> roles = Collections.singletonList(role);
         when(roleService.getAllRoles()).thenReturn(roles);
+        when(mapper.toResponse(any(Role.class))).thenReturn(roleResponse);
 
         List<RoleResponse> result = roleController.getAllRoles();
 
@@ -74,7 +72,9 @@ public class RoleControllerTest {
 
     @Test
     public void getRoleByIdTest() throws Exception {
+        when(roleService.getMapper()).thenReturn(mapper);
         when(roleService.getRoleById(1)).thenReturn(role);
+        when(mapper.toResponse(any(Role.class))).thenReturn(roleResponse);
 
         ResponseEntity<RoleResponse> result = roleController.getRoleById(1);
 
@@ -84,7 +84,10 @@ public class RoleControllerTest {
 
     @Test
     public void createRoleTest() throws Exception {
+        when(roleService.getMapper()).thenReturn(mapper);
+        when(mapper.toEntity(any(RoleRequest.class))).thenReturn(role);
         when(roleService.createRole(any(Role.class))).thenReturn(role);
+        when(mapper.toResponse(any(Role.class))).thenReturn(roleResponse);
 
         RoleResponse result = roleController.createRole(roleRequest);
 
@@ -94,10 +97,13 @@ public class RoleControllerTest {
 
     @Test
     public void updateRoleTest() throws Exception {
+        when(roleService.getMapper()).thenReturn(mapper);
         Role updatedRole = new Role();
         updatedRole.setId(1);
         updatedRole.setRole("Updated Admin");
+        when(mapper.toEntity(any(RoleRequest.class))).thenReturn(role);
         when(roleService.updateRole(eq(1), any(Role.class))).thenReturn(updatedRole);
+        when(mapper.toResponse(any(Role.class))).thenReturn(roleResponse);
 
         ResponseEntity<RoleResponse> result = roleController.updateRole(1, roleRequest);
 
@@ -107,11 +113,10 @@ public class RoleControllerTest {
 
     @Test
     public void deleteRoleTest() throws Exception {
-        HttpStatusCode isNoContent = HttpStatusCode.valueOf(204);
         doNothing().when(roleService).deleteRole(1);
         ResponseEntity<Void> result = roleController.deleteRole(1);
 
-        assertEquals(isNoContent, result.getStatusCode());
+        assertEquals(HttpStatusCode.valueOf(204), result.getStatusCode());
         verify(roleService, times(1)).deleteRole(1);
     }
 }
