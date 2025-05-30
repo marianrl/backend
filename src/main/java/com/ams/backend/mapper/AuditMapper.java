@@ -20,7 +20,7 @@ public class AuditMapper {
     return new AuditResponse(
         entity.getId(),
         entity.getAuditDate(),
-        new AuditTypeResponse(entity.getIdTipoAuditoria().getId(), entity.getIdTipoAuditoria().getAuditType()),
-        new AuditedResponse(entity.getIdAuditado().getId(), entity.getIdAuditado().getAudited()));
+        new AuditTypeResponse(entity.getAuditType().getId(), entity.getAuditType().getAuditType()),
+        new AuditedResponse(entity.getAudited().getId(), entity.getAudited().getAudited()));
   }
 }

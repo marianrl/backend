@@ -16,12 +16,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Rol")
+@Table(name = "\"Rol\"")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "rol", nullable = false)
+    @Column(name = "\"rol\"", nullable = false)
     private String role;
 }

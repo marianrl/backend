@@ -1,6 +1,5 @@
 package com.ams.backend.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,12 +16,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Administrada")
+@Table(name = "\"Administrada\"")
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "unidad", nullable = false)
-    private String group;
+    @Column(name = "\"unidad\"", nullable = false)
+    private String unit;
 }

@@ -18,26 +18,26 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Usuario")
+@Table(name = "\"Usuario\"")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "nombre", nullable = false)
+    @Column(name = "\"nombre\"", nullable = false)
     private String name;
 
-    @Column(name = "apellido", nullable = false)
+    @Column(name = "\"apellido\"", nullable = false)
     private String lastName;
 
-    @Column(name = "mail", nullable = false)
+    @Column(name = "\"mail\"", nullable = false)
     private String mail;
 
-    @Column(name = "contraseña", nullable = false)
+    @Column(name = "\"contraseña\"", nullable = false)
     private String password;
 
     @ManyToOne
-    @JoinColumn(name = "id_rol")
+    @JoinColumn(name = "\"id_rol\"")
     private Role role;
 
 }

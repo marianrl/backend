@@ -53,8 +53,8 @@ public class AuditServiceImpl implements AuditService {
                         "AuditType not found for this id :: " + auditRequest.getAuditTypeId()));
 
         Audit audit = auditMapper.toEntity(auditRequest);
-        audit.setIdTipoAuditoria(auditType);
-        audit.setIdAuditado(new Audited(2, "No"));
+        audit.setAuditType(auditType);
+        audit.setAudited(new Audited(2, "No"));
 
         Audit savedAudit = auditRepository.save(audit);
         return auditMapper.toResponse(savedAudit);
@@ -67,7 +67,7 @@ public class AuditServiceImpl implements AuditService {
         Audited audited = auditedRepository.findById(1)
                 .orElseThrow(() -> new ResourceNotFoundException("Audited not found for this id :: 1"));
 
-        audit.setIdAuditado(audited);
+        audit.setAudited(audited);
         Audit updatedAudit = auditRepository.save(audit);
 
         return auditMapper.toResponse(updatedAudit);

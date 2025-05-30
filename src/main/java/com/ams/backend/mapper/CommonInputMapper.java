@@ -64,12 +64,12 @@ public class CommonInputMapper {
     if (commonInput.getAudit() != null) {
       Audit audit = commonInput.getAudit();
       AuditTypeResponse auditTypeResponse = new AuditTypeResponse();
-      auditTypeResponse.setId(audit.getIdTipoAuditoria().getId());
-      auditTypeResponse.setAuditType(audit.getIdTipoAuditoria().getAuditType());
+      auditTypeResponse.setId(audit.getAuditType().getId());
+      auditTypeResponse.setAuditType(audit.getAuditType().getAuditType());
 
       AuditedResponse auditedResponse = new AuditedResponse();
-      auditedResponse.setId(audit.getIdAuditado().getId());
-      auditedResponse.setAudited(audit.getIdAuditado().getAudited());
+      auditedResponse.setId(audit.getAudited().getId());
+      auditedResponse.setAudited(audit.getAudited().getAudited());
 
       AuditResponse auditResponse = new AuditResponse();
       auditResponse.setId(audit.getId());

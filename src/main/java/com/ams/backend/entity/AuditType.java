@@ -16,12 +16,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Tipo_Auditoria")
+@Table(name = "\"Tipo_Auditoria\"")
 public class AuditType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "tipo_Auditoria", nullable = false)
+    @Column(name = "\"tipo_auditoria\"", nullable = false)
     private String auditType;
 }

@@ -21,46 +21,46 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Ingreso_Comun")
+@Table(name = "\"Ingreso_Comun\"")
 public class CommonInput {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "apellido", nullable = false)
+    @Column(name = "\"apellido\"", nullable = false)
     private String lastName;
 
-    @Column(name = "nombre", nullable = false)
+    @Column(name = "\"nombre\"", nullable = false)
     private String name;
 
-    @Column(name = "cuil", nullable = false)
+    @Column(name = "\"cuil\"", nullable = false)
     private String cuil;
 
-    @Column(name = "legajo", nullable = false)
+    @Column(name = "\"legajo\"", nullable = false)
     private String file;
 
-    @Column(name = "asignacion", nullable = false)
+    @Column(name = "\"asignacion\"", nullable = false)
     private String allocation;
 
     @ManyToOne
-    @JoinColumn(name = "id_cliente")
+    @JoinColumn(name = "\"id_cliente\"")
     private Client client;
 
-    @Column(name = "uoc", nullable = false)
+    @Column(name = "\"uoc\"", nullable = false)
     private String uoc;
 
     @ManyToOne
-    @JoinColumn(name = "id_sucursal")
+    @JoinColumn(name = "\"id_sucursal\"")
     private Branch branch;
 
-    @Column(name = "fecha_ingreso", nullable = false)
+    @Column(name = "\"fecha_ingreso\"", nullable = false)
     private @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate admissionDate;
 
     @ManyToOne
-    @JoinColumn(name = "id_caracteristicas")
+    @JoinColumn(name = "\"id_caracteristicas\"")
     private Features features;
 
     @ManyToOne
-    @JoinColumn(name = "id_auditoria")
+    @JoinColumn(name = "\"id_auditoria\"")
     private Audit audit;
 }

@@ -14,20 +14,20 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Auditoria")
+@Table(name = "\"Auditoria\"")
 public class Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "fecha_auditoria", nullable = false)
+    @Column(name = "\"fecha_auditoria\"", nullable = false)
     private @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate auditDate;
 
     @ManyToOne
-    @JoinColumn(name = "id_tipo_auditoria")
-    private AuditType idTipoAuditoria;
+    @JoinColumn(name = "\"id_tipo_auditoria\"")
+    private AuditType auditType;
 
     @ManyToOne
-    @JoinColumn(name = "id_auditado")
-    private Audited idAuditado;
+    @JoinColumn(name = "\"id_auditado\"")
+    private Audited audited;
 }

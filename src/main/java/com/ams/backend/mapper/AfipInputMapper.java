@@ -49,10 +49,10 @@ public class AfipInputMapper {
       response.setAudit(new AuditResponse(
           entity.getAudit().getId(),
           entity.getAudit().getAuditDate(),
-          new AuditTypeResponse(entity.getAudit().getIdTipoAuditoria().getId(),
-              entity.getAudit().getIdTipoAuditoria().getAuditType()),
-          new AuditedResponse(entity.getAudit().getIdAuditado().getId(),
-              entity.getAudit().getIdAuditado().getAudited())));
+          new AuditTypeResponse(entity.getAudit().getAuditType().getId(),
+              entity.getAudit().getAuditType().getAuditType()),
+          new AuditedResponse(entity.getAudit().getAudited().getId(),
+              entity.getAudit().getAudited().getAudited())));
     }
 
     return response;

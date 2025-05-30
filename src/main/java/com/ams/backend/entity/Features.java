@@ -1,5 +1,6 @@
 package com.ams.backend.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,18 +18,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "Caracteristicas")
+@Table(name = "\"Caracteristicas\"")
 public class Features {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "id_tipo_auditoria")
+    @JoinColumn(name = "\"id_tipo_auditoria\"")
     private AuditType auditType;
 
     @ManyToOne
-    @JoinColumn(name = "id_respuestas")
+    @JoinColumn(name = "\"id_respuestas\"")
     private Answer answer;
 
 }

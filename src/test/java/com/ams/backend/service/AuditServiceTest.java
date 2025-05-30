@@ -59,8 +59,8 @@ public class AuditServiceTest {
         audit = new Audit();
         audit.setId(1);
         audit.setAuditDate(LocalDate.now());
-        audit.setIdTipoAuditoria(auditType);
-        audit.setIdAuditado(new Audited(2, "No"));
+        audit.setAuditType(auditType);
+        audit.setAudited(new Audited(2, "No"));
 
         AuditTypeResponse auditTypeResponse = new AuditTypeResponse(1, "Financial Audit");
         AuditedResponse auditedResponse = new AuditedResponse(2, "No");
@@ -137,8 +137,8 @@ public class AuditServiceTest {
         Audit updatedAudit = new Audit();
         updatedAudit.setId(1);
         updatedAudit.setAuditDate(LocalDate.now().plusDays(1));
-        updatedAudit.setIdTipoAuditoria(auditType);
-        updatedAudit.setIdAuditado(new Audited(2, "No"));
+        updatedAudit.setAuditType(auditType);
+        updatedAudit.setAudited(new Audited(2, "No"));
 
         AuditResponse updatedResponse = new AuditResponse(
                 1,
