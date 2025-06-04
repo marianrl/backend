@@ -1,5 +1,7 @@
 package com.ams.backend.configuration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,41 +18,53 @@ import com.ams.backend.security.JwtRequestFilter;
 
 @Configuration
 public class SecurityConfig {
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        logger.info("Configuring AuthenticationManager");
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors() // Habilitar CORS
-            .and()
-            .csrf().disable()
-            .authorizeHttpRequests()
-            // Permitir acceso sin autenticación a las rutas de Swagger y otras específicas
-            .requestMatchers(
-                "/swagger-ui/**",       // Rutas de Swagger UI
-                "/v3/api-docs/**",      // Documentación de OpenAPI
-                "/swagger-ui.html",     // Entrada principal de Swagger
-                "/api/v1/user/authenticate", // Endpoint de autenticación
-                "/api/v1/register"      // Endpoint de registro
-            ).permitAll()
-            // Proteger cualquier otra ruta
-            .anyRequest().authenticated()
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        logger.info("Configuring SecurityFilterChain");
+        try {
+            http.cors()
+                    .and()
+                    .csrf().disable()
+                    .authorizeHttpRequests()
+                    .requestMatchers(
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**",
+                            "/swagger-ui.html",
+                            "/api/v1/user/authenticate",
+                            "/api/v1/register",
+                            "/actuator/**",
+                            "/health")
+                    .permitAll()
+                    .anyRequest().authenticated()
+                    .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        // Añadir el filtro JWT
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
+            http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+            logger.info("SecurityFilterChain configured successfully");
+            return http.build();
+        } catch (Exception e) {
+            logger.error("Error configuring SecurityFilterChain: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+        logger.info("Configuring PasswordEncoder");
         return new BCryptPasswordEncoder();
     }
 }
