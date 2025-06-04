@@ -1,6 +1,7 @@
 package com.ams.backend.security;
 
 import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -8,11 +9,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.security.Key;
 import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class JwtTokenUtil {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // Genera una clave segura
+    @Value("${JWT_SECRET:defaultSecretKey12345678901234567890123456789012345678901234567890}")
+    private String secret;
+
+    private Key getSigningKey() {
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     private static final long EXPIRATION_TIME = 86400000; // 1 día
 
     public String generateToken(String username, String name, String lastName, int roleId) {
@@ -27,14 +36,14 @@ public class JwtTokenUtil {
                 .setSubject(username) // Usuario (email o username)
                 .setIssuedAt(new Date()) // Fecha de creación del token
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Fecha de expiración
-                .signWith(key) // Firmar el token con la clave secreta
+                .signWith(getSigningKey()) // Firmar el token con la clave secreta
                 .compact();
     }
 
     public String getUsernameFromToken(String token) {
         // Crear un JwtParser usando JwtParserBuilder
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key) // Usa la clave de firma para verificar el token
+                .setSigningKey(getSigningKey()) // Usa la clave de firma para verificar el token
                 .build() // Construir el parser
                 .parseClaimsJws(token) // Analizar el token JWT
                 .getBody(); // Obtener el cuerpo (claims)
@@ -45,7 +54,7 @@ public class JwtTokenUtil {
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(key) // Configura la clave de firma
+                    .setSigningKey(getSigningKey()) // Configura la clave de firma
                     .build() // Construye el parser
                     .parseClaimsJws(token); // Valida y analiza el token
 
