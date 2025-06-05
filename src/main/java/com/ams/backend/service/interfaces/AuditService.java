@@ -9,11 +9,11 @@ import com.ams.backend.response.AuditResponse;
 public interface AuditService {
   List<AuditResponse> getAllAudit();
 
-  AuditResponse getAuditById(int id) throws ResourceNotFoundException;
+  AuditResponse getAuditById(int auditId) throws ResourceNotFoundException;
 
   AuditResponse createAudit(AuditRequest auditRequest) throws ResourceNotFoundException;
 
-  AuditResponse updateAudit(int id, AuditRequest auditRequest) throws ResourceNotFoundException;
+  AuditResponse updateAudit(int auditId, AuditRequest auditRequest) throws ResourceNotFoundException;
 
-  void deleteAudit(int id) throws ResourceNotFoundException;
+  void deleteAudit(int auditId) throws ResourceNotFoundException;
 }

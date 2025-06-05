@@ -105,6 +105,18 @@
     	<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		
+		<!-- Rate Limiting -->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>8.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j-jcache</artifactId>
+			<version>8.1.0</version>
+		</dependency>
+		
 		<!-- Dependencia de Cloudmersive -->
 		<dependency>
 			<groupId>com.github.Cloudmersive</groupId>
