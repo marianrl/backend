@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 
-public interface CommonInputRepository extends JpaRepository<CommonInput, Integer>, JpaSpecificationExecutor<CommonInput> {
+public interface CommonInputRepository
+        extends JpaRepository<CommonInput, Integer>, JpaSpecificationExecutor<CommonInput> {
 
     List<CommonInput> findByAudit_Id(int id);
 
