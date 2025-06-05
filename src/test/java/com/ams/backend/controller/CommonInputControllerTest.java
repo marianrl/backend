@@ -27,8 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -124,26 +122,6 @@ public class CommonInputControllerTest {
 
         assertEquals(Collections.singletonList(commonInputResponse), result.getBody());
         verify(commonInputService, times(1)).getCommonInputByAuditNumber(1);
-    }
-
-    @Test
-    public void testGetFilteredCommonInputs() {
-        List<CommonInput> commonInputs = Collections.singletonList(commonInput);
-        when(commonInputService.getMapper()).thenReturn(mapper);
-        when(commonInputService.getFilteredCommonInputs(
-                anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong()))
-                .thenReturn(commonInputs);
-        when(mapper.toResponse(any(CommonInput.class))).thenReturn(commonInputResponse);
-
-        List<CommonInputResponse> result = commonInputController.getFilteredCommonInputs(
-                "Apellido", "Nombre", "20-12345678-9", "1234", "Asignacion",
-                1L, "UOC", 1L, LocalDate.now(), 1L);
-
-        assertEquals(Collections.singletonList(commonInputResponse), result);
-        verify(commonInputService, times(1)).getFilteredCommonInputs(
-                anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyLong(), anyString(), anyLong(), any(LocalDate.class), anyLong());
     }
 
     @Test

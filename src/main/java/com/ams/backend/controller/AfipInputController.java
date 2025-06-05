@@ -8,11 +8,9 @@ import com.ams.backend.service.interfaces.AfipInputService;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,32 +36,6 @@ public class AfipInputController {
             @PathVariable(value = "id") int auditNumber) {
         List<AfipInputResponse> afipInput = afipInputService.getAfipInputByAuditNumber(auditNumber);
         return ResponseEntity.ok().body(afipInput);
-    }
-
-    @GetMapping("/afipInput/filtered")
-    public List<AfipInputResponse> getFilteredAfipInputs(
-            @RequestParam(required = false) String apellido,
-            @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String cuil,
-            @RequestParam(required = false) String legajo,
-            @RequestParam(required = false) String asignacion,
-            @RequestParam(required = false) Long idCliente,
-            @RequestParam(required = false) String uoc,
-            @RequestParam(required = false) Long idSucursal,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaIngreso,
-            @RequestParam(required = false) Long idCaracteristicas) {
-
-        return afipInputService.getFilteredAfipInputs(
-                apellido,
-                nombre,
-                cuil,
-                legajo,
-                asignacion,
-                idCliente,
-                uoc,
-                idSucursal,
-                fechaIngreso,
-                idCaracteristicas);
     }
 
     @PostMapping("/afipInput")

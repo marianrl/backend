@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,10 +59,6 @@ public class AfipInputServiceTest {
     final private Audited audited = new Audited(1, "NO");
     final private Features features = new Features(1, auditType, answer);
     final private Audit audit = new Audit(1, LocalDate.now(), auditType, audited);
-
-    private static Specification<AfipInput> anyAfipInputSpecification() {
-        return argThat(argument -> true);
-    }
 
     final private AfipInput afipInput = new AfipInput(
             1,
@@ -208,37 +202,6 @@ public class AfipInputServiceTest {
         assertEquals(afipInputResponse, result.get(0));
         assertEquals(afipInputResponse2, result.get(1));
         verify(afipInputRepository).findByAudit_Id(1);
-    }
-
-    @Test
-    public void testGetFilteredAfipInputs_EmptyResult() {
-        when(afipInputRepository.findAll(anyAfipInputSpecification())).thenReturn(new ArrayList<>());
-
-        List<AfipInputResponse> result = afipInputService.getFilteredAfipInputs(
-                "NonExistent", "Name", "00-00000000-0", "0000", "0000",
-                999L, "UOC-999", 999L, LocalDate.now(), 999L);
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-        verify(afipInputRepository).findAll(anyAfipInputSpecification());
-    }
-
-    @Test
-    public void testGetFilteredAfipInputs_WithNullParameters() {
-        List<AfipInput> expectedList = Arrays.asList(afipInput, afipInput2);
-        when(afipInputRepository.findAll(anyAfipInputSpecification())).thenReturn(expectedList);
-        when(afipInputMapper.toResponse(afipInput)).thenReturn(afipInputResponse);
-        when(afipInputMapper.toResponse(afipInput2)).thenReturn(afipInputResponse2);
-
-        List<AfipInputResponse> result = afipInputService.getFilteredAfipInputs(
-                null, null, null, null, null,
-                null, null, null, null, null);
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals(afipInputResponse, result.get(0));
-        assertEquals(afipInputResponse2, result.get(1));
-        verify(afipInputRepository).findAll(anyAfipInputSpecification());
     }
 
     @Test

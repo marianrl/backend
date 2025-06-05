@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
@@ -65,10 +63,6 @@ public class CommonInputServiceTest {
     final private Audited audited = new Audited(1, "NO");
     final private Features features = new Features(1, auditType, answer);
     final private Audit audit = new Audit(1, LocalDate.now(), auditType, audited);
-
-    private static Specification<CommonInput> anyCommonInputSpecification() {
-        return argThat(argument -> true); // Acepta cualquier Specification<AfipInput>
-    }
 
     final private CommonInput commonInput = new CommonInput(
             1,
@@ -140,21 +134,6 @@ public class CommonInputServiceTest {
         List<CommonInput> actualCommonInput = commonInputService.getCommonInputByAuditNumber(commonInput.getId());
 
         assertEquals(commonInputList, actualCommonInput);
-    }
-
-    @Test
-    public void testGetFilteredCommonInputs_Success() {
-
-        List<CommonInput> expectedCommonInputs = Arrays.asList(commonInput, commonInput2);
-
-        when(commonInputRepository.findAll(anyCommonInputSpecification())).thenReturn(expectedCommonInputs);
-
-        List<CommonInput> result = commonInputService.getFilteredCommonInputs(
-                "Perez", "Juan", "20-45125484-7", "4568", "1248", 1L, "UOC-123", 1L, LocalDate.now(), 1L);
-
-        assertEquals(expectedCommonInputs, result);
-
-        verify(commonInputRepository).findAll(anyCommonInputSpecification());
     }
 
     @Test

@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -148,23 +147,5 @@ public class AfipInputControllerTest {
 
         assertEquals(isNoContent, result.getStatusCode());
         verify(afipInputService, times(1)).deleteAfipInput(1);
-    }
-
-    @Test
-    void getFilteredAfipInputs_Success() {
-        // Arrange
-        List<AfipInputResponse> expectedInputs = Arrays.asList(afipInputResponse, afipInputResponse);
-        when(afipInputService.getFilteredAfipInputs(any(), any(), any(), any(), any(), any(), any(), any(), any(),
-                any()))
-                .thenReturn(expectedInputs);
-
-        // Act
-        List<AfipInputResponse> result = afipInputController.getFilteredAfipInputs(
-                "Doe", "John", "123", "456", "ASG", 1L, "UOC", 2L, LocalDate.now(), 3L);
-
-        // Assert
-        assertEquals(expectedInputs, result);
-        verify(afipInputService).getFilteredAfipInputs(
-                "Doe", "John", "123", "456", "ASG", 1L, "UOC", 2L, LocalDate.now(), 3L);
     }
 }

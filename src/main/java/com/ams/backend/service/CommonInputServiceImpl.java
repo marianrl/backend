@@ -6,7 +6,6 @@ import com.ams.backend.entity.AuditType;
 import com.ams.backend.entity.Branch;
 import com.ams.backend.entity.Client;
 import com.ams.backend.entity.CommonInput;
-import com.ams.backend.entity.CommonInputSpecification;
 import com.ams.backend.entity.Features;
 import com.ams.backend.exception.ResourceNotFoundException;
 import com.ams.backend.mapper.CommonInputMapper;
@@ -21,10 +20,8 @@ import com.ams.backend.service.interfaces.CommonInputService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -66,25 +63,6 @@ public class CommonInputServiceImpl implements CommonInputService {
 
     public Optional<CommonInput> getCommonInputById(int id) {
         return commonInputRepository.findById(id);
-    }
-
-    public List<CommonInput> getFilteredCommonInputs(
-            String apellido,
-            String nombre,
-            String cuil,
-            String legajo,
-            String asignacion,
-            Long idCliente,
-            String uoc,
-            Long idSucursal,
-            LocalDate fechaIngreso,
-            Long idCaracteristicas) {
-
-        Specification<CommonInput> specification = CommonInputSpecification.getFilteredCommonInputs(
-                apellido, nombre, cuil, legajo, asignacion, idCliente, uoc, idSucursal, fechaIngreso,
-                idCaracteristicas);
-
-        return commonInputRepository.findAll(specification);
     }
 
     public CommonInput createCommonInput(InputRequest inputRequest) throws ResourceNotFoundException {

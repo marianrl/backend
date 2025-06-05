@@ -1,6 +1,5 @@
 package com.ams.backend.service.interfaces;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,10 +14,6 @@ public interface AfipInputService {
   Optional<AfipInputResponse> getAfipInputById(int id);
 
   List<AfipInputResponse> getAfipInputByAuditNumber(int id);
-
-  List<AfipInputResponse> getFilteredAfipInputs(String apellido, String nombre, String cuil, String legajo,
-      String asignacion, Long idCliente, String uoc,
-      Long idSucursal, LocalDate fechaIngreso, Long idCaracteristicas);
 
   AfipInputResponse createAfipInput(InputRequest inputRequest) throws ResourceNotFoundException;
 
