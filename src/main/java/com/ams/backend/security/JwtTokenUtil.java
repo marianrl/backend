@@ -12,20 +12,23 @@ import java.util.Map;
 import java.security.Key;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
+import javax.crypto.SecretKey;
 
 @Component
 public class JwtTokenUtil {
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
     private static final long EXPIRATION_TIME = 86400000; // 1 día
 
-    @Value("${JWT_SECRET:defaultSecretKey12345678901234567890123456789012345678901234567890}")
+    @Value("${JWT_SECRET}")
     private String secret;
 
     private Key getSigningKey() {
         try {
             logger.debug("Getting signing key from secret");
+            // Generate a key that's suitable for HS512
             byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-            return Keys.hmacShaKeyFor(keyBytes);
+            SecretKey key = Keys.hmacShaKeyFor(keyBytes);
+            return Keys.hmacShaKeyFor(key.getEncoded());
         } catch (Exception e) {
             logger.error("Error getting signing key: {}", e.getMessage(), e);
             throw e;
@@ -45,7 +48,7 @@ public class JwtTokenUtil {
                     .setSubject(username)
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                    .signWith(getSigningKey())
+                    .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                     .compact();
         } catch (Exception e) {
             logger.error("Error generating token: {}", e.getMessage(), e);
