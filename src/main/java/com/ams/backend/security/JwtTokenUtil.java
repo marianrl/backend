@@ -19,7 +19,7 @@ public class JwtTokenUtil {
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
     private static final long EXPIRATION_TIME = 86400000; // 1 día
 
-    @Value("${jwt.secret}")
+    @Value("${JWT_SECRET}")
     private String secret;
 
     private Key getSigningKey() {
