@@ -9,7 +9,7 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: JWT_SECRET
+      - key: jwt.secret
         value: 'RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512'
       - key: PORT
         value: 8080
