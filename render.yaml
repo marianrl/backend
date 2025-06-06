@@ -13,18 +13,6 @@ services:
         value: 'RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512'
       - key: PORT
         value: 8080
-      - key: SPRING_DATASOURCE_URL
-        fromDatabase:
-          name: ams-database
-          property: connectionString
-      - key: SPRING_DATASOURCE_USERNAME
-        fromDatabase:
-          name: ams-database
-          property: user
-      - key: SPRING_DATASOURCE_PASSWORD
-        fromDatabase:
-          name: ams-database
-          property: password
       - key: CLOUDMERSIVE_API_KEY
         sync: false
       - key: PDFBOLT_API_KEY
