@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: ams-backend
+    env: docker
+    buildCommand: './mvnw clean install -DskipTests'
+    startCommand: 'java -jar target/*.jar'
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: ams-database
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: ams-database
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: ams-database
+          property: password
+      - key: CLOUDMERSIVE_API_KEY
+        sync: false
+      - key: PDFBOLT_API_KEY
+        sync: false
