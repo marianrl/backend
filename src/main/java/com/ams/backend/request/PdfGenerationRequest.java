@@ -1,4 +1,4 @@
-package com.ams.backend.dto;
+package com.ams.backend.request;
 
 import lombok.Data;
 import java.util.Date;

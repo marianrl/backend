@@ -1,6 +1,6 @@
 package com.ams.backend.controller;
 
-import com.ams.backend.dto.PdfGenerationRequest;
+import com.ams.backend.request.PdfGenerationRequest;
 import com.ams.backend.response.PDFBoltResponse;
 import com.ams.backend.service.interfaces.PDFBoltService;
 import org.springframework.http.ResponseEntity;

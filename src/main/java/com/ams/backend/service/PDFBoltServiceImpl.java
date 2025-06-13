@@ -1,7 +1,7 @@
 package com.ams.backend.service;
 
 import com.ams.backend.client.PDFBoltClient;
-import com.ams.backend.dto.PdfGenerationRequest;
+import com.ams.backend.request.PdfGenerationRequest;
 import com.ams.backend.response.PDFBoltResponse;
 import com.ams.backend.service.interfaces.PDFBoltService;
 import org.springframework.stereotype.Service;
