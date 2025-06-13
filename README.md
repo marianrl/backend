@@ -12,6 +12,7 @@
 - [Documentación de la API](#documentación-de-la-api)
 - [Contribuciones](#contribuciones)
 - [Licencia](#licencia)
+- [Ejecución de la Aplicación](#ejecución-de-la-aplicación)
 
 ---
 
@@ -54,26 +55,41 @@ Asegúrate de tener instalados:
 4. **Git**: [Descargue Git](https://git-scm.com/)
 5. **Clave API de Cloudmersive**: Necesaria para la transformación de archivos Excel
 
-## Cómo ejecutar el proyecto
+## Ejecución de la Aplicación
 
-El proyecto puede ejecutarse en dos modos diferentes: local y producción. Para cambiar entre modos, se utiliza la variable de entorno `SPRING_PROFILES_ACTIVE`.
+### Modo Desarrollo Local
 
-### Modo Local
+Hay dos formas de ejecutar la aplicación en modo local:
+
+1. Usando un solo comando (recomendado):
 
 ```powershell
-$env:SPRING_PROFILES_ACTIVE="local"; mvn spring-boot:run
+$env:SPRING_PROFILES_ACTIVE="local"; $env:JWT_SECRET="RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512"; mvn spring-boot:run
+```
+
+2. Configurando las variables de entorno por separado:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE="local"
+$env:JWT_SECRET="RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512RenderAMSSecureKeyHS512"
+mvn spring-boot:run
 ```
 
 ### Modo Producción
 
+Para ejecutar la aplicación en modo producción:
+
+1. Construir la aplicación:
+
 ```powershell
-$env:SPRING_PROFILES_ACTIVE="prod"; mvn spring-boot:run
+npm run build
 ```
 
-### Explicación de los perfiles
+2. Servir la aplicación construida:
 
-- **local**: Configuración para desarrollo local, con propiedades específicas para entornos de desarrollo.
-- **prod**: Configuración para producción, optimizada para entornos de producción.
+```powershell
+serve -s build
+```
 
 ---
 

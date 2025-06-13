@@ -123,6 +123,12 @@
 			<artifactId>Cloudmersive.APIClient.Java</artifactId>
 			<version>v3.62</version>
 		</dependency>
+
+		<!-- Thymeleaf -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
 	</dependencies>
 
 	

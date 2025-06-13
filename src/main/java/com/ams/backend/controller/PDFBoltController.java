@@ -1,11 +1,10 @@
 package com.ams.backend.controller;
 
+import com.ams.backend.dto.PdfGenerationRequest;
 import com.ams.backend.response.PDFBoltResponse;
 import com.ams.backend.service.interfaces.PDFBoltService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/pdf")
@@ -18,9 +17,8 @@ public class PDFBoltController {
   }
 
   @PostMapping("/generate")
-  public ResponseEntity<PDFBoltResponse> generatePDF(@RequestBody Map<String, String> request) {
-    String url = request.get("url");
-    PDFBoltResponse response = pdfBoltService.generatePDF(url);
+  public ResponseEntity<PDFBoltResponse> generatePDF(@RequestBody PdfGenerationRequest request) {
+    PDFBoltResponse response = pdfBoltService.generatePDF(request);
     return ResponseEntity.ok(response);
   }
 }
